@@ -1,0 +1,23 @@
+{
+	"title": "Photo Rama",
+	"description": "Photography portfolio by Rama",
+	"author": "Rama",
+	"url": "https://photo.rama.app",
+	"r2PublicUrl": "/dev-images",
+	"socials": [
+		{
+			"platform": "instagram",
+			"url": "https://instagram.com/rama",
+			"label": "Instagram"
+		},
+		{
+			"platform": "github",
+			"url": "https://github.com/rama",
+			"label": "GitHub"
+		}
+	],
+	"about": {
+		"bio": "Photographer capturing moments through light and shadow.",
+		"avatar": ""
+	}
+}
