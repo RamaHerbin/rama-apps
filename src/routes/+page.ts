@@ -28,6 +28,17 @@ export function load() {
 		];
 	}
 
+	if (trailImages.length === 0) {
+		trailImages = [
+			'/DSCF0385-ed.jpg',
+			'/DSCF0404.jpg',
+			'/DSCF0501test.webp',
+			'/DSCF0548test.webp',
+			'/DSCF0703test2_1.webp',
+			'/IMG_0318.jpg'
+		];
+	}
+
 	return {
 		recentPhotos,
 		featuredPhotos,
