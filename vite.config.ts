@@ -9,5 +9,10 @@ export default defineConfig({
 		alias: {
 			'fancy-ui': path.resolve(__dirname, '../inspira-svelte/src/lib')
 		}
+	},
+	server: {
+		fs: {
+			allow: ['..']
+		}
 	}
 });

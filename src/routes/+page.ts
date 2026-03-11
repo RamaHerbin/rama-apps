@@ -11,11 +11,22 @@ export function load() {
 		photoCount: getPhotosByCollection(c.id).length
 	}));
 
-	// Use recent photo thumbnails for the cursor trail
-	const trailImages = recentPhotos
+	// Use recent photo thumbnails for the cursor trail, fallback to static images
+	let trailImages = recentPhotos
 		.slice(0, 10)
 		.map((p) => p.variants?.thumb?.jpg?.url)
 		.filter(Boolean);
+
+	if (trailImages.length === 0) {
+		trailImages = [
+			'/DSCF0385-ed.jpg',
+			'/DSCF0404.jpg',
+			'/DSCF0501test.webp',
+			'/DSCF0548test.webp',
+			'/DSCF0703test2_1.webp',
+			'/IMG_0318.jpg'
+		];
+	}
 
 	return {
 		recentPhotos,
