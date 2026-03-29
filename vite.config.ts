@@ -14,10 +14,5 @@ export default defineConfig({
 		fs: {
 			allow: ['.', path.resolve(__dirname, '../fancy-ui')]
 		}
-	},
-	server: {
-		fs: {
-			allow: ['..']
-		}
 	}
 });
