@@ -7,7 +7,7 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	resolve: {
 		alias: {
-			'fancy-ui': path.resolve(__dirname, '../inspira-svelte/src/lib')
+			'fancy-ui': path.resolve(__dirname, '../fancy-ui/src/lib')
 		}
 	},
 	server: {
