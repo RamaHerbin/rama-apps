@@ -60,7 +60,9 @@
 		<BlurReveal>
 			<h1 class="text-3xl font-bold">{data.photo.title}</h1>
 			{#if data.photo.description}
-				<p class="mt-2 text-muted-foreground">{data.photo.description}</p>
+				<div class="mt-3">
+					<Focus sentence={data.photo.description} manualMode blurAmount={3} animationDuration={0.4} class="text-muted-foreground" />
+				</div>
 			{/if}
 		</BlurReveal>
 

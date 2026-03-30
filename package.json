@@ -13,7 +13,7 @@
 		"ingest": "tsx scripts/ingest.ts"
 	},
 	"dependencies": {
-		"fancy-ui": "link:../inspira-svelte",
+		"fancy-ui": "link:../fancy-ui",
 		"gsap": "^3.14.2"
 	},
 	"devDependencies": {
