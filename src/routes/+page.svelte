@@ -9,7 +9,9 @@
 	let { data } = $props();
 
 	let trailImageUrls = $derived(
-		data.trailImages.map((p: string) => p.startsWith('/') ? p : getImageUrl(p))
+		(data.trailImages ?? [])
+			.filter((p): p is string => typeof p === 'string')
+			.map((p) => (p.startsWith('/') ? p : getImageUrl(p)))
 	);
 
 	function openLightbox(photo: Photo) {
@@ -24,10 +26,22 @@
 />
 
 <!-- Hero: ImageTrailCursor plein écran -->
-<section class="relative h-[100svh] w-full cursor-none overflow-hidden bg-neutral-950">
+<section class="relative h-[100svh] w-full overflow-hidden bg-neutral-950" class:cursor-none={trailImageUrls.length > 0}>
 	{#if trailImageUrls.length > 0}
 		<ImageTrailCursor images={trailImageUrls} variant="type1" class="h-full w-full" />
 	{/if}
+
+	<!-- Static hero content (visible without JS) -->
+	<div class="pointer-events-none absolute inset-0 z-[100] flex flex-col items-center justify-center gap-6 text-center">
+		<h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">{data.site.title}</h1>
+		<p class="max-w-md text-base text-white/60 sm:text-lg">{data.site.description}</p>
+		<a
+			href="/gallery"
+			class="pointer-events-auto rounded-full border border-white/30 px-6 py-2.5 text-sm font-medium text-white/80 transition-colors hover:border-white hover:text-white"
+		>
+			View gallery
+		</a>
+	</div>
 
 	<!-- Scroll indicator -->
 	<div class="pointer-events-none absolute bottom-8 left-1/2 z-[200] -translate-x-1/2 animate-bounce">
@@ -46,9 +60,10 @@
 
 		<div class="grid grid-cols-3 gap-1 sm:gap-2">
 			{#each data.recentPhotos as photo (photo.id)}
-				<button
+				<a
+					href="/gallery/{photo.slug}"
 					class="group relative aspect-square overflow-hidden bg-neutral-100"
-					onclick={() => openLightbox(photo)}
+					onclick={(e) => { e.preventDefault(); openLightbox(photo); }}
 				>
 					<img
 						src={getImageUrl(photo.variants.thumb.jpg.url)}
@@ -63,7 +78,7 @@
 							{photo.title}
 						</span>
 					</div>
-				</button>
+				</a>
 			{/each}
 		</div>
 

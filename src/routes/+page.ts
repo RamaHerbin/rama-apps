@@ -12,10 +12,10 @@ export function load() {
 	}));
 
 	// Use recent photo thumbnails for the cursor trail, fallback to static images
-	let trailImages = recentPhotos
+	let trailImages: string[] = recentPhotos
 		.slice(0, 10)
 		.map((p) => p.variants?.thumb?.jpg?.url)
-		.filter(Boolean);
+		.filter((url): url is string => typeof url === 'string');
 
 	if (trailImages.length === 0) {
 		trailImages = [
