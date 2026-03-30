@@ -40,7 +40,6 @@ src/
 │   │   └── r2.ts                    # R2 URL builder
 │   └── utils.ts             # cn() class merger
 ├── routes/
-<<<<<<< HEAD
 │   ├── +layout.svelte               # Root layout (header/footer)
 │   ├── +layout.ts                   # Root load (site config)
 │   ├── +page.svelte                 # Home: hero + recent + collections
@@ -58,25 +57,6 @@ src/
 │       ├── batch/+page.svelte       # Batch processing
 │       ├── publish/+page.svelte     # Publish to gallery + Instagram
 │       └── library/+page.svelte     # Photo management
-=======
-│   ├── (gallery)/           # Public portfolio (prerendered)
-│   │   ├── +page.svelte             # Home: hero + recent + collections
-│   │   ├── gallery/
-│   │   │   ├── +page.svelte         # All photos, tag filtering
-│   │   │   └── [slug]/+page.svelte  # Photo detail + EXIF + nav
-│   │   ├── collections/
-│   │   │   ├── +page.svelte         # All collections
-│   │   │   └── [slug]/+page.svelte  # Collection photos
-│   │   └── about/+page.svelte       # Bio, avatar, social links
-│   ├── (studio)/            # Private, auth required (TO BUILD)
-│   │   └── studio/
-│   │       ├── +page.svelte         # Dashboard
-│   │       ├── edit/+page.svelte    # Single image editor
-│   │       ├── batch/+page.svelte   # Batch processing
-│   │       ├── publish/+page.svelte # Publish to gallery + Instagram
-│   │       └── library/+page.svelte # Photo management
-│   └── +layout.svelte       # Root layout (header/footer)
->>>>>>> 3073dd2 (fix: rename inspira-svelte → fancy-ui references, add photos data and CLAUDE.md)
 ├── scripts/                 # CLI tools (existing)
 │   ├── ingest.ts            # Main ingestion CLI
 │   ├── exif.ts              # EXIF extraction (sharp + exif-reader)
@@ -160,11 +140,7 @@ SiteConfig { title, description, author, url, r2PublicUrl, socials[], about: { b
 - Requires Instagram Graph API + Facebook Business account
 
 ## Dependency: fancy-ui
-<<<<<<< HEAD
 - Local link: `"fancy-ui": "link:../fancy-ui"`
-=======
-- Local link: `"fancy-ui": "link:../inspira-svelte"`
->>>>>>> 3073dd2 (fix: rename inspira-svelte → fancy-ui references, add photos data and CLAUDE.md)
 - Import: `import { BlurReveal, Compare, Focus } from 'fancy-ui'`
 - Currently used: ImageTrailCursor, CardSpotlight, LineShadowText, LiquidGlass, TextGenerateEffect
 - Useful for Studio: Compare (before/after), Focus, BlurReveal
