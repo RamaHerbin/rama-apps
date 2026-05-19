@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BlurReveal, GlareCard, Focus } from 'fancy-ui';
+	import { BlurReveal, GlareCard, Focus } from 'fancy-ui-svelte';
 	import ImageOptimized from '$lib/components/ImageOptimized.svelte';
 	import ExifDisplay from '$lib/components/ExifDisplay.svelte';
 	import SEOHead from '$lib/components/SEOHead.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TextGenerateEffect, BlurReveal, LineShadowText, LiquidGlass } from 'fancy-ui';
+	import { TextGenerateEffect, BlurReveal, LineShadowText, LiquidGlass } from 'fancy-ui-svelte';
 	import SEOHead from '$lib/components/SEOHead.svelte';
 
 	let { data } = $props();

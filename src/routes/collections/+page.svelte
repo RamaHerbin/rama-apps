@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BlurReveal } from 'fancy-ui';
+	import { BlurReveal } from 'fancy-ui-svelte';
 	import CollectionCard from '$lib/components/CollectionCard.svelte';
 	import SEOHead from '$lib/components/SEOHead.svelte';
 
