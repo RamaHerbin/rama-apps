@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BlurReveal } from 'fancy-ui';
+	import { BlurReveal } from 'fancy-ui-svelte';
 	import PhotoGrid from '$lib/components/PhotoGrid.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import SEOHead from '$lib/components/SEOHead.svelte';

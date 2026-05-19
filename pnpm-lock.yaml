@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      fancy-ui:
-        specifier: link:../inspira-svelte
-        version: link:../inspira-svelte
+      fancy-ui-svelte:
+        specifier: ^0.4.0
+        version: 0.4.0(svelte@5.53.10)(tailwindcss@4.2.1)
       gsap:
         specifier: ^3.14.2
         version: 3.14.2
@@ -1385,6 +1385,9 @@ packages:
   bowser@2.14.1:
     resolution: {integrity: sha512-tzPjzCxygAKWFOJP011oxFHs57HzIhOEracIgAePE4pqB3LikALKnSzUyU4MGs9/iCEUuHlAJTjTc5M+u7YEGg==}
 
+  canvas-confetti@1.9.4:
+    resolution: {integrity: sha512-yxQbJkAVrFXWNbTUjPqjF7G+g6pDotOUHGbkZq2NELZUMDpiJ85rIEazVb8GTaAptNW2miJAXbs1BtioA251Pw==}
+
   chokidar@4.0.3:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
     engines: {node: '>= 14.16.0'}
@@ -1451,6 +1454,13 @@ packages:
 
   exif-reader@2.0.3:
     resolution: {integrity: sha512-zFbQvguwT9JkqyYhR7pjE1Yn8SagwaGLNRU0Oh14xFa1paSf5Gzxn4gxgk0XhnudI0UIqU+HgnBX93+nva592A==}
+
+  fancy-ui-svelte@0.4.0:
+    resolution: {integrity: sha512-Y85dKxcLXOsYgNk3zR4ya2Il92YHk/TUNNbr4g5XTbJT4F0WjyqZvlgUXKMIu5ZzeyiUNSyKlu18zxsJSdJw+Q==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+      tailwindcss: ^4.0.0
 
   fast-xml-builder@1.1.0:
     resolution: {integrity: sha512-7mtITW/we2/wTUZqMyBOR2F8xP4CRxMiSEcQxPIqdRWdO2L/HZSOlzoNyghmyDwNB8BDxePooV1ZTJpkOUhdRg==}
@@ -1701,6 +1711,9 @@ packages:
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
+
+  three@0.183.2:
+    resolution: {integrity: sha512-di3BsL2FEQ1PA7Hcvn4fyJOlxRRgFYBpMTcyOgkwJIaDOdJMebEFPA+t98EvjuljDx4hNulAGwF6KIjtwI5jgQ==}
 
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
@@ -3218,6 +3231,8 @@ snapshots:
 
   bowser@2.14.1: {}
 
+  canvas-confetti@1.9.4: {}
+
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
@@ -3321,6 +3336,16 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   exif-reader@2.0.3: {}
+
+  fancy-ui-svelte@0.4.0(svelte@5.53.10)(tailwindcss@4.2.1):
+    dependencies:
+      canvas-confetti: 1.9.4
+      clsx: 2.1.1
+      gsap: 3.14.2
+      svelte: 5.53.10
+      tailwind-merge: 3.5.0
+      tailwindcss: 4.2.1
+      three: 0.183.2
 
   fast-xml-builder@1.1.0:
     dependencies:
@@ -3607,6 +3632,8 @@ snapshots:
   tailwindcss@4.2.1: {}
 
   tapable@2.3.0: {}
+
+  three@0.183.2: {}
 
   tinyglobby@0.2.15:
     dependencies:

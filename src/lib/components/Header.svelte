@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LineShadowText } from 'fancy-ui';
+	import { LineShadowText } from 'fancy-ui-svelte';
 	import { page } from '$app/state';
 
 	interface Props {

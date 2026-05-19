@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Collection, Photo } from '$lib/types/index.js';
-	import { CardSpotlight } from 'fancy-ui';
-	import { BlurReveal } from 'fancy-ui';
+	import { CardSpotlight } from 'fancy-ui-svelte';
+	import { BlurReveal } from 'fancy-ui-svelte';
 	import ImageOptimized from './ImageOptimized.svelte';
 	import { cn } from '$lib/utils.js';
 
