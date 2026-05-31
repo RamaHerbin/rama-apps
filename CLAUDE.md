@@ -1,156 +1,141 @@
-# Project: photo.rama.app
+# Project: rama-apps (monorepo)
 
-## Purpose
-Personal photography platform — one SvelteKit app with two faces:
-- **Gallery** (`/`, `/gallery`, `/collections`, `/about`) — Public portfolio, prerendered, SEO-optimized
-- **Studio** (`/studio`) — Private tools for image editing (resize, borders, batch processing) and publishing to both the site and Instagram
+## Structure
+pnpm monorepo with two SvelteKit apps:
+- **`apps/photo`** — photo.rama.app: Photography portfolio + studio tools
+- **`apps/main`** — rama.app: Personal portfolio/landing page
 
-## Stack
+## Stack (shared)
 - SvelteKit (Svelte 5) on Cloudflare Workers (`adapter-cloudflare`)
 - Tailwind CSS v4 (via `@tailwindcss/vite`)
-- `fancy-ui` as local dependency (`link:../fancy-ui`)
+- `fancy-ui-svelte` npm package for UI components
+- TypeScript
+
+## Commands
+```bash
+# Root
+pnpm install              # Install all workspace deps
+pnpm dev:photo            # Dev server for photo app
+pnpm dev:main             # Dev server for main app
+pnpm build:photo          # Build photo app
+pnpm build:main           # Build main app
+pnpm check:photo          # Typecheck photo app
+pnpm check:main           # Typecheck main app
+
+# From app dirs
+cd apps/photo && pnpm dev
+cd apps/main && pnpm dev
+pnpm --filter photo ingest <file> [options]
+```
+
+## Monorepo layout
+```
+apps/
+├── photo/                 # photo.rama.app
+│   ├── src/
+│   │   ├── lib/components/    # PhotoCard, PhotoGrid, Lightbox, etc.
+│   │   ├── lib/types/         # Photo, Collection, SiteConfig
+│   │   ├── lib/data/          # JSON data layer
+│   │   ├── lib/stores/        # Lightbox state
+│   │   ├── lib/config/r2.ts   # R2 URL builder
+│   │   ├── lib/utils.ts       # cn() merger
+│   │   └── routes/            # Gallery + Studio routes
+│   ├── scripts/               # CLI ingestion tools
+│   ├── data/                  # photos.json, collections.json, site.json
+│   └── static/                # Static assets
+├── main/                  # rama.app
+│   ├── src/
+│   │   ├── lib/portfolio/     # Portfolio components (from FancyUI)
+│   │   │   ├── sections/      # Hero, About, Projects, etc.
+│   │   │   ├── NavAnchor, ReviewCard, ContactForm, etc.
+│   │   │   ├── types.ts, validation.ts, index.ts
+│   │   ├── lib/stores/theme.svelte.ts  # Dark/light mode
+│   │   ├── lib/utils.ts       # cn() merger
+│   │   └── routes/            # Single-page portfolio
+│   └── static/portfolio/      # Portfolio images & SVGs
+pnpm-workspace.yaml
+package.json               # Root with workspace scripts
+```
+
+---
+
+## apps/photo — photo.rama.app
+
+### Purpose
+Photography platform with two faces:
+- **Gallery** (`/`, `/gallery`, `/collections`, `/about`) — Public, prerendered, SEO-optimized
+- **Studio** (`/studio`) — Private image editing tools (TO BUILD)
+
+### Photo-specific stack
 - Sharp for server-side image processing
 - Cloudflare R2 for image storage
 - GSAP for animations
 
-## Repository structure
-
-```
-src/
-├── lib/
-│   ├── components/          # App components
-│   │   ├── PhotoCard.svelte         # Card with spotlight effect
-│   │   ├── PhotoGrid.svelte         # CSS columns masonry layout
-│   │   ├── Lightbox.svelte          # Modal viewer (keyboard + touch)
-│   │   ├── ImageOptimized.svelte    # <picture> with AVIF/WebP/JPG
-│   │   ├── ExifDisplay.svelte       # EXIF metadata grid
-│   │   ├── CollectionCard.svelte    # Collection preview card
-│   │   ├── Header.svelte            # Sticky nav
-│   │   ├── Footer.svelte            # Footer with socials
-│   │   └── SEOHead.svelte           # Meta tags, OG, JSON-LD
-│   ├── types/               # TypeScript definitions
-│   │   ├── photo.ts                 # Photo, PhotoVariants, ExifData
-│   │   ├── collection.ts            # Collection
-│   │   └── site.ts                  # SiteConfig
-│   ├── data/                # In-memory JSON data layer
-│   │   └── index.ts                 # getPhotos(), getCollections(), etc.
-│   ├── stores/              # Svelte 5 reactive stores
-│   │   └── lightbox.svelte.ts       # Lightbox state ($state/$derived)
-│   ├── config/
-│   │   └── r2.ts                    # R2 URL builder
-│   └── utils.ts             # cn() class merger
-├── routes/
-│   ├── +layout.svelte               # Root layout (header/footer)
-│   ├── +layout.ts                   # Root load (site config)
-│   ├── +page.svelte                 # Home: hero + recent + collections
-│   ├── +page.ts                     # Home load (photos, trailImages)
-│   ├── gallery/
-│   │   ├── +page.svelte             # All photos, tag filtering
-│   │   └── [slug]/+page.svelte      # Photo detail + EXIF + nav
-│   ├── collections/
-│   │   ├── +page.svelte             # All collections
-│   │   └── [slug]/+page.svelte      # Collection photos
-│   ├── about/+page.svelte           # Bio, avatar, social links
-│   └── studio/                      # Private, auth required (TO BUILD)
-│       ├── +page.svelte             # Dashboard
-│       ├── edit/+page.svelte        # Single image editor
-│       ├── batch/+page.svelte       # Batch processing
-│       ├── publish/+page.svelte     # Publish to gallery + Instagram
-│       └── library/+page.svelte     # Photo management
-├── scripts/                 # CLI tools (existing)
-│   ├── ingest.ts            # Main ingestion CLI
-│   ├── exif.ts              # EXIF extraction (sharp + exif-reader)
-│   ├── variants.ts          # Image resize (4 sizes × 3 formats)
-│   ├── upload.ts            # R2 upload (AWS SDK S3Client)
-│   └── json-store.ts        # Read/write photos.json, collections.json
-└── data/                    # JSON data files
-    ├── photos.json          # Photo metadata + variant URLs
-    ├── collections.json     # Collections
-    └── site.json            # Site config (title, socials, about)
-```
-
-## What exists today
-
-### Gallery (done)
-- Home page with ImageTrailCursor hero, recent photos grid, featured collections
-- Gallery page with masonry grid, tag filtering
-- Photo detail with full EXIF display, prev/next navigation, JSON-LD
-- Collections index and detail pages
-- About page with TextGenerateEffect, LineShadowText, LiquidGlass avatar
-- Lightbox with keyboard/touch controls, EXIF overlay
-- ImageOptimized component (`<picture>` AVIF > WebP > JPG, lazy loading)
-- SEO: prerendered, OG tags, structured data
-
-### Ingestion pipeline (done)
-```bash
-pnpm ingest photo.jpg -t "Title" -d "Description" -c "collection" --tags "tag1,tag2" -f
-```
-- Extracts EXIF (camera, lens, aperture, shutter, ISO, GPS, date)
-- Generates 12 variants (4 sizes: thumb/medium/large/original × 3 formats: AVIF/WebP/JPG)
-- Uploads to R2 with immutable cache headers
-- Stores metadata in data/photos.json
+### What exists
+- Full gallery with masonry grid, tag filtering, photo detail + EXIF, collections
+- Lightbox with keyboard/touch controls
+- ImageOptimized component (`<picture>` AVIF > WebP > JPG)
+- SEO: prerendered, OG tags, JSON-LD
+- Ingestion pipeline: `pnpm --filter photo ingest photo.jpg -t "Title" --tags "tag1,tag2" -f`
 
 ### Data model
 ```typescript
-Photo {
-  id, slug, title, description?, tags[], collectionIds[], featured, aspectRatio,
-  variants: { thumb/medium/large/original: { avif/webp/jpg: { url, width, height } } },
-  exif: { camera?, lens?, focalLength?, aperture?, shutterSpeed?, iso?, dateTaken?, location? },
-  createdAt, updatedAt
-}
+Photo { id, slug, title, description?, tags[], collectionIds[], featured, aspectRatio, variants, exif, createdAt, updatedAt }
 Collection { id, slug, title, description?, coverPhotoId?, featured, createdAt, updatedAt }
 SiteConfig { title, description, author, url, r2PublicUrl, socials[], about: { bio, avatar } }
 ```
 
-## What needs to be built: Studio
+### Studio roadmap
+- Phase 1: Upload, resize, borders, Instagram preview, publish to gallery
+- Phase 2: Batch processing, crop, collection management
+- Phase 3: Adjustments, filters, watermarks, history/undo
 
-### Architecture
-- Route group `(studio)` with auth guard (simple password or OAuth — just me for now)
-- Server-side image processing via Sharp (reuse existing variants.ts logic)
-- Canvas API client-side for real-time preview only
-- Replaces CLI workflow with a web UI
+### Image variants spec
+| Size     | Max width | AVIF quality | WebP quality | JPEG quality |
+|----------|-----------|--------------|--------------|--------------|
+| thumb    | 400px     | 65%          | 80%          | 85%          |
+| medium   | 1200px    | 65%          | 80%          | 85%          |
+| large    | 2400px    | 65%          | 80%          | 85%          |
+| original | max       | 65%          | 80%          | 85%          |
 
-### Phase 1 — MVP editor
-- Upload single/multiple images via drag & drop
-- Resize with aspect ratio presets: 1:1, 4:5, 16:9, 9:16, 4:3, free
-- Add borders (solid color: white, black, custom hex)
-- Preview Instagram grid appearance
-- Export/download processed images
-- Publish to gallery (replace `pnpm ingest` with UI flow)
+R2 path: `{photoId}/{size}.{format}`
 
-### Phase 2 — Batch & collections
-- Batch processing (apply same edits to multiple images)
-- Border presets (textures, gradients)
-- Crop tool with grid overlay
-- Preview across formats (Instagram post, story, carousel)
-- Collection/album management UI
-- Photo metadata editing (title, description, tags)
+### Photo env vars
+```env
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=photo-rama
+```
 
-### Phase 3 — Lightroom light
-- Basic adjustments: exposure, contrast, saturation, temperature, highlights, shadows
-- Filters/presets (saveable)
-- Watermark overlay (text or image, position, opacity)
-- Multi-format export (WebP, JPEG quality slider, PNG)
-- History/undo stack
-- Side-by-side before/after (use fancy-ui Compare component)
+---
 
-### Instagram sync (bidirectional)
-- **Outbound**: Select photos → apply edits → publish to Instagram (Graph API) + portfolio simultaneously
-- **Inbound**: Import existing Instagram posts into the portfolio
-- Requires Instagram Graph API + Facebook Business account
+## apps/main — rama.app
 
-## Dependency: fancy-ui
-- Local link: `"fancy-ui": "link:../fancy-ui"`
-- Import: `import { BlurReveal, Compare, Focus } from 'fancy-ui'`
-- Currently used: ImageTrailCursor, CardSpotlight, LineShadowText, LiquidGlass, TextGenerateEffect
-- Useful for Studio: Compare (before/after), Focus, BlurReveal
-- If a component doesn't exist yet in fancy-ui, build it there first — not here
+### Purpose
+Personal portfolio / landing page. Migrated from FancyUI repo.
+
+### Components
+All FancyUI components imported from `fancy-ui-svelte` npm package.
+Portfolio-specific components live in `$lib/portfolio/`.
+
+### Theme
+Uses shadcn-style CSS variables (oklch color space) with dark mode toggle.
+Theme store at `$lib/stores/theme.svelte.ts`.
+
+---
+
+## Dependency: fancy-ui-svelte
+- npm package: `"fancy-ui-svelte": "^0.4.0"`
+- Import: `import { BlurReveal, Compare, FluidCursor } from 'fancy-ui-svelte'`
+- Both apps use it. Tailwind `@source` directive needed to scan its classes.
+- If a component doesn't exist yet, build it in fancy-ui repo first
 
 ## Hard rules
-- Never store full-resolution images in the git repo
-- Always extract and preserve EXIF data before any processing
-- Image processing server-side (Sharp) for production quality; Canvas client-side for preview only
-- Auth required for all `/studio` routes and all write API endpoints
+- Never store full-resolution images in git
+- Always extract and preserve EXIF data before processing
+- Image processing server-side (Sharp); Canvas client-side for preview only
+- Auth required for `/studio` routes and write API endpoints
 - Gallery pages must work without JavaScript (SSR + progressive enhancement)
 - Prerender all public gallery routes
 
@@ -162,37 +147,3 @@ SiteConfig { title, description, author, url, r2PublicUrl, socials[], about: { b
 - `bind:this` for DOM refs
 - `onMount` with cleanup return
 - `onclick={handler}` syntax (not `on:click`)
-
-## Image variants spec
-| Size     | Max width | AVIF quality | WebP quality | JPEG quality |
-|----------|-----------|--------------|--------------|--------------|
-| thumb    | 400px     | 65%          | 80%          | 85%          |
-| medium   | 1200px    | 65%          | 80%          | 85%          |
-| large    | 2400px    | 65%          | 80%          | 85%          |
-| original | max       | 65%          | 80%          | 85%          |
-
-R2 path pattern: `{photoId}/{size}.{format}`
-
-## Environment variables
-```env
-# R2 Storage
-R2_ACCOUNT_ID=
-R2_ACCESS_KEY_ID=
-R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=photo-rama
-
-# Instagram (future)
-INSTAGRAM_APP_ID=
-INSTAGRAM_APP_SECRET=
-INSTAGRAM_REDIRECT_URI=
-
-# Auth (future)
-AUTH_SECRET=
-ADMIN_PASSWORD=
-```
-
-## Commands
-- `pnpm dev` — dev server
-- `pnpm build` — production build
-- `pnpm check` — typecheck
-- `pnpm ingest <file> [options]` — CLI photo ingestion
