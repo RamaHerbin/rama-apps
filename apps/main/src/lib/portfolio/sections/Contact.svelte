@@ -6,7 +6,7 @@
 					Let's Connect
 				</h2>
 				<p class="text-muted-foreground max-w-2xl text-lg">
-					Ready to collaborate on your next project or just want to say hi?
+					Ready to collaborate on your next project or just want to say hello?
 				</p>
 			</div>
 

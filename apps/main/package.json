@@ -11,7 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
 	},
 	"dependencies": {
-		"fancy-ui-svelte": "^0.4.0"
+		"fancy-ui-svelte": "^0.7.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-cloudflare": "^5.0.0",

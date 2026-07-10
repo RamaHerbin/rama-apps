@@ -31,7 +31,7 @@
 				Carbon&nbsp;footprint <span class="text-foreground">neutral</span>
 			</span>
 			<a
-				href="/portfolio/carbon"
+				href="/carbon"
 				class="text-muted-foreground/60 decoration-border/20 hover:text-muted-foreground hover:decoration-border/40 ml-1 underline underline-offset-2 transition"
 			>
 				Learn&nbsp;more
@@ -48,7 +48,7 @@
 			Carbon&nbsp;footprint <span class="text-foreground">neutral</span>
 		</span>
 		<a
-			href="/portfolio/carbon"
+			href="/carbon"
 			class="text-muted-foreground/60 decoration-border/20 ml-1 underline underline-offset-2"
 		>
 			Learn&nbsp;more

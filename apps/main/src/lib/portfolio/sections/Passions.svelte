@@ -55,7 +55,7 @@
 					<div class="border-border/20 aspect-square overflow-hidden rounded-lg border">
 						<img
 							src="/portfolio/20160624.jpg"
-							alt="Sunset in Denmark"
+							alt="Sunset picture in Danmark"
 							class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
 							loading="lazy"
 						/>

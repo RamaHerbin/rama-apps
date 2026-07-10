@@ -12,3 +12,12 @@
 		<CarbonNeutralBadge />
 	</div>
 </footer>
+
+<a
+	href="https://fancy-ui.rama.app/"
+	target="_blank"
+	rel="noopener noreferrer"
+	class="border-border/40 bg-background/80 text-muted-foreground/70 hover:text-foreground hover:border-border fixed bottom-4 left-4 z-50 rounded-lg border px-3 py-1.5 text-xs backdrop-blur-sm transition-colors"
+>
+	Made with <span class="text-accent-foreground font-medium">FancyUI</span>
+</a>

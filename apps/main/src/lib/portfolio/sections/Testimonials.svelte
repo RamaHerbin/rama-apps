@@ -97,6 +97,7 @@
 						username={review.name}
 						body={review.testimonial}
 						linkedinUrl={review.linkedinUrl}
+						date={review.date}
 					/>
 				{/each}
 			</Marquee>

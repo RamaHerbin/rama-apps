@@ -7,10 +7,11 @@
 		username: string;
 		body: string;
 		linkedinUrl: string;
+		date: string;
 		class?: string;
 	}
 
-	let { img, name, username, body, linkedinUrl, class: className }: Props = $props();
+	let { img, name, username, body, linkedinUrl, date, class: className }: Props = $props();
 </script>
 
 <a
@@ -18,7 +19,7 @@
 	target="_blank"
 	rel="noopener noreferrer"
 	class={cn(
-		"relative block w-88 cursor-pointer overflow-hidden rounded-xl border p-4 transition-all duration-300",
+		"relative block w-75 cursor-pointer overflow-hidden rounded-xl border p-4 transition-all duration-300",
 		"border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
 		"dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
 		className
@@ -37,6 +38,7 @@
 				<div class="text-sm font-medium dark:text-white">{name}</div>
 				<p class="text-xs font-medium dark:text-white/60">{username}</p>
 			</div>
+			<span class="text-muted-foreground ml-auto text-xs">{date}</span>
 		</div>
 		<blockquote class="mt-2 text-sm">{body}</blockquote>
 		<figcaption class="sr-only">Review by {name}</figcaption>
