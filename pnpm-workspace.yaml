@@ -4,3 +4,5 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+minimumReleaseAgeExclude:
+  - fancy-ui-svelte@0.7.0
