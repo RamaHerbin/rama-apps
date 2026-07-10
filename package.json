@@ -11,12 +11,5 @@
 		"check:photo": "pnpm --filter photo check",
 		"check:main": "pnpm --filter main check",
 		"prepare": "pnpm -r prepare"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild",
-			"sharp",
-			"workerd"
-		]
 	}
 }

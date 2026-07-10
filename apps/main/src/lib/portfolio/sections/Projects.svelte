@@ -64,7 +64,7 @@
 
 			<!-- Fleur de Papier -->
 			<a
-				href="/portfolio/projects/fleur-de-papier"
+				href="/projects/fleur-de-papier"
 				class="group border-border/20 bg-card hover:border-border/40 hover:bg-card/80 relative cursor-pointer overflow-hidden rounded-xl border p-6 transition-all duration-300"
 			>
 				<div class="space-y-4">
@@ -123,7 +123,7 @@
 
 			<!-- Personal Projects -->
 			<a
-				href="/portfolio/projects/personal"
+				href="/projects/personal"
 				class="group border-border/20 bg-card hover:border-border/40 hover:bg-card/80 relative cursor-pointer overflow-hidden rounded-xl border p-6 transition-all duration-300"
 			>
 				<div class="space-y-4">

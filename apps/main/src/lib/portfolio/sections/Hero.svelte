@@ -30,14 +30,12 @@
 	bind:this={heroSectionRef}
 	class="relative flex min-h-[90vh] items-center justify-center overflow-hidden"
 >
-	<!-- Fluid Cursor -->
-	<FluidCursor simResolution={128} />
+	<!-- Fluid Cursor - contained to this section only, never full-screen/global -->
+	<FluidCursor contained simResolution={128} class="absolute inset-0 -z-10" />
 
 	<!-- Interactive Grid Pattern Background -->
 	{#if showInteractiveElements}
 		<InteractiveGridPattern
-			width={80}
-			height={80}
 			class="inset-0 h-full [mask-image:radial-gradient(500px_circle_at_center,white,transparent)] opacity-30"
 		/>
 	{/if}
@@ -48,8 +46,8 @@
 			Rama Herbin
 		</h1>
 
-		<BlurReveal delay={0.2} duration={0.75} class="space-y-8">
-			<h2 class="text-xl font-medium text-neutral-400 sm:text-2xl lg:text-3xl">
+		<BlurReveal delay={0.2} duration={0.75} class="space-y-6">
+			<h2 class="text-muted-foreground text-xl font-medium sm:text-2xl lg:text-3xl">
 				Front-End & UI Engineer
 			</h2>
 
@@ -81,5 +79,28 @@
 				</RainbowButton>
 			</div>
 		</BlurReveal>
+	</div>
+
+	<!-- Version Badge - Top Left -->
+	<div class="absolute top-6 left-6 z-20">
+		<span
+			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
+		>
+			v1.0.0-alpha
+		</span>
+	</div>
+
+	<!-- AI-Powered Badge - Top Right -->
+	<div class="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
+		<span
+			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
+		>
+			AI-powered
+		</span>
+		<span
+			class="text-muted-foreground/40 bg-background/60 border-border/10 rounded-sm border px-2 py-1 font-mono text-[10px] backdrop-blur-sm"
+		>
+			temporary ai generated content
+		</span>
 	</div>
 </div>

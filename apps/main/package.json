@@ -11,7 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
 	},
 	"dependencies": {
-		"fancy-ui-svelte": "^0.4.0"
+		"fancy-ui-svelte": "file:/private/tmp/claude-501/-Users-ramaherbin-Documents-dev-perso-photo-rama/efa9e681-4c2c-474e-a97f-50332e8f9f15/scratchpad/fancy-ui-svelte-0.6.0.tgz"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-cloudflare": "^5.0.0",

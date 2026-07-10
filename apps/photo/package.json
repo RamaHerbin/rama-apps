@@ -13,7 +13,7 @@
 		"ingest": "tsx scripts/ingest.ts"
 	},
 	"dependencies": {
-		"fancy-ui-svelte": "^0.4.0",
+		"fancy-ui-svelte": "file:/private/tmp/claude-501/-Users-ramaherbin-Documents-dev-perso-photo-rama/efa9e681-4c2c-474e-a97f-50332e8f9f15/scratchpad/fancy-ui-svelte-0.6.0.tgz",
 		"gsap": "^3.14.2"
 	},
 	"devDependencies": {
