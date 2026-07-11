@@ -29,3 +29,6 @@ vite.config.ts.timestamp-*
 design-refs/
 *.mov
 /*.mp4
+
+# Portfolio PDF source at repo root (served copy lives in apps/main/static)
+/*.pdf
