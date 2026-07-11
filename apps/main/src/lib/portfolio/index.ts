@@ -9,6 +9,7 @@ export { default as NavAnchor } from "./NavAnchor.svelte";
 export { default as ReviewCard } from "./ReviewCard.svelte";
 export { default as CarbonNeutralBadge } from "./CarbonNeutralBadge.svelte";
 export { default as ContactForm } from "./ContactForm.svelte";
+export { default as ScrollBlurOverlay } from "./ScrollBlurOverlay.svelte";
 
 // Sections
 export { default as Hero } from "./sections/Hero.svelte";
