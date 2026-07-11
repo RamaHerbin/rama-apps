@@ -296,25 +296,43 @@
 						<div>
 							<h3 class="text-xl font-semibold text-foreground mb-2">Portfolio Archive</h3>
 							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								Previous portfolio iterations showcasing the evolution of my design and
-								development approach. A testament to continuous learning and improvement in
-								craft.
+								My 2023 technical portfolio (book technique) — a print-style document walking
+								through past projects and case studies, from interactive kiosks to cultural web
+								experiences. A snapshot of my earlier work and how the craft has evolved.
 							</p>
 
 							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>React</span
-								>
+								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded">PDF</span>
 								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
 									>Archive</span
 								>
 								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Evolution</span
+									>2023</span
 								>
 							</div>
 
-							<div class="text-sm text-muted-foreground">
-								<span>Legacy versions</span>
+							<div class="flex items-center space-x-4 text-sm">
+								<a
+									href="/rama-herbin-portfolio-2023.pdf"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+								>
+									<svg
+										class="w-4 h-4 mr-1"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+										></path>
+									</svg>
+									View 2023 book (PDF)
+								</a>
 							</div>
 						</div>
 					</div>
