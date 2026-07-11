@@ -152,8 +152,8 @@
 		<div class="mb-12 grid grid-cols-1 gap-12 lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]">
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-a.jpg`,
-				"Screen capture — collection explorer with grouped touch interactions",
-				"FIG. A — COLLECTION EXPLORER",
+				"Screen capture — cleaning the coins with a fingertip",
+				"FIG. A — COIN CLEANING",
 				"TOUCH"
 			)}
 			<div class="flex flex-col justify-center gap-6">
@@ -182,15 +182,15 @@
 		<div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-b.jpg`,
-				"Screen capture — zooming into a single work for a closer look",
-				"FIG. B — ARTWORK DEEP-DIVE",
-				"ZOOM"
+				"Screen capture — illustrated narrative of Joseph Pellerin's coin inventory",
+				"FIG. B — ILLUSTRATED NARRATIVE",
+				"STORY"
 			)}
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-c.jpg`,
-				"Screen capture — multi-language idle attract screen reading DÉBUT, START, INICIO",
-				"FIG. C — MULTI-LANGUAGE ATTRACT SCREEN",
-				"IDLE"
+				"Screen capture — the 169 BCE coin-hoard opening scene with the DÉBUT / START / INICIO language bar",
+				"FIG. C — MULTI-LANGUAGE INTERFACE",
+				"FR · EN · ES"
 			)}
 		</div>
 	</section>

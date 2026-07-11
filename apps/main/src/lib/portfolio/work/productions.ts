@@ -70,7 +70,7 @@ export const productions: Production[] = [
 		tags: ["Touch UI", "Zoom", "Multi-language"],
 		featured: true,
 		layout: "full",
-		video: video("bnf-richelieu", "01:31", "BNF-RICHELIEU_DEMO"),
+		video: video("bnf-richelieu", "00:29", "BNF-RICHELIEU_DEMO"),
 		detailHref: "/projects/fleur-de-papier/bnf-richelieu"
 	},
 	{
@@ -97,7 +97,7 @@ export const productions: Production[] = [
 		tags: ["Interactive comic", "Illustration", "Animation"],
 		featured: true,
 		layout: "split-right",
-		video: video("terre-adelice", "01:35", "TERRE-ADELICE_BD")
+		video: video("terre-adelice", "00:51", "TERRE-ADELICE_BD")
 	},
 	{
 		slug: "atrium-de-rouen",
