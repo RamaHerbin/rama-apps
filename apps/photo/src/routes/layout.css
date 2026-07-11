@@ -60,3 +60,26 @@ body {
 	background-color: var(--color-background);
 	color: var(--color-foreground);
 }
+
+/*
+ * Curtain painted before hydration by the inline script in app.html, lifted
+ * by BootLoader.svelte once it decides whether to play or skip. The
+ * animation is a failsafe only: it self-clears after 4s so a dead/blocked
+ * JS bundle never leaves a permanent white/blank screen.
+ */
+html.boot-pending::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 9998;
+	background: var(--color-background);
+	pointer-events: none;
+	animation: boot-curtain-failsafe 4s forwards;
+}
+
+@keyframes boot-curtain-failsafe {
+	to {
+		opacity: 0;
+		visibility: hidden;
+	}
+}

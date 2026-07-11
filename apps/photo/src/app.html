@@ -3,6 +3,20 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			// Paints the boot-loader curtain before hydration so there is no
+			// flash of unstyled content while the loader decides whether to play.
+			// The 'photoRamaBootPlayed' literal below must stay in sync with
+			// STORAGE_KEY in src/lib/boot-loader.ts.
+			try {
+				if (
+					sessionStorage.getItem('photoRamaBootPlayed') !== '1' &&
+					!window.matchMedia('(prefers-reduced-motion: reduce)').matches
+				) {
+					document.documentElement.classList.add('boot-pending');
+				}
+			} catch (e) {}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
