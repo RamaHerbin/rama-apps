@@ -1,185 +1,185 @@
+<script lang="ts">
+	import { SectionLabel, Tag, MediaFrame } from "$lib/portfolio/work/index.js";
+</script>
+
 <section id="projects" class="px-6 py-20">
 	<div class="mx-auto max-w-6xl">
-		<div class="mb-16 text-center">
-			<h2 class="text-foreground mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+		<SectionLabel label="SELECTED WORK" counter="03 PROJECTS" class="mb-6" />
+
+		<div
+			class="mb-16 grid grid-cols-1 items-end gap-12 lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
+		>
+			<h2 class="text-foreground text-[clamp(40px,7vw,56px)] leading-none font-[750] tracking-[-0.03em]">
 				Selected Work
 			</h2>
-			<p class="text-muted-foreground mx-auto max-w-2xl text-lg">
-				A showcase of creative applications, personal projects, and professional experiences
+			<p class="text-muted-foreground text-[17px] leading-[1.6] text-pretty">
+				Creative applications, cultural experiences and professional work — some shown through
+				video demos where confidentiality applies.
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-			<!-- Current Work (Ansys) -->
-			<div
-				class="group border-border/20 bg-card hover:border-border/40 relative overflow-hidden rounded-xl border p-6 transition-all duration-300"
-			>
-				<div class="space-y-4">
-					<div class="bg-foreground/10 flex h-12 w-12 items-center justify-center rounded-lg">
-						<svg
-							class="text-foreground h-6 w-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0V6a2 2 0 012 2v6.294a2 2 0 01-1.255 1.855l-7.49 2.997a2 2 0 01-1.51 0l-7.49-2.997A2 2 0 013 14.294V8a2 2 0 012-2V6"
-							></path>
-						</svg>
-					</div>
-					<div>
-						<h3 class="text-foreground mb-2 text-xl font-semibold">Current Work</h3>
-						<p class="text-muted-foreground mb-3 text-sm">Ansys Digital Safety Manager</p>
-						<p class="text-muted-foreground text-sm leading-relaxed">
-							Building enterprise-scale safety applications with Angular, focusing on UI/UX for
-							safety engineers.
-							<span class="text-foreground/80 font-medium">Details under NDA.</span>
-						</p>
-					</div>
-					<div class="flex flex-wrap gap-2">
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Angular</span>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs"
-							>TypeScript</span
-						>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs"
-							>Enterprise</span
-						>
-					</div>
-					<div class="text-muted-foreground flex items-center space-x-2 text-xs">
-						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-							></path>
-						</svg>
-						<span>Confidential Project</span>
-					</div>
+		<!-- 01 · Fleur de Papier — links to the case study -->
+		<a
+			href="/projects/fleur-de-papier"
+			class="group border-border/50 hover:bg-foreground/[0.02] grid grid-cols-1 items-center gap-12 border-t py-10 transition-colors lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
+		>
+			<MediaFrame aspect="16 / 10">
+				<img
+					src="/videos/fleur-de-papier/bnf-richelieu-poster.jpg"
+					alt=""
+					class="absolute inset-0 h-full w-full object-cover"
+					loading="lazy"
+				/>
+				<div
+					class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
+				>
+					<span>6 PRODUCTIONS &middot; VIDEO DEMOS</span>
+					<span class="flex items-center gap-1.5">
+						<span class="bg-accent-work h-1.5 w-1.5 rounded-full" aria-hidden="true"></span>
+						CASE 01
+					</span>
+				</div>
+			</MediaFrame>
+
+			<div>
+				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
+					<span class="text-accent-work">01</span>
+					<span class="text-muted-foreground">FLEUR DE PAPIER &mdash; CULTURAL MEDIATION AGENCY</span>
+				</div>
+				<h3
+					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+				>
+					Cultural Applications
+				</h3>
+				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
+					Interactive experiences for the BnF Richelieu, La Contemporaine, L'Atrium de Rouen and
+					more &mdash; touch installations, editorial web apps and an interactive comic, all
+					demonstrated on video.
+				</p>
+				<div class="mt-[18px] flex flex-wrap gap-2">
+					<Tag label="Vue 3" />
+					<Tag label="Nuxt" />
+					<Tag label="GSAP" />
+					<Tag label="Creative Dev" />
+				</div>
+				<span
+					class="text-foreground group-hover:border-foreground border-border mt-6 inline-flex items-center gap-2.5 border-b pb-1 text-[15px] font-semibold transition-colors"
+				>
+					View the case study
+					<span class="text-accent-work" aria-hidden="true">&rarr;</span>
+				</span>
+			</div>
+		</a>
+
+		<!-- 02 · Ansys — confidential, not a link -->
+		<div
+			class="border-border/50 hover:bg-foreground/[0.02] grid grid-cols-1 items-center gap-12 border-t py-10 transition-colors lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
+		>
+			<div>
+				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
+					<span class="text-accent-work">02</span>
+					<span class="text-muted-foreground">ANSYS &mdash; SYNOPSYS INC. &middot; CURRENT</span>
+				</div>
+				<h3
+					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+				>
+					Digital Safety Manager
+				</h3>
+				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
+					Enterprise-scale safety applications built with Angular &mdash; UI/UX for safety
+					engineers planning, executing and monitoring safety cases.
+				</p>
+				<div class="mt-[18px] flex flex-wrap gap-2">
+					<Tag label="Angular" />
+					<Tag label="TypeScript" />
+					<Tag label="Enterprise" />
+				</div>
+				<div class="text-muted-foreground mt-6 inline-flex items-center gap-2 text-[13px]">
+					<svg
+						class="h-4 w-4"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+						></path>
+					</svg>
+					<span>Confidential project &mdash; no public visuals</span>
 				</div>
 			</div>
 
-			<!-- Fleur de Papier -->
-			<a
-				href="/projects/fleur-de-papier"
-				class="group border-border/20 bg-card hover:border-border/40 hover:bg-card/80 relative cursor-pointer overflow-hidden rounded-xl border p-6 transition-all duration-300"
+			<div
+				class="border-border/60 bg-surface-raised relative overflow-hidden rounded-[14px] border bg-[repeating-linear-gradient(-45deg,transparent,transparent_12px,var(--color-border)_12px,var(--color-border)_24px)]"
 			>
-				<div class="space-y-4">
-					<div
-						class="bg-foreground/10 group-hover:bg-foreground/20 flex h-12 w-12 items-center justify-center rounded-lg transition-colors"
+				<div class="flex aspect-[16/10] flex-col items-center justify-center gap-3.5">
+					<svg
+						class="text-muted-foreground h-7 w-7"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
 					>
-						<svg
-							class="text-foreground h-6 w-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2M9 12l2 2 4-4"
-							></path>
-						</svg>
-					</div>
-					<div>
-						<h3 class="text-foreground group-hover:text-foreground/90 mb-2 text-xl font-semibold">
-							Cultural Applications
-						</h3>
-						<p class="text-muted-foreground mb-3 text-sm">Fleur de Papier Agency</p>
-						<p class="text-muted-foreground text-sm leading-relaxed">
-							Creative web applications for cultural mediation. Interactive experiences bridging
-							art, technology, and public engagement.
-						</p>
-					</div>
-					<div class="flex flex-wrap gap-2">
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">React</span>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Creative</span>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Cultural</span>
-					</div>
-					<div
-						class="text-muted-foreground group-hover:text-foreground/80 flex items-center space-x-2 text-xs"
-					>
-						<span>View Projects</span>
-						<svg
-							class="h-4 w-4 transition-transform group-hover:translate-x-1"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 8l4 4m0 0l-4 4m4-4H3"
-							></path>
-						</svg>
-					</div>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+						></path>
+					</svg>
+					<span class="text-muted-foreground font-mono text-[11px] tracking-[0.16em]">
+						DETAILS UNDER NDA
+					</span>
 				</div>
-			</a>
-
-			<!-- Personal Projects -->
-			<a
-				href="/projects/personal"
-				class="group border-border/20 bg-card hover:border-border/40 hover:bg-card/80 relative cursor-pointer overflow-hidden rounded-xl border p-6 transition-all duration-300"
-			>
-				<div class="space-y-4">
-					<div
-						class="bg-foreground/10 group-hover:bg-foreground/20 flex h-12 w-12 items-center justify-center rounded-lg transition-colors"
-					>
-						<svg
-							class="text-foreground h-6 w-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-							></path>
-						</svg>
-					</div>
-					<div>
-						<h3 class="text-foreground group-hover:text-foreground/90 mb-2 text-xl font-semibold">
-							Personal Projects
-						</h3>
-						<p class="text-muted-foreground mb-3 text-sm">Side Projects & Experiments</p>
-						<p class="text-muted-foreground text-sm leading-relaxed">
-							Portfolio iterations, blog platform, and creative experiments. Exploring new
-							technologies and design patterns.
-						</p>
-					</div>
-					<div class="flex flex-wrap gap-2">
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Vue</span>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Nuxt</span>
-						<span class="bg-foreground/10 text-foreground rounded px-2 py-1 text-xs">Blog</span>
-					</div>
-					<div
-						class="text-muted-foreground group-hover:text-foreground/80 flex items-center space-x-2 text-xs"
-					>
-						<span>Explore Projects</span>
-						<svg
-							class="h-4 w-4 transition-transform group-hover:translate-x-1"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 8l4 4m0 0l-4 4m4-4H3"
-							></path>
-						</svg>
-					</div>
-				</div>
-			</a>
+			</div>
 		</div>
+
+		<!-- 03 · Personal Projects -->
+		<a
+			href="/projects/personal"
+			class="group border-border/50 hover:bg-foreground/[0.02] grid grid-cols-1 items-center gap-12 border-t border-b py-10 transition-colors lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
+		>
+			<div>
+				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
+					<span class="text-accent-work">03</span>
+					<span class="text-muted-foreground">SIDE PROJECTS &amp; EXPERIMENTS</span>
+				</div>
+				<h3
+					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+				>
+					Personal Projects
+				</h3>
+				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
+					Portfolio iterations, a blog platform and creative experiments &mdash; exploring new
+					technologies and design patterns.
+				</p>
+			</div>
+
+			<div class="flex items-center justify-end gap-6">
+				<div class="flex flex-wrap justify-end gap-2">
+					<Tag label="Vue" />
+					<Tag label="Nuxt" />
+					<Tag label="Blog" />
+				</div>
+				<span
+					class="border-border/70 text-foreground flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border"
+					aria-hidden="true"
+				>
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 8l4 4m0 0l-4 4m4-4H3"
+						></path>
+					</svg>
+				</span>
+			</div>
+		</a>
 
 		<div class="mt-12 text-center">
 			<p class="text-muted-foreground mx-auto max-w-2xl text-sm">

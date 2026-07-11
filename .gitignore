@@ -24,3 +24,8 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Design mockup refs + local video sources (never commit)
+design-refs/
+*.mov
+/*.mp4
