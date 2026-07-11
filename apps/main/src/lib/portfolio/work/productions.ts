@@ -123,7 +123,7 @@ export const productions: Production[] = [
 		tags: ["Touch tables", "Zoom", "In-gallery"],
 		featured: false,
 		layout: "duo",
-		video: video("la-contemporaine-touch", "00:35", "LA-CONTEMPORAINE-TOUCH_DEMO")
+		video: video("la-contemporaine-touch", "00:23", "LA-CONTEMPORAINE-TOUCH_DEMO")
 	},
 	{
 		slug: "auberge-des-dauphins",
