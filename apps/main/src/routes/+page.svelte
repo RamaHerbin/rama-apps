@@ -10,6 +10,7 @@
 		Creative,
 		Contact,
 		Footer,
+		ScrollBlurOverlay,
 	} from "$lib/portfolio/index.js";
 </script>
 
@@ -35,3 +36,5 @@
 </main>
 
 <Footer />
+
+<ScrollBlurOverlay />
