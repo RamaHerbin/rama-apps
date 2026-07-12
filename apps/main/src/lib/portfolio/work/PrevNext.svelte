@@ -1,7 +1,11 @@
 <script lang="ts">
+	import { c } from "$lib/content/index.js";
+
 	interface NavCell {
-		eyebrow: string;
-		title: string;
+		/** content key for the eyebrow text (e.g. "fdp.prev-next.prev.eyebrow") */
+		eyebrowKey: string;
+		/** content key for the title text */
+		titleKey: string;
 		href: string;
 	}
 
@@ -25,13 +29,15 @@
 		>
 			<span
 				class="text-muted-foreground font-mono text-[10px] tracking-[0.14em]"
+				data-edit={prev.eyebrowKey}
 			>
-				{prev.eyebrow}
+				{c(prev.eyebrowKey)}
 			</span>
 			<span
 				class="text-foreground text-[32px] font-bold tracking-[-0.025em]"
+				data-edit={prev.titleKey}
 			>
-				{prev.title}
+				{c(prev.titleKey)}
 			</span>
 		</a>
 	{/if}
@@ -42,13 +48,15 @@
 		>
 			<span
 				class="text-muted-foreground font-mono text-[10px] tracking-[0.14em]"
+				data-edit={next.eyebrowKey}
 			>
-				{next.eyebrow}
+				{c(next.eyebrowKey)}
 			</span>
 			<span
 				class="text-foreground text-[32px] font-bold tracking-[-0.025em]"
+				data-edit={next.titleKey}
 			>
-				{next.title}
+				{c(next.titleKey)}
 			</span>
 		</a>
 	{/if}

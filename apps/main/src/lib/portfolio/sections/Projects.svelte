@@ -1,20 +1,25 @@
 <script lang="ts">
 	import { SectionLabel, Tag, MediaFrame } from "$lib/portfolio/work/index.js";
+	import { c, cList } from "$lib/content/index.js";
 </script>
 
 <section id="projects" class="px-6 py-20">
 	<div class="mx-auto max-w-6xl">
-		<SectionLabel label="SELECTED WORK" counter="03 PROJECTS" class="mb-6" />
+		<!-- SectionLabel does not forward data-edit attributes to its rendered DOM,
+		     so label/counter are content-driven but not directly click-to-edit here. -->
+		<SectionLabel labelKey="home.projects.label" counterKey="home.projects.counter" class="mb-6" />
 
 		<div
 			class="mb-16 grid grid-cols-1 items-end gap-12 lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
 		>
-			<h2 class="text-foreground text-[clamp(40px,7vw,56px)] leading-none font-[750] tracking-[-0.03em]">
-				Selected Work
+			<h2
+				class="text-foreground text-[clamp(40px,7vw,56px)] leading-none font-[750] tracking-[-0.03em]"
+				data-edit="home.projects.title"
+			>
+				{c("home.projects.title")}
 			</h2>
-			<p class="text-muted-foreground text-[17px] leading-[1.6] text-pretty">
-				Creative applications, cultural experiences and professional work — some shown through
-				video demos where confidentiality applies.
+			<p class="text-muted-foreground text-[17px] leading-[1.6] text-pretty" data-edit="home.projects.intro">
+				{c("home.projects.intro")}
 			</p>
 		</div>
 
@@ -33,39 +38,44 @@
 				<div
 					class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
 				>
-					<span>6 PRODUCTIONS &middot; VIDEO DEMOS</span>
+					<span data-edit="home.projects.fdp.caption">{c("home.projects.fdp.caption")}</span>
 					<span class="flex items-center gap-1.5">
 						<span class="bg-accent-work h-1.5 w-1.5 rounded-full" aria-hidden="true"></span>
-						CASE 01
+						<span data-edit="home.projects.fdp.case-label">{c("home.projects.fdp.case-label")}</span>
 					</span>
 				</div>
 			</MediaFrame>
 
 			<div>
 				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
-					<span class="text-accent-work">01</span>
-					<span class="text-muted-foreground">FLEUR DE PAPIER &mdash; CULTURAL MEDIATION AGENCY</span>
+					<span class="text-accent-work" data-edit="home.projects.fdp.index"
+						>{c("home.projects.fdp.index")}</span
+					>
+					<span class="text-muted-foreground" data-edit="home.projects.fdp.eyebrow"
+						>{c("home.projects.fdp.eyebrow")}</span
+					>
 				</div>
 				<h3
 					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+					data-edit="home.projects.fdp.title"
 				>
-					Cultural Applications
+					{c("home.projects.fdp.title")}
 				</h3>
-				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
-					Interactive experiences for the BnF Richelieu, La Contemporaine, L'Atrium de Rouen and
-					more &mdash; touch installations, editorial web apps and an interactive comic, all
-					demonstrated on video.
+				<p
+					class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty"
+					data-edit="home.projects.fdp.description"
+				>
+					{c("home.projects.fdp.description")}
 				</p>
-				<div class="mt-[18px] flex flex-wrap gap-2">
-					<Tag label="Vue 3" />
-					<Tag label="Nuxt" />
-					<Tag label="GSAP" />
-					<Tag label="Creative Dev" />
+				<div class="mt-[18px] flex flex-wrap gap-2" data-edit-list="home.projects.fdp.tags">
+					{#each cList("home.projects.fdp.tags") as t, i}
+						<span data-edit-item={i}><Tag label={t} /></span>
+					{/each}
 				</div>
 				<span
 					class="text-foreground group-hover:border-foreground border-border mt-6 inline-flex items-center gap-2.5 border-b pb-1 text-[15px] font-semibold transition-colors"
 				>
-					View the case study
+					<span data-edit="home.projects.fdp.cta">{c("home.projects.fdp.cta")}</span>
 					<span class="text-accent-work" aria-hidden="true">&rarr;</span>
 				</span>
 			</div>
@@ -77,22 +87,29 @@
 		>
 			<div>
 				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
-					<span class="text-accent-work">02</span>
-					<span class="text-muted-foreground">ANSYS &mdash; SYNOPSYS INC. &middot; CURRENT</span>
+					<span class="text-accent-work" data-edit="home.projects.ansys.index"
+						>{c("home.projects.ansys.index")}</span
+					>
+					<span class="text-muted-foreground" data-edit="home.projects.ansys.eyebrow"
+						>{c("home.projects.ansys.eyebrow")}</span
+					>
 				</div>
 				<h3
 					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+					data-edit="home.projects.ansys.title"
 				>
-					Digital Safety Manager
+					{c("home.projects.ansys.title")}
 				</h3>
-				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
-					Enterprise-scale safety applications built with Angular &mdash; UI/UX for safety
-					engineers planning, executing and monitoring safety cases.
+				<p
+					class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty"
+					data-edit="home.projects.ansys.description"
+				>
+					{c("home.projects.ansys.description")}
 				</p>
-				<div class="mt-[18px] flex flex-wrap gap-2">
-					<Tag label="Angular" />
-					<Tag label="TypeScript" />
-					<Tag label="Enterprise" />
+				<div class="mt-[18px] flex flex-wrap gap-2" data-edit-list="home.projects.ansys.tags">
+					{#each cList("home.projects.ansys.tags") as t, i}
+						<span data-edit-item={i}><Tag label={t} /></span>
+					{/each}
 				</div>
 				<div class="text-muted-foreground mt-6 inline-flex items-center gap-2 text-[13px]">
 					<svg
@@ -109,7 +126,9 @@
 							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
 						></path>
 					</svg>
-					<span>Confidential project &mdash; no public visuals</span>
+					<span data-edit="home.projects.ansys.confidential-note"
+						>{c("home.projects.ansys.confidential-note")}</span
+					>
 				</div>
 			</div>
 
@@ -131,8 +150,11 @@
 							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
 						></path>
 					</svg>
-					<span class="text-muted-foreground font-mono text-[11px] tracking-[0.16em]">
-						DETAILS UNDER NDA
+					<span
+						class="text-muted-foreground font-mono text-[11px] tracking-[0.16em]"
+						data-edit="home.projects.ansys.nda-label"
+					>
+						{c("home.projects.ansys.nda-label")}
 					</span>
 				</div>
 			</div>
@@ -145,25 +167,32 @@
 		>
 			<div>
 				<div class="flex items-baseline gap-3.5 font-mono text-[11px] tracking-[0.12em]">
-					<span class="text-accent-work">03</span>
-					<span class="text-muted-foreground">SIDE PROJECTS &amp; EXPERIMENTS</span>
+					<span class="text-accent-work" data-edit="home.projects.personal.index"
+						>{c("home.projects.personal.index")}</span
+					>
+					<span class="text-muted-foreground" data-edit="home.projects.personal.eyebrow"
+						>{c("home.projects.personal.eyebrow")}</span
+					>
 				</div>
 				<h3
 					class="text-foreground mt-3.5 text-[clamp(28px,4vw,40px)] leading-[1.05] font-bold tracking-[-0.025em]"
+					data-edit="home.projects.personal.title"
 				>
-					Personal Projects
+					{c("home.projects.personal.title")}
 				</h3>
-				<p class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty">
-					Portfolio iterations, a blog platform and creative experiments &mdash; exploring new
-					technologies and design patterns.
+				<p
+					class="text-muted-foreground mt-4 text-base leading-[1.65] text-pretty"
+					data-edit="home.projects.personal.description"
+				>
+					{c("home.projects.personal.description")}
 				</p>
 			</div>
 
 			<div class="flex items-center justify-end gap-6">
-				<div class="flex flex-wrap justify-end gap-2">
-					<Tag label="Vue" />
-					<Tag label="Nuxt" />
-					<Tag label="Blog" />
+				<div class="flex flex-wrap justify-end gap-2" data-edit-list="home.projects.personal.tags">
+					{#each cList("home.projects.personal.tags") as t, i}
+						<span data-edit-item={i}><Tag label={t} /></span>
+					{/each}
 				</div>
 				<span
 					class="border-border/70 text-foreground flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border"
@@ -182,9 +211,8 @@
 		</a>
 
 		<div class="mt-12 text-center">
-			<p class="text-muted-foreground mx-auto max-w-2xl text-sm">
-				Some projects are presented through video demonstrations due to confidentiality agreements
-				and client privacy requirements.
+			<p class="text-muted-foreground mx-auto max-w-2xl text-sm" data-edit="home.projects.footnote">
+				{c("home.projects.footnote")}
 			</p>
 		</div>
 	</div>

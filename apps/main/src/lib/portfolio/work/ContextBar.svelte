@@ -1,19 +1,22 @@
 <script lang="ts">
+	import { c } from "$lib/content/index.js";
+
 	interface NavLink {
 		href: string;
-		label: string;
+		/** content key for the label text */
+		labelKey: string;
 	}
 
 	interface Props {
 		/** left link (with a ← arrow). null hides it. */
 		prev?: NavLink | null;
-		/** center status label, e.g. "CASE 01 — FLEUR DE PAPIER" */
-		center: string;
+		/** content key for the center status label, e.g. "fdp.context-bar.center" */
+		centerKey: string;
 		/** right link (with a → arrow). null hides it. */
 		next?: NavLink | null;
 	}
 
-	let { prev = null, center, next = null }: Props = $props();
+	let { prev = null, centerKey, next = null }: Props = $props();
 </script>
 
 <!-- Hidden below sm: the pill is unreadable on narrow mobile. -->
@@ -26,21 +29,21 @@
 			class="text-muted-foreground hover:text-foreground hover:bg-foreground/6 flex items-center gap-2 px-5 py-3 transition-colors"
 		>
 			<span aria-hidden="true">←</span>
-			{prev.label}
+			<span data-edit={prev.labelKey}>{c(prev.labelKey)}</span>
 		</a>
 	{/if}
 	<span
 		class="border-border/50 text-foreground/85 flex items-center border-x px-5 py-3"
 	>
 		<span class="text-accent-work mr-2" aria-hidden="true">●</span>
-		{center}
+		<span data-edit={centerKey}>{c(centerKey)}</span>
 	</span>
 	{#if next}
 		<a
 			href={next.href}
 			class="text-muted-foreground hover:text-foreground hover:bg-foreground/6 flex items-center gap-2 px-5 py-3 transition-colors"
 		>
-			{next.label}
+			<span data-edit={next.labelKey}>{c(next.labelKey)}</span>
 			<span aria-hidden="true">→</span>
 		</a>
 	{/if}

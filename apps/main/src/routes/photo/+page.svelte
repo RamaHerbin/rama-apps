@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ImageTrailCursor } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 
 	const images = [
 		"/portfolio/IMG_0318.jpg",
@@ -28,8 +29,11 @@
 
 	<!-- Subtle instruction -->
 	<div class="pointer-events-none relative z-20 flex h-full items-end justify-center pb-12">
-		<span class="text-white/20 text-xs tracking-[0.2em] uppercase select-none animate-pulse">
-			Move your cursor
+		<span
+			class="text-white/20 text-xs tracking-[0.2em] uppercase select-none animate-pulse"
+			data-edit="photo.hero.instruction"
+		>
+			{c("photo.hero.instruction")}
 		</span>
 	</div>
 
@@ -37,7 +41,12 @@
 	<header
 		class="pointer-events-none absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-8 py-6"
 	>
-		<span class="text-white/50 text-xs tracking-[0.3em] uppercase select-none">photo.rama.app</span>
-		<span class="text-white/30 text-xs tracking-wider select-none">2025</span>
+		<span
+			class="text-white/50 text-xs tracking-[0.3em] uppercase select-none"
+			data-edit="photo.hero.brand">{c("photo.hero.brand")}</span
+		>
+		<span class="text-white/30 text-xs tracking-wider select-none" data-edit="photo.hero.year"
+			>{c("photo.hero.year")}</span
+		>
 	</header>
 </div>

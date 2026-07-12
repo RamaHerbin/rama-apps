@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { BlurReveal } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 
 	let isMobile = $state(false);
 
@@ -28,13 +29,16 @@
 		>
 			🌱
 			<span class="text-muted-foreground tracking-tight">
-				Carbon&nbsp;footprint <span class="text-foreground">neutral</span>
+				<span class="whitespace-nowrap" data-edit="shared.carbon.label">{c("shared.carbon.label")}</span>
+				<span class="text-foreground" data-edit="shared.carbon.status">{c("shared.carbon.status")}</span>
 			</span>
 			<a
-				href="/carbon"
-				class="text-muted-foreground/60 decoration-border/20 hover:text-muted-foreground hover:decoration-border/40 ml-1 underline underline-offset-2 transition"
+				href={c("shared.carbon.link.href")}
+				data-edit="shared.carbon.link.label"
+				data-edit-href="shared.carbon.link.href"
+				class="text-muted-foreground/60 decoration-border/20 hover:text-muted-foreground hover:decoration-border/40 ml-1 whitespace-nowrap underline underline-offset-2 transition"
 			>
-				Learn&nbsp;more
+				{c("shared.carbon.link.label")}
 			</a>
 		</div>
 	</BlurReveal>
@@ -45,13 +49,16 @@
 	>
 		🌱
 		<span class="text-muted-foreground tracking-tight">
-			Carbon&nbsp;footprint <span class="text-foreground">neutral</span>
+			<span class="whitespace-nowrap" data-edit="shared.carbon.label">{c("shared.carbon.label")}</span>
+			<span class="text-foreground" data-edit="shared.carbon.status">{c("shared.carbon.status")}</span>
 		</span>
 		<a
-			href="/carbon"
-			class="text-muted-foreground/60 decoration-border/20 ml-1 underline underline-offset-2"
+			href={c("shared.carbon.link.href")}
+			data-edit="shared.carbon.link.label"
+			data-edit-href="shared.carbon.link.href"
+			class="text-muted-foreground/60 decoration-border/20 ml-1 whitespace-nowrap underline underline-offset-2"
 		>
-			Learn&nbsp;more
+			{c("shared.carbon.link.label")}
 		</a>
 	</div>
 {/if}

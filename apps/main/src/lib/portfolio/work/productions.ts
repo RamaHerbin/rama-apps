@@ -10,6 +10,8 @@
  * "DEMO IN PREPARATION" chip. Their `tbc: true` also flags unverified specifics.
  */
 
+import { c, cList } from "$lib/content/index.js";
+
 export type ProductionIndex = "01" | "02" | "03" | "04" | "05" | "06";
 
 export type ProductionLayout = "full" | "split-left" | "split-right" | "duo" | "slim";
@@ -61,13 +63,12 @@ export const productions: Production[] = [
 	{
 		slug: "bnf-richelieu",
 		index: "01",
-		title: "BnF Richelieu",
-		subtitle: "Bibliothèque nationale de France",
-		client: "Bibliothèque nationale de France",
-		description:
-			"An interactive digital experience for the Richelieu site of the Bibliothèque nationale de France. Visitors explore grouped collection items — including ancient coins — by touch, zoom into individual works for a closer look, and are welcomed by a multi-language idle attract screen (DÉBUT · START · INICIO).",
-		role: "Creative development & front-end — interactions, animations and integration",
-		tags: ["Touch UI", "Zoom", "Multi-language"],
+		title: c("productions.bnf-richelieu.title"),
+		subtitle: c("productions.bnf-richelieu.subtitle"),
+		client: c("productions.bnf-richelieu.client"),
+		description: c("productions.bnf-richelieu.description"),
+		role: c("productions.bnf-richelieu.role"),
+		tags: cList("productions.bnf-richelieu.tags"),
 		featured: true,
 		layout: "full",
 		video: video("bnf-richelieu", "00:29", "BNF-RICHELIEU_DEMO"),
@@ -76,12 +77,11 @@ export const productions: Production[] = [
 	{
 		slug: "la-contemporaine",
 		index: "02",
-		title: "La Contemporaine",
-		subtitle: "Museum & library of contemporary history",
-		description:
-			"A web cultural-mediation experience for La Contemporaine — an editorial, document-driven journey through exile testimonies and the Chilean dictatorship, built around the question “À partir de quels documents s’écrit l’histoire ?”.",
-		role: "Front-end & interactive development — content integration and accessibility",
-		tags: ["Editorial web", "Interactive", "Accessibility"],
+		title: c("productions.la-contemporaine.title"),
+		subtitle: c("productions.la-contemporaine.subtitle"),
+		description: c("productions.la-contemporaine.description"),
+		role: c("productions.la-contemporaine.role"),
+		tags: cList("productions.la-contemporaine.tags"),
 		featured: true,
 		layout: "split-left",
 		video: video("la-contemporaine", "00:16", "LA-CONTEMPORAINE_DEMO")
@@ -89,12 +89,11 @@ export const productions: Production[] = [
 	{
 		slug: "terre-adelice",
 		index: "03",
-		title: "Terre Adélice",
-		subtitle: "Interactive comic",
-		description:
-			"An interactive comic combining illustration, narration and web interactions — the story of an artisanal ice-cream maker rooted in the Eyrieux valley, in the Ardèche.",
-		role: "Creative development — graphic integration, interactions and narrative progression",
-		tags: ["Interactive comic", "Illustration", "Animation"],
+		title: c("productions.terre-adelice.title"),
+		subtitle: c("productions.terre-adelice.subtitle"),
+		description: c("productions.terre-adelice.description"),
+		role: c("productions.terre-adelice.role"),
+		tags: cList("productions.terre-adelice.tags"),
 		featured: true,
 		layout: "split-right",
 		video: video("terre-adelice", "00:51", "TERRE-ADELICE_BD")
@@ -102,12 +101,11 @@ export const productions: Production[] = [
 	{
 		slug: "atrium-de-rouen",
 		index: "04",
-		title: "L'Atrium de Rouen",
-		subtitle: "Cultural & scientific mediation",
-		description:
-			"An interactive mediation app for L'Atrium de Rouen, in a cultural and scientific context — front-end development, interactive integration and animation.",
-		role: "Front-end development & interactive integration",
-		tags: ["Interactive", "Mediation"],
+		title: c("productions.atrium-de-rouen.title"),
+		subtitle: c("productions.atrium-de-rouen.subtitle"),
+		description: c("productions.atrium-de-rouen.description"),
+		role: c("productions.atrium-de-rouen.role"),
+		tags: cList("productions.atrium-de-rouen.tags"),
 		featured: false,
 		layout: "duo",
 		tbc: true
@@ -115,12 +113,11 @@ export const productions: Production[] = [
 	{
 		slug: "la-contemporaine-touch",
 		index: "05",
-		title: "La Contemporaine — Touch tables",
-		subtitle: "In-gallery touch exploration",
-		description:
-			"In-gallery touch exploration of the museum collections. Visitors browse grouped artworks — WWI-era prints and drawings — and zoom into individual works in detail on large touch screens.",
-		role: "Front-end & interactive development",
-		tags: ["Touch tables", "Zoom", "In-gallery"],
+		title: c("productions.la-contemporaine-touch.title"),
+		subtitle: c("productions.la-contemporaine-touch.subtitle"),
+		description: c("productions.la-contemporaine-touch.description"),
+		role: c("productions.la-contemporaine-touch.role"),
+		tags: cList("productions.la-contemporaine-touch.tags"),
 		featured: false,
 		layout: "duo",
 		video: video("la-contemporaine-touch", "00:23", "LA-CONTEMPORAINE-TOUCH_DEMO")
@@ -128,12 +125,11 @@ export const productions: Production[] = [
 	{
 		slug: "auberge-des-dauphins",
 		index: "06",
-		title: "Auberge des Dauphins",
-		subtitle: "Forêt de Saou — heritage site",
-		description:
-			"A digital experience for the heritage site of the Auberge des Dauphins, in the heart of the Saou forest — an interactive mediation interface connecting cultural content, storytelling and visual experience.",
-		role: "Front-end development",
-		tags: ["Mediation", "Heritage"],
+		title: c("productions.auberge-des-dauphins.title"),
+		subtitle: c("productions.auberge-des-dauphins.subtitle"),
+		description: c("productions.auberge-des-dauphins.description"),
+		role: c("productions.auberge-des-dauphins.role"),
+		tags: cList("productions.auberge-des-dauphins.tags"),
 		featured: false,
 		layout: "slim",
 		tbc: true
@@ -147,19 +143,19 @@ export interface MetaItem {
 
 /** Fleur de Papier case-study hero meta strip (safe, user-provided values). */
 export const fdpHeroMeta: MetaItem[] = [
-	{ label: "ROLE", value: "Creative Developer" },
-	{ label: "PERIOD", value: "2020 — 2023" },
-	{ label: "STACK", value: "Vue · Nuxt · GSAP" },
-	{ label: "OUTPUT", value: "6 productions · 5 institutions" }
+	{ label: "ROLE", value: c("fdp.meta.role") },
+	{ label: "PERIOD", value: c("fdp.meta.period") },
+	{ label: "STACK", value: c("fdp.meta.stack") },
+	{ label: "OUTPUT", value: c("fdp.meta.output") }
 ];
 
 /** BnF Richelieu detail-page hero meta strip. STACK stays TBC (not verified per-project). */
 export const bnfMeta: MetaItem[] = [
-	{ label: "CLIENT", value: "Bibliothèque nationale de France" },
-	{ label: "YEAR", value: "2022 (TBC)" },
-	{ label: "ROLE", value: "Creative dev · front-end" },
-	{ label: "STACK", value: "TBC" },
-	{ label: "FORMAT", value: "Large-format touch screens" }
+	{ label: "CLIENT", value: c("bnf.meta.client") },
+	{ label: "YEAR", value: c("bnf.meta.year") },
+	{ label: "ROLE", value: c("bnf.meta.role") },
+	{ label: "STACK", value: c("bnf.meta.stack") },
+	{ label: "FORMAT", value: c("bnf.meta.format") }
 ];
 
 export interface ApproachItem {
@@ -176,33 +172,33 @@ export interface ApproachItem {
 export const approach: ApproachItem[] = [
 	{
 		index: "01",
-		title: "Creative development",
-		desc: "Custom interaction models and canvas work where they serve the story — never as decoration."
+		title: c("fdp.approach.01.title"),
+		desc: c("fdp.approach.01.desc")
 	},
 	{
 		index: "02",
-		title: "Accessibility",
-		desc: "Public installations must work for everyone: children, seniors and first-time visitors alike."
+		title: c("fdp.approach.02.title"),
+		desc: c("fdp.approach.02.desc")
 	},
 	{
 		index: "03",
-		title: "Performance",
-		desc: "Smooth motion on modest kiosk hardware and fast loads on gallery networks — performance is part of the design."
+		title: c("fdp.approach.03.title"),
+		desc: c("fdp.approach.03.desc")
 	},
 	{
 		index: "04",
-		title: "Animation & motion",
-		desc: "Motion as narration: GSAP timelines and scroll choreography that guide attention rather than distract."
+		title: c("fdp.approach.04.title"),
+		desc: c("fdp.approach.04.desc")
 	},
 	{
 		index: "05",
-		title: "Interactive storytelling",
-		desc: "Editorial structures that turn collections and archives into narratives visitors want to follow."
+		title: c("fdp.approach.05.title"),
+		desc: c("fdp.approach.05.desc")
 	},
 	{
 		index: "06",
-		title: "Flash → modern web",
-		desc: "Migrating legacy Flash / ActionScript 3 experiences to standards-based JavaScript and Vue.js."
+		title: c("fdp.approach.06.title"),
+		desc: c("fdp.approach.06.desc")
 	}
 ];
 
