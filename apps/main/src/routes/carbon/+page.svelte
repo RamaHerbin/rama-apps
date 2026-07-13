@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { BlurReveal } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 </script>
 
 <svelte:head>
@@ -17,52 +18,79 @@
 			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 			</svg>
-			Back to portfolio
+			<span data-edit="carbon.back-link.label">{c("carbon.back-link.label")}</span>
 		</a>
 	</nav>
 
 	<!-- Main content -->
 	<section class="mx-auto max-w-2xl px-6 py-16 text-white/80">
 		<BlurReveal delay={0.2} duration={0.75}>
-			<h1 class="text-2xl font-semibold tracking-tight text-white">Carbon &amp; Footprint</h1>
-			<p class="mt-4 text-sm leading-7 text-white/60">
-				This site aims to minimize environmental impact through efficient code, optimized images,
-				and reduced motion rendering.
+			<h1 class="text-2xl font-semibold tracking-tight text-white" data-edit="carbon.hero.title">
+				{c("carbon.hero.title")}
+			</h1>
+			<p class="mt-4 text-sm leading-7 text-white/60" data-edit="carbon.hero.description">
+				{c("carbon.hero.description")}
 			</p>
 		</BlurReveal>
 
 		<BlurReveal delay={0.4} duration={0.75}>
 			<div class="mt-8 space-y-6">
-				<h2 class="text-lg font-medium text-white/90">Optimization Strategies</h2>
+				<h2 class="text-lg font-medium text-white/90" data-edit="carbon.strategies.title">
+					{c("carbon.strategies.title")}
+				</h2>
 				<ul class="list-disc space-y-2 pl-6 text-sm text-white/60">
-					<li>Lazy loading and code splitting for animations and interactive elements.</li>
-					<li>Optimized vector graphics and compressed assets for minimal bandwidth usage.</li>
-					<li>Server-side rendering and intelligent caching strategies.</li>
-					<li>Efficient CSS with Tailwind's purge system to reduce bundle size.</li>
-					<li>Modern image formats (WebP, AVIF) with fallbacks for compatibility.</li>
+					<li data-edit="carbon.strategy.1">{c("carbon.strategy.1")}</li>
+					<li data-edit="carbon.strategy.2">{c("carbon.strategy.2")}</li>
+					<li data-edit="carbon.strategy.3">{c("carbon.strategy.3")}</li>
+					<li data-edit="carbon.strategy.4">{c("carbon.strategy.4")}</li>
+					<li data-edit="carbon.strategy.5">{c("carbon.strategy.5")}</li>
 				</ul>
 			</div>
 		</BlurReveal>
 
 		<BlurReveal delay={0.6} duration={0.75}>
 			<div class="mt-8 space-y-4">
-				<h2 class="text-lg font-medium text-white/90">Performance Metrics</h2>
+				<h2 class="text-lg font-medium text-white/90" data-edit="carbon.metrics.title">
+					{c("carbon.metrics.title")}
+				</h2>
 				<div class="grid gap-4 sm:grid-cols-2">
 					<div class="rounded-lg border border-white/10 bg-white/5 p-4">
-						<div class="text-sm text-white/50">Bundle Size</div>
-						<div class="text-lg font-medium text-white">~45KB gzipped</div>
+						<div class="text-sm text-white/50" data-edit="carbon.metric.bundle-size.label">
+							{c("carbon.metric.bundle-size.label")}
+						</div>
+						<div class="text-lg font-medium text-white" data-edit="carbon.metric.bundle-size.value">
+							{c("carbon.metric.bundle-size.value")}
+						</div>
 					</div>
 					<div class="rounded-lg border border-white/10 bg-white/5 p-4">
-						<div class="text-sm text-white/50">First Paint</div>
-						<div class="text-lg font-medium text-white">&lt; 1.2s</div>
+						<div class="text-sm text-white/50" data-edit="carbon.metric.first-paint.label">
+							{c("carbon.metric.first-paint.label")}
+						</div>
+						<div class="text-lg font-medium text-white" data-edit="carbon.metric.first-paint.value">
+							{c("carbon.metric.first-paint.value")}
+						</div>
 					</div>
 					<div class="rounded-lg border border-white/10 bg-white/5 p-4">
-						<div class="text-sm text-white/50">Lighthouse Score</div>
-						<div class="text-lg font-medium text-white">95+</div>
+						<div class="text-sm text-white/50" data-edit="carbon.metric.lighthouse-score.label">
+							{c("carbon.metric.lighthouse-score.label")}
+						</div>
+						<div
+							class="text-lg font-medium text-white"
+							data-edit="carbon.metric.lighthouse-score.value"
+						>
+							{c("carbon.metric.lighthouse-score.value")}
+						</div>
 					</div>
 					<div class="rounded-lg border border-white/10 bg-white/5 p-4">
-						<div class="text-sm text-white/50">CO₂ per visit</div>
-						<div class="text-lg font-medium text-white">~0.2g</div>
+						<div class="text-sm text-white/50" data-edit="carbon.metric.co2-per-visit.label">
+							{c("carbon.metric.co2-per-visit.label")}
+						</div>
+						<div
+							class="text-lg font-medium text-white"
+							data-edit="carbon.metric.co2-per-visit.value"
+						>
+							{c("carbon.metric.co2-per-visit.value")}
+						</div>
 					</div>
 				</div>
 			</div>

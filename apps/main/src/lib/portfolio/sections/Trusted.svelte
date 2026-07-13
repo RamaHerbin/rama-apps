@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AnimatedLogoCloud } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 
 	const logos = [
 		{ name: "Angular", path: "/portfolio/Angular_Logo_SVG.svg" },
@@ -14,8 +15,11 @@
 <section id="trusted" class="px-6 py-20">
 	<div class="mx-auto max-w-6xl">
 		<div class="mb-2 text-center">
-			<h2 class="text-foreground text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-				They Trusted Me
+			<h2
+				class="text-foreground text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
+				data-edit="home.trusted.title"
+			>
+				{c("home.trusted.title")}
 			</h2>
 		</div>
 		<div>

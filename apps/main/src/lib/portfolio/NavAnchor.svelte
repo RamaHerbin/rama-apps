@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import { LiquidGlass } from "fancy-ui-svelte";
 	import { createThemeState, toggleTheme } from "$lib/stores/theme.svelte.js";
+	import { c } from "$lib/content/index.js";
 
 	const themeState = createThemeState();
 
@@ -38,7 +39,7 @@
 
 		<!-- Portfolio Title -->
 		<div class="flex flex-1 justify-center">
-			<span class="text-muted-foreground text-sm font-medium tracking-wide">
+			<span class="text-muted-foreground text-sm font-medium tracking-wide" data-edit="shared.nav.title">
 				{title}
 			</span>
 		</div>
@@ -78,14 +79,14 @@
 	<!-- Static navigation for immediate render -->
 	{#if !showBackgroundEffects}
 		<div class="bg-background/80 border-border/20 w-full rounded-lg border backdrop-blur-sm">
-			{@render nav("Portfolio 2k25")}
+			{@render nav(c("shared.nav.title"))}
 		</div>
 	{/if}
 
 	<!-- LiquidGlass Navigation - Lazy loaded for better performance -->
 	{#if showBackgroundEffects}
 		<LiquidGlass containerClass="w-full">
-			{@render nav("DevFolio 2k25")}
+			{@render nav(c("shared.nav.title"))}
 		</LiquidGlass>
 	{/if}
 </div>

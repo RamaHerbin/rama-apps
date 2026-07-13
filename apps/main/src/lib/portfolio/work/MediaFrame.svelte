@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
 	import { cn } from "$lib/utils.js";
+	import { c } from "$lib/content/index.js";
 
 	interface Caption {
 		/** left label, e.g. "BNF-RICHELIEU_DEMO.MP4" */
@@ -10,8 +11,8 @@
 	}
 
 	interface Chip {
-		/** e.g. "HOVER PREVIEW · MUTED" or "DEMO IN PREPARATION" */
-		label: string;
+		/** content key for the chip label text, e.g. "fdp.production-media.demo-in-preparation-chip" */
+		labelKey: string;
 		/** blinking accent dot before the label */
 		dot?: boolean;
 	}
@@ -80,7 +81,7 @@
 						class="bg-accent-work h-1.5 w-1.5 rounded-full motion-safe:animate-[blink_1.6s_ease-in-out_infinite]"
 					></span>
 				{/if}
-				{chip.label}
+				<span data-edit={chip.labelKey}>{c(chip.labelKey)}</span>
 			</div>
 		{/if}
 

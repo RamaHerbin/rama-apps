@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { NavAnchor, Footer } from "$lib/portfolio/index.js";
+	import { c, cList } from "$lib/content/index.js";
 </script>
 
 <svelte:head>
@@ -30,16 +31,19 @@
 						d="M15 19l-7-7 7-7"
 					></path>
 				</svg>
-				Back to Portfolio
+				<span data-edit="personal.back-link.label">{c("personal.back-link.label")}</span>
 			</a>
 
 			<!-- Title -->
 			<div class="space-y-4 mb-12">
-				<h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-					Personal Projects
+				<h1
+					class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground"
+					data-edit="personal.hero.title"
+				>
+					{c("personal.hero.title")}
 				</h1>
-				<p class="text-xl text-muted-foreground">
-					Side Projects • Experiments • Creative Development
+				<p class="text-xl text-muted-foreground" data-edit="personal.hero.subtitle">
+					{c("personal.hero.subtitle")}
 				</p>
 			</div>
 		</div>
@@ -71,35 +75,36 @@
 						</div>
 
 						<div>
-							<h3 class="text-xl font-semibold text-foreground mb-2">FancyUI</h3>
-							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								Open-source Svelte 5 component library — animated and interactive UI components
-								(blur reveals, fluid cursor, liquid glass, and more), published to npm with a
-								live documentation site and Storybook.
+							<h3
+								class="text-xl font-semibold text-foreground mb-2"
+								data-edit="personal.card-fancyui.title"
+							>
+								{c("personal.card-fancyui.title")}
+							</h3>
+							<p
+								class="text-muted-foreground text-sm leading-relaxed mb-4"
+								data-edit="personal.card-fancyui.description"
+							>
+								{c("personal.card-fancyui.description")}
 							</p>
 
-							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Svelte 5</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Tailwind</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded">npm</span>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Components</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Animation</span
-								>
+							<div class="flex flex-wrap gap-2 mb-4" data-edit-list="personal.card-fancyui.tags">
+								{#each cList("personal.card-fancyui.tags") as tag, i (i)}
+									<span
+										class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
+										data-edit-item={i}>{tag}</span
+									>
+								{/each}
 							</div>
 
 							<div class="flex items-center space-x-4 text-sm">
 								<a
-									href="https://fancy-ui.rama.app"
+									href={c("personal.card-fancyui.docs.href")}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+									data-edit="personal.card-fancyui.docs.label"
+									data-edit-href="personal.card-fancyui.docs.href"
 								>
 									<svg
 										class="w-4 h-4 mr-1"
@@ -114,21 +119,23 @@
 											d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
 										></path>
 									</svg>
-									Visit Docs
+									{c("personal.card-fancyui.docs.label")}
 								</a>
 								<span class="text-muted-foreground">•</span>
 								<a
-									href="https://github.com/RamaHerbin/fancy-ui"
+									href={c("personal.card-fancyui.github.href")}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+									data-edit="personal.card-fancyui.github.label"
+									data-edit-href="personal.card-fancyui.github.href"
 								>
 									<svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
 										<path
 											d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
 										/>
 									</svg>
-									GitHub
+									{c("personal.card-fancyui.github.label")}
 								</a>
 							</div>
 						</div>
@@ -157,47 +164,53 @@
 						</div>
 
 						<div>
-							<h3 class="text-xl font-semibold text-foreground mb-2">Portfolio 2025</h3>
-							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								Current portfolio built with Nuxt 3, featuring modern UI components, interactive
-								cursors, and performance optimizations. Showcases technical skills and creative
-								development approach.
+							<h3
+								class="text-xl font-semibold text-foreground mb-2"
+								data-edit="personal.card-portfolio-2025.title"
+							>
+								{c("personal.card-portfolio-2025.title")}
+							</h3>
+							<p
+								class="text-muted-foreground text-sm leading-relaxed mb-4"
+								data-edit="personal.card-portfolio-2025.description"
+							>
+								{c("personal.card-portfolio-2025.description")}
 							</p>
 
-							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Nuxt 3</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Vue 3</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>TypeScript</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Tailwind</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>WebGL</span
-								>
+							<div
+								class="flex flex-wrap gap-2 mb-4"
+								data-edit-list="personal.card-portfolio-2025.tags"
+							>
+								{#each cList("personal.card-portfolio-2025.tags") as tag, i (i)}
+									<span
+										class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
+										data-edit-item={i}>{tag}</span
+									>
+								{/each}
 							</div>
 
 							<div class="flex items-center space-x-4 text-sm">
 								<a
-									href="https://github.com/RamaHerbin/portfolio-2k25"
+									href={c("personal.card-portfolio-2025.github.href")}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+									data-edit="personal.card-portfolio-2025.github.label"
+									data-edit-href="personal.card-portfolio-2025.github.href"
 								>
 									<svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
 										<path
 											d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
 										/>
 									</svg>
-									GitHub
+									{c("personal.card-portfolio-2025.github.label")}
 								</a>
 								<span class="text-muted-foreground">•</span>
-								<span class="text-muted-foreground">You're viewing it!</span>
+								<span
+									class="text-muted-foreground"
+									data-edit="personal.card-portfolio-2025.viewing-note"
+									>{c("personal.card-portfolio-2025.viewing-note")}</span
+								>
 							</div>
 						</div>
 					</div>
@@ -225,32 +238,36 @@
 						</div>
 
 						<div>
-							<h3 class="text-xl font-semibold text-foreground mb-2">Blog Platform</h3>
-							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								Personal blog exploring front-end development, creative coding, and technical
-								insights. Built as a learning platform to share knowledge and document my
-								development journey.
+							<h3
+								class="text-xl font-semibold text-foreground mb-2"
+								data-edit="personal.card-blog.title"
+							>
+								{c("personal.card-blog.title")}
+							</h3>
+							<p
+								class="text-muted-foreground text-sm leading-relaxed mb-4"
+								data-edit="personal.card-blog.description"
+							>
+								{c("personal.card-blog.description")}
 							</p>
 
-							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Next.js</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded">MDX</span>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Blog</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Writing</span
-								>
+							<div class="flex flex-wrap gap-2 mb-4" data-edit-list="personal.card-blog.tags">
+								{#each cList("personal.card-blog.tags") as tag, i (i)}
+									<span
+										class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
+										data-edit-item={i}>{tag}</span
+									>
+								{/each}
 							</div>
 
 							<div class="flex items-center space-x-4 text-sm">
 								<a
-									href="https://blog.rama.app"
+									href={c("personal.card-blog.visit.href")}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+									data-edit="personal.card-blog.visit.label"
+									data-edit-href="personal.card-blog.visit.href"
 								>
 									<svg
 										class="w-4 h-4 mr-1"
@@ -265,7 +282,7 @@
 											d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
 										></path>
 									</svg>
-									Visit Blog
+									{c("personal.card-blog.visit.label")}
 								</a>
 							</div>
 						</div>
@@ -294,21 +311,26 @@
 						</div>
 
 						<div>
-							<h3 class="text-xl font-semibold text-foreground mb-2">Portfolio Archive</h3>
-							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								My 2023 technical portfolio (book technique) — a print-style document walking
-								through past projects and case studies, from interactive kiosks to cultural web
-								experiences. A snapshot of my earlier work and how the craft has evolved.
+							<h3
+								class="text-xl font-semibold text-foreground mb-2"
+								data-edit="personal.card-archive.title"
+							>
+								{c("personal.card-archive.title")}
+							</h3>
+							<p
+								class="text-muted-foreground text-sm leading-relaxed mb-4"
+								data-edit="personal.card-archive.description"
+							>
+								{c("personal.card-archive.description")}
 							</p>
 
-							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded">PDF</span>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Archive</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>2023</span
-								>
+							<div class="flex flex-wrap gap-2 mb-4" data-edit-list="personal.card-archive.tags">
+								{#each cList("personal.card-archive.tags") as tag, i (i)}
+									<span
+										class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
+										data-edit-item={i}>{tag}</span
+									>
+								{/each}
 							</div>
 
 							<div class="flex items-center space-x-4 text-sm">
@@ -317,6 +339,7 @@
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+									data-edit="personal.card-archive.view.label"
 								>
 									<svg
 										class="w-4 h-4 mr-1"
@@ -331,7 +354,7 @@
 											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 										></path>
 									</svg>
-									View 2023 book (PDF)
+									{c("personal.card-archive.view.label")}
 								</a>
 							</div>
 						</div>
@@ -360,27 +383,32 @@
 						</div>
 
 						<div>
-							<h3 class="text-xl font-semibold text-foreground mb-2">Creative Experiments</h3>
-							<p class="text-muted-foreground text-sm leading-relaxed mb-4">
-								Ongoing collection of creative coding experiments, UI component explorations, and
-								technical proof-of-concepts. A playground for testing new ideas and technologies.
+							<h3
+								class="text-xl font-semibold text-foreground mb-2"
+								data-edit="personal.card-experiments.title"
+							>
+								{c("personal.card-experiments.title")}
+							</h3>
+							<p
+								class="text-muted-foreground text-sm leading-relaxed mb-4"
+								data-edit="personal.card-experiments.description"
+							>
+								{c("personal.card-experiments.description")}
 							</p>
 
-							<div class="flex flex-wrap gap-2 mb-4">
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>WebGL</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Three.js</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
-									>Experiments</span
-								>
-								<span class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded">R&D</span>
+							<div class="flex flex-wrap gap-2 mb-4" data-edit-list="personal.card-experiments.tags">
+								{#each cList("personal.card-experiments.tags") as tag, i (i)}
+									<span
+										class="px-2 py-1 text-xs bg-foreground/10 text-foreground rounded"
+										data-edit-item={i}>{tag}</span
+									>
+								{/each}
 							</div>
 
 							<div class="text-sm text-muted-foreground">
-								<span>In development</span>
+								<span data-edit="personal.card-experiments.status"
+									>{c("personal.card-experiments.status")}</span
+								>
 							</div>
 						</div>
 					</div>

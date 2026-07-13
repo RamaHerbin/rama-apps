@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { FluidCursor, InteractiveGridPattern, BlurReveal, RainbowButton } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 
 	let heroSectionRef: HTMLDivElement | undefined = $state();
 	let showInteractiveElements = $state(false);
@@ -42,30 +43,41 @@
 
 	<!-- Hero Content -->
 	<div class="relative z-10 mx-auto mt-32 max-w-4xl px-6 text-center lg:px-8">
-		<h1 class="text-foreground text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-			Rama Herbin
+		<h1
+			class="text-foreground text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+			data-edit="home.hero.title"
+		>
+			{c("home.hero.title")}
 		</h1>
 
 		<BlurReveal delay={0.2} duration={0.75} class="space-y-6">
-			<h2 class="text-muted-foreground text-xl font-medium sm:text-2xl lg:text-3xl">
-				Front-End & UI Engineer
+			<h2
+				class="text-muted-foreground text-xl font-medium sm:text-2xl lg:text-3xl"
+				data-edit="home.hero.role"
+			>
+				{c("home.hero.role")}
 			</h2>
 
 			<p class="text-muted-foreground text-lg sm:text-xl">
-				working at
+				<span data-edit="home.hero.working-at">{c("home.hero.working-at")}</span>
 				<a
-					href="https://www.ansys.com"
+					href={c("home.hero.ansys.href")}
+					data-edit="home.hero.ansys.label"
+					data-edit-href="home.hero.ansys.href"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-foreground font-semibold underline-offset-4 hover:underline"
-					aria-label="Open Ansys website in a new tab"
+					aria-label="Open Ansys website in a new tab">{c("home.hero.ansys.label")}</a
 				>
-					Ansys&reg;
-				</a>
-				<span class="text-foreground/80"> &mdash; part of </span>
-				<span class="text-foreground/90 align-baseline text-[0.9em]">Synopsys Inc.</span>
-				<span class="text-foreground/80 text-tiny block italic"
-					>A simulation-driven company&trade;</span
+				<span class="text-foreground/80" data-edit="home.hero.company-part"
+					>{c("home.hero.company-part")}</span
+				>
+				<span
+					class="text-foreground/90 align-baseline text-[0.9em]"
+					data-edit="home.hero.parent-company">{c("home.hero.parent-company")}</span
+				>
+				<span class="text-foreground/80 text-tiny block italic" data-edit="home.hero.tagline"
+					>{c("home.hero.tagline")}</span
 				>
 			</p>
 
@@ -75,7 +87,7 @@
 					onclick={scrollToAbout}
 					aria-label="Scroll to About section"
 				>
-					Explore
+					<span data-edit="home.hero.cta">{c("home.hero.cta")}</span>
 				</RainbowButton>
 			</div>
 		</BlurReveal>
@@ -85,8 +97,9 @@
 	<div class="absolute top-6 left-6 z-20">
 		<span
 			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
+			data-edit="home.hero.badge.version"
 		>
-			v1.0.0-alpha
+			{c("home.hero.badge.version")}
 		</span>
 	</div>
 
@@ -94,13 +107,15 @@
 	<div class="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
 		<span
 			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
+			data-edit="home.hero.badge.ai"
 		>
-			AI-powered
+			{c("home.hero.badge.ai")}
 		</span>
 		<span
 			class="text-muted-foreground/40 bg-background/60 border-border/10 rounded-sm border px-2 py-1 font-mono text-[10px] backdrop-blur-sm"
+			data-edit="home.hero.badge.ai-note"
 		>
-			temporary ai generated content
+			{c("home.hero.badge.ai-note")}
 		</span>
 	</div>
 </div>

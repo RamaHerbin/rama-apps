@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { ImageTrailCursor } from "fancy-ui-svelte";
+	import { c } from "$lib/content/index.js";
 
 	let isMobile = $state(false);
 	let creativeSection: HTMLDivElement | undefined = $state();
@@ -56,8 +57,9 @@
 		>
 			<span
 				class="absolute inset-0 flex items-center justify-center text-4xl text-white/40 select-none"
+				data-edit="home.creative.hover-label"
 			>
-				Hover Here
+				{c("home.creative.hover-label")}
 			</span>
 
 			{#if isVisible}
