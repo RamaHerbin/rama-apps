@@ -11,7 +11,10 @@ export interface Testimonial {
 	name: string;
 	designation: string;
 	image: string;
-	testimonial: string;
+	/** condensed pull-quote shown on the card */
+	excerpt: string;
+	/** the full recommendation, one entry per paragraph, shown in the dialog */
+	body: string[];
 	linkedinUrl: string;
 	date: string;
 }
