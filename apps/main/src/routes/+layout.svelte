@@ -1,8 +1,12 @@
 <script lang="ts">
 	import "./layout.css";
 	import { onMount, type Component } from "svelte";
+	import { dev } from "$app/environment";
+	import { injectAnalytics } from "@vercel/analytics/sveltekit";
 
 	let { children } = $props();
+
+	injectAnalytics({ mode: dev ? "development" : "production" });
 
 	// Edit mode is opt-in via ?edit=1&studioOrigin=…, resolved client-side only.
 	// The overlay + runtime are dynamically imported (including the param parser)
