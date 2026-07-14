@@ -21,6 +21,10 @@ export function getPhotoBySlug(slug: string): Photo | undefined {
 	return photos.find((p) => p.slug === slug);
 }
 
+export function getPhotoById(id: string): Photo | undefined {
+	return photos.find((p) => p.id === id);
+}
+
 export function getPhotosByCollection(collectionId: string): Photo[] {
 	return getPhotos().filter((p) => p.collectionIds.includes(collectionId));
 }
