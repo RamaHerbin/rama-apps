@@ -131,6 +131,7 @@
 				{playSize}
 				playLabel={`Play ${p.title} demo full-screen`}
 				onplay={() => openLightbox(p)}
+				fadePlayOnHover
 			>
 				{#if canHoverPreview && previewing[p.slug]}
 					<!-- svelte-ignore a11y_media_has_caption -->

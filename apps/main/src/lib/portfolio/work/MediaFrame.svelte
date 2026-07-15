@@ -30,6 +30,9 @@
 		onplay?: () => void;
 		/** aria-label for the play button */
 		playLabel?: string;
+		/** fade the centre play button out while the frame is hovered (e.g. when a
+		 *  hover-preview video takes over). Stays clickable. */
+		fadePlayOnHover?: boolean;
 		/** soft hover glow shadow (default true). false = border-color hover only */
 		glow?: boolean;
 		class?: string;
@@ -44,6 +47,7 @@
 		playSize,
 		onplay,
 		playLabel = "Play video",
+		fadePlayOnHover = false,
 		glow = true,
 		class: className,
 		children
@@ -53,10 +57,17 @@
 	const iconSize = $derived(playSize ? Math.round(playSize * 0.32) : 0);
 </script>
 
+<!--
+	When onplay is set the whole frame is clickable (mouse convenience); the
+	centre <button> below stays the real, keyboard-focusable control.
+-->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
+	onclick={onplay}
 	class={cn(
 		"border-border/60 bg-surface-raised group relative overflow-hidden rounded-[14px] border transition-[border-color,box-shadow] duration-300 hover:border-border",
 		glow && "hover:shadow-[0_0_60px_oklch(0.32_0.015_80_/_0.3)]",
+		onplay && "cursor-pointer",
 		className
 	)}
 >
@@ -88,9 +99,15 @@
 		{#if playSize && onplay}
 			<button
 				type="button"
-				onclick={onplay}
+				onclick={(e) => {
+					e.stopPropagation();
+					onplay?.();
+				}}
 				aria-label={playLabel}
-				class="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[oklch(0.1_0_0_/_0.5)] text-white backdrop-blur-md transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.12] hover:bg-[oklch(0.1_0_0_/_0.75)] focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:scale-100"
+				class={cn(
+					"absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[oklch(0.1_0_0_/_0.5)] text-white backdrop-blur-md transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.12] hover:bg-[oklch(0.1_0_0_/_0.75)] focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:scale-100",
+					fadePlayOnHover && "group-hover:opacity-0"
+				)}
 				style="width: {playSize}px; height: {playSize}px;"
 			>
 				<svg
