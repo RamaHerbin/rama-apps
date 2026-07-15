@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import ReviewCard from "$lib/portfolio/ReviewCard.svelte";
 	import Avatar from "$lib/portfolio/Avatar.svelte";
+	import LinkedInIcon from "$lib/portfolio/LinkedInIcon.svelte";
 	import TestimonialAvatars from "$lib/portfolio/TestimonialAvatars.svelte";
 	import { resolveAvatar } from "$lib/portfolio/avatar.js";
 	import { c } from "$lib/content/index.js";
@@ -12,6 +13,12 @@
 	// stored one key per paragraph — `testimonials.{id}.body.{n}` — and the count
 	// has to live here rather than being derived from the JSON, which components
 	// are not allowed to read directly (see EDIT-CONTRACT.md).
+	// Rama's own LinkedIn recommendations page — the source these testimonials
+	// come from. The dialog's "View on LinkedIn" links here (not the reviewer's
+	// profile; that's what the header logo is for).
+	const RECOMMENDATIONS_URL =
+		"https://www.linkedin.com/in/rama-herbin/details/recommendations/";
+
 	const paragraphCounts: Record<number, number> = { 1: 5, 2: 4, 3: 3, 4: 1 };
 
 	// Real photos (consented) live at static/portfolio/testimonials/<slug>.{webp,jpg};
@@ -275,7 +282,20 @@
 					class="h-11 w-11 shrink-0"
 				/>
 				<div class="flex flex-col">
-					<span class="font-medium">{active.name}</span>
+					<span class="flex items-center gap-1.5 font-medium">
+						{active.name}
+						{#if active.linkedinUrl}
+							<a
+								href={active.linkedinUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-[#0A66C2] transition-opacity hover:opacity-70"
+								aria-label={`Open ${active.name}'s LinkedIn profile`}
+							>
+								<LinkedInIcon class="h-4 w-4" />
+							</a>
+						{/if}
+					</span>
 					<span class="text-muted-foreground text-sm">{active.designation}</span>
 				</div>
 				<span class="text-muted-foreground ml-auto text-xs">{active.date}</span>
@@ -290,18 +310,15 @@
 			</div>
 
 			<footer class="mt-6 flex items-center justify-between">
-				{#if active.linkedinUrl}
-					<a
-						href={active.linkedinUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-muted-foreground hover:text-foreground text-xs font-medium underline underline-offset-2 transition-colors"
-					>
-						View on LinkedIn
-					</a>
-				{:else}
-					<span></span>
-				{/if}
+				<a
+					href={RECOMMENDATIONS_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-medium underline underline-offset-2 transition-colors"
+				>
+					<LinkedInIcon class="h-3.5 w-3.5 no-underline" />
+					View on LinkedIn
+				</a>
 				<button
 					type="button"
 					class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
