@@ -91,10 +91,10 @@
 </script>
 
 <svelte:head>
-	<title>Fleur de Papier — Case Study - Rama Herbin</title>
+	<title>Fleur de Papier · Case Study · Rama Herbin</title>
 	<meta
 		name="description"
-		content="Case study: interactive, educational web experiences built at Fleur de Papier for cultural institutions — BnF Richelieu, La Contemporaine, Terre Adélice and more. 2020–2023."
+		content="Case study: interactive, educational web experiences built at Fleur de Papier for cultural institutions: BnF Richelieu, La Contemporaine, Terre Adélice and more. 2020-2023."
 	/>
 </svelte:head>
 
@@ -149,7 +149,7 @@
 				{:else}
 					<img
 						src={v.poster}
-						alt={`${p.title} — video poster`}
+						alt={`${p.title}, video poster`}
 						class="absolute inset-0 h-full w-full object-cover"
 						loading="lazy"
 					/>

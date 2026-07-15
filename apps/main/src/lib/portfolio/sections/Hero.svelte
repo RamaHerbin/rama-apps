@@ -34,11 +34,24 @@
 	<!-- Fluid Cursor - contained to this section only, never full-screen/global -->
 	<FluidCursor contained simResolution={128} class="absolute inset-0 -z-10" />
 
-	<!-- Interactive Grid Pattern Background -->
+	<!--
+		Interactive Grid Pattern Background.
+		InteractiveGridPattern draws fixed 40px squares from its top-left corner,
+		but its SVG box stretches to the full section, so on wide screens the
+		squares only cover the left portion and the spotlight looks "cut off" on
+		the right. Instead, pin the grid to a fixed square box centred on the hero
+		copy (not the section centre — the content sits 4rem lower because of
+		`mt-32`), and mask a 500px-radius spotlight at that box's centre. The
+		1000px spotlight then always lands fully on the grid: symmetric and
+		viewport-independent. Box is 26×40px = 1040px, a touch larger than the
+		spotlight so its edges stay masked.
+	-->
 	{#if showInteractiveElements}
-		<InteractiveGridPattern
-			class="inset-0 h-full [mask-image:radial-gradient(500px_circle_at_center,white,transparent)] opacity-30"
-		/>
+		<div
+			class="absolute top-[calc(50%+4rem)] left-1/2 h-[1040px] w-[1040px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(circle_500px_at_center,white,transparent)] opacity-30"
+		>
+			<InteractiveGridPattern squares={[26, 26]} class="h-full w-full" />
+		</div>
 	{/if}
 
 	<!-- Hero Content -->
@@ -100,22 +113,6 @@
 			data-edit="home.hero.badge.version"
 		>
 			{c("home.hero.badge.version")}
-		</span>
-	</div>
-
-	<!-- AI-Powered Badge - Top Right -->
-	<div class="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
-		<span
-			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
-			data-edit="home.hero.badge.ai"
-		>
-			{c("home.hero.badge.ai")}
-		</span>
-		<span
-			class="text-muted-foreground/40 bg-background/60 border-border/10 rounded-sm border px-2 py-1 font-mono text-[10px] backdrop-blur-sm"
-			data-edit="home.hero.badge.ai-note"
-		>
-			{c("home.hero.badge.ai-note")}
 		</span>
 	</div>
 </div>

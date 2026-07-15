@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { cn } from "$lib/utils.js";
+	import Avatar from "$lib/portfolio/Avatar.svelte";
 
 	interface Props {
 		img: string;
+		/** optional WebP source for the avatar; falls back to `img` when absent */
+		imgWebp?: string;
 		name: string;
 		/** content key for `name`; enables click-to-edit when set */
 		nameKey?: string;
@@ -16,11 +19,14 @@
 		date: string;
 		/** content key for `date`; enables click-to-edit when set */
 		dateKey?: string;
+		/** when set, renders a "Read more" button opening the full recommendation */
+		onReadMore?: () => void;
 		class?: string;
 	}
 
 	let {
 		img,
+		imgWebp,
 		name,
 		nameKey,
 		username,
@@ -30,6 +36,7 @@
 		linkedinHrefKey,
 		date,
 		dateKey,
+		onReadMore,
 		class: className
 	}: Props = $props();
 </script>
@@ -51,21 +58,21 @@
 	)}
 >
 	<div class="flex flex-row items-center gap-2">
+		<!--
+			`href` is dropped when the URL is empty (we don't have every profile URL
+			yet) so it renders as a plain avatar rather than a dead link. The
+			data-edit-href stays either way, so the studio link popover can still
+			fill it in.
+		-->
 		<a
-			href={linkedinUrl}
+			href={linkedinUrl || undefined}
 			data-edit-href={linkedinHrefKey}
 			target="_blank"
 			rel="noopener noreferrer"
 			class="shrink-0 cursor-pointer"
-			aria-label={`Open ${name}'s LinkedIn profile`}
+			aria-label={linkedinUrl ? `Open ${name}'s LinkedIn profile` : undefined}
 		>
-			<img
-				class="h-8 w-8 rounded-full object-cover"
-				width="32"
-				height="32"
-				alt={`Profile picture of ${name}`}
-				src={img}
-			/>
+			<Avatar src={img} webp={imgWebp} {name} size={32} class="h-8 w-8" />
 		</a>
 		<div class="flex flex-col">
 			<div class="text-sm font-medium dark:text-white" data-edit={nameKey}>{name}</div>
@@ -74,5 +81,22 @@
 		<span class="text-muted-foreground ml-auto text-xs" data-edit={dateKey}>{date}</span>
 	</div>
 	<blockquote class="mt-2 text-sm" data-edit={bodyKey}>{body}</blockquote>
+
+	<!--
+		Deliberately OUTSIDE the [data-edit] blockquote: the edit runtime's click
+		delegation only swallows clicks that resolve to a [data-edit-href],
+		[data-edit-item] or [data-edit] ancestor, so a button sitting next to them
+		keeps working in edit mode instead of turning into a text caret.
+	-->
+	{#if onReadMore}
+		<button
+			type="button"
+			class="text-muted-foreground hover:text-foreground mt-3 cursor-pointer text-xs font-medium underline underline-offset-2 transition-colors"
+			onclick={onReadMore}
+		>
+			Read more
+		</button>
+	{/if}
+
 	<figcaption class="sr-only">Review by {name}</figcaption>
 </figure>

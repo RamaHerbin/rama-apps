@@ -315,8 +315,6 @@ home.hero.company-part    "— part of"
 home.hero.parent-company  "Synopsys Inc."
 home.hero.tagline         "A simulation-driven company™"
 home.hero.badge.version   "v1.0.0-alpha"
-home.hero.badge.ai        "AI-powered"
-home.hero.badge.ai-note   "temporary ai generated content"
 home.hero.cta             "Explore"
 ```
 

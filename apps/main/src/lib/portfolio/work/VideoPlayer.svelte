@@ -120,7 +120,7 @@
 	{:else}
 		<img
 			src={poster}
-			alt={title ? `${title} — video poster` : ""}
+			alt={title ? `${title}, video poster` : ""}
 			class="absolute inset-0 h-full w-full bg-black object-contain"
 			loading="lazy"
 		/>
