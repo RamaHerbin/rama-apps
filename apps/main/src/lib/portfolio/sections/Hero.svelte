@@ -6,11 +6,6 @@
 	let heroSectionRef: HTMLDivElement | undefined = $state();
 	let showInteractiveElements = $state(false);
 
-	function scrollToAbout() {
-		const el = document.getElementById("trusted");
-		el?.scrollIntoView({ behavior: "smooth" });
-	}
-
 	onMount(() => {
 		if ("requestIdleCallback" in window) {
 			requestIdleCallback(
@@ -96,9 +91,8 @@
 
 			<div class="pt-8">
 				<RainbowButton
+					href="#projects"
 					class="px-8 py-4 text-lg font-medium transition-all hover:scale-105"
-					onclick={scrollToAbout}
-					aria-label="Scroll to About section"
 				>
 					<span data-edit="home.hero.cta">{c("home.hero.cta")}</span>
 				</RainbowButton>

@@ -210,4 +210,11 @@
 	body {
 		@apply bg-background text-foreground font-sans;
 	}
+	/* Smooth in-page anchor scrolling (e.g. the hero "Explore" → #projects link),
+	   disabled when the user prefers reduced motion. */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
 }
