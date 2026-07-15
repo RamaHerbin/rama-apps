@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { AnimatedTooltip, Marquee } from "fancy-ui-svelte";
+	import { Marquee } from "fancy-ui-svelte";
 	import ReviewCard from "$lib/portfolio/ReviewCard.svelte";
 	import Avatar from "$lib/portfolio/Avatar.svelte";
+	import TestimonialAvatars from "$lib/portfolio/TestimonialAvatars.svelte";
 	import { resolveAvatar } from "$lib/portfolio/avatar.js";
 	import { c } from "$lib/content/index.js";
 	import type { Testimonial } from "$lib/portfolio/types.js";
@@ -45,7 +46,8 @@
 		id: t.id,
 		name: t.name,
 		designation: t.designation,
-		image: t.image
+		image: t.image,
+		href: t.linkedinUrl || undefined
 	}));
 
 	// A single dialog reused by every card, rather than one per card inside the
@@ -94,9 +96,9 @@
 			</p>
 		</div>
 
-		<!-- AnimatedTooltip -->
+		<!-- Colleague avatars — click opens the LinkedIn profile -->
 		<div class="flex w-full flex-row items-center justify-center">
-			<AnimatedTooltip items={tooltipItems} />
+			<TestimonialAvatars items={tooltipItems} />
 		</div>
 
 		<!-- Marquee -->
