@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { cn } from "$lib/utils.js";
+	import Avatar from "$lib/portfolio/Avatar.svelte";
 
 	interface Props {
 		img: string;
+		/** optional WebP source for the avatar; falls back to `img` when absent */
+		imgWebp?: string;
 		name: string;
 		/** content key for `name`; enables click-to-edit when set */
 		nameKey?: string;
@@ -23,6 +26,7 @@
 
 	let {
 		img,
+		imgWebp,
 		name,
 		nameKey,
 		username,
@@ -68,13 +72,7 @@
 			class="shrink-0 cursor-pointer"
 			aria-label={linkedinUrl ? `Open ${name}'s LinkedIn profile` : undefined}
 		>
-			<img
-				class="h-8 w-8 rounded-full object-cover"
-				width="32"
-				height="32"
-				alt={`Profile picture of ${name}`}
-				src={img}
-			/>
+			<Avatar src={img} webp={imgWebp} {name} size={32} class="h-8 w-8" />
 		</a>
 		<div class="flex flex-col">
 			<div class="text-sm font-medium dark:text-white" data-edit={nameKey}>{name}</div>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { AnimatedTooltip, Marquee } from "fancy-ui-svelte";
 	import ReviewCard from "$lib/portfolio/ReviewCard.svelte";
-	import { initialsAvatar } from "$lib/portfolio/avatar.js";
+	import Avatar from "$lib/portfolio/Avatar.svelte";
+	import { resolveAvatar } from "$lib/portfolio/avatar.js";
 	import { c } from "$lib/content/index.js";
 	import type { Testimonial } from "$lib/portfolio/types.js";
 
@@ -12,20 +13,33 @@
 	// are not allowed to read directly (see EDIT-CONTRACT.md).
 	const paragraphCounts: Record<number, number> = { 1: 5, 2: 4, 3: 3, 4: 1 };
 
+	// Real photos (consented) live at static/portfolio/testimonials/<slug>.{webp,jpg};
+	// ids without an entry fall back to generated initials. Romain has no photo yet.
+	const photoSlugs: Record<number, string> = {
+		1: "mathilde-gallouet",
+		3: "hichem-rekouane",
+		4: "elie-nissen"
+	};
+
 	const testimonialIds = [1, 2, 3, 4];
 
-	const testimonials: Testimonial[] = testimonialIds.map((id) => ({
-		id,
-		name: c(`testimonials.${id}.name`),
-		designation: c(`testimonials.${id}.designation`),
-		image: initialsAvatar(c(`testimonials.${id}.name`)),
-		excerpt: c(`testimonials.${id}.excerpt`),
-		body: Array.from({ length: paragraphCounts[id] ?? 0 }, (_, i) =>
-			c(`testimonials.${id}.body.${i + 1}`)
-		),
-		linkedinUrl: c(`testimonials.${id}.linkedin.href`),
-		date: c(`testimonials.${id}.date`)
-	}));
+	const testimonials: Testimonial[] = testimonialIds.map((id) => {
+		const name = c(`testimonials.${id}.name`);
+		const avatar = resolveAvatar(name, photoSlugs[id]);
+		return {
+			id,
+			name,
+			designation: c(`testimonials.${id}.designation`),
+			image: avatar.src,
+			imageWebp: avatar.webp,
+			excerpt: c(`testimonials.${id}.excerpt`),
+			body: Array.from({ length: paragraphCounts[id] ?? 0 }, (_, i) =>
+				c(`testimonials.${id}.body.${i + 1}`)
+			),
+			linkedinUrl: c(`testimonials.${id}.linkedin.href`),
+			date: c(`testimonials.${id}.date`)
+		};
+	});
 
 	const tooltipItems = testimonials.map((t) => ({
 		id: t.id,
@@ -93,6 +107,7 @@
 				{#each testimonials as review (review.id)}
 					<ReviewCard
 						img={review.image}
+						imgWebp={review.imageWebp}
 						name={review.name}
 						nameKey={`testimonials.${review.id}.name`}
 						username={review.designation}
@@ -134,12 +149,12 @@
 	{#if active}
 		<article class="p-6">
 			<header class="flex flex-row items-center gap-3">
-				<img
-					class="h-11 w-11 shrink-0 rounded-full object-cover"
-					width="44"
-					height="44"
-					alt={`Profile picture of ${active.name}`}
+				<Avatar
 					src={active.image}
+					webp={active.imageWebp}
+					name={active.name}
+					size={44}
+					class="h-11 w-11 shrink-0"
 				/>
 				<div class="flex flex-col">
 					<span class="font-medium">{active.name}</span>
