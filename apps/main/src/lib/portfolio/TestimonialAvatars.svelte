@@ -15,10 +15,15 @@
 
 	interface Props {
 		items: AvatarItem[];
+		/** Fired with the hovered/focused avatar id, or null when it leaves. */
+		onHoverChange?: (id: number | string | null) => void;
+		/** Controlled active id (e.g. driven by a hovered ReviewCard) — shows that
+		 *  avatar's tooltip and enlarges it, as if hovered. */
+		activeId?: number | string | null;
 		class?: string;
 	}
 
-	let { items, class: className }: Props = $props();
+	let { items, onHoverChange, activeId = null, class: className }: Props = $props();
 
 	// Faithful port of fancy-ui-svelte's AnimatedTooltip, with one change: each
 	// avatar is wrapped in an <a> so clicking a colleague opens their LinkedIn
@@ -35,6 +40,7 @@
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 		mouseX = event.clientX - rect.left - rect.width / 2;
 		hoveredIndex = itemId;
+		onHoverChange?.(itemId);
 	}
 
 	function handleMouseMove(event: MouseEvent) {
@@ -46,6 +52,19 @@
 	function handleMouseLeave() {
 		hoveredIndex = null;
 		mouseX = 0;
+		onHoverChange?.(null);
+	}
+
+	// Keyboard parity: focusing an avatar (tab) centres its card too.
+	function handleFocus(itemId: number | string) {
+		hoveredIndex = itemId;
+		onHoverChange?.(itemId);
+	}
+
+	function handleBlur() {
+		hoveredIndex = null;
+		mouseX = 0;
+		onHoverChange?.(null);
 	}
 
 	const avatarClass =
@@ -59,10 +78,12 @@
 			onmouseenter={(e) => handleMouseEnter(e, item.id)}
 			onmouseleave={handleMouseLeave}
 			onmousemove={handleMouseMove}
+			onfocusin={() => handleFocus(item.id)}
+			onfocusout={handleBlur}
 			role="button"
 			tabindex="0"
 		>
-			{#if hoveredIndex === item.id}
+			{#if activeId === item.id}
 				<div
 					class="pointer-events-none absolute -top-16 left-1/2 z-50 flex flex-col items-center justify-center rounded-md bg-black px-4 py-2 text-xs whitespace-nowrap shadow-xl"
 					style="transform: translateX(calc(-50% + {translation}px)) rotate({rotation}deg);"
@@ -87,10 +108,22 @@
 					class="cursor-pointer"
 					aria-label={`Open ${item.name}'s LinkedIn profile`}
 				>
-					<img src={item.image} alt={item.name} class={avatarClass} />
+					<img
+						src={item.image}
+						alt={item.name}
+						class={avatarClass}
+						class:scale-105={activeId === item.id}
+						class:z-30={activeId === item.id}
+					/>
 				</a>
 			{:else}
-				<img src={item.image} alt={item.name} class={avatarClass} />
+				<img
+						src={item.image}
+						alt={item.name}
+						class={avatarClass}
+						class:scale-105={activeId === item.id}
+						class:z-30={activeId === item.id}
+					/>
 			{/if}
 		</div>
 	{/each}
