@@ -36,15 +36,22 @@
 
 	<!--
 		Interactive Grid Pattern Background.
-		The spotlight mask is nudged down by 4rem to sit on the hero copy rather
-		than the section's geometric centre: the content carries `mt-32` (8rem),
-		which shifts a vertically-centred flex child down by half that (4rem). Keep
-		this offset in sync with that margin.
+		InteractiveGridPattern draws fixed 40px squares from its top-left corner,
+		but its SVG box stretches to the full section, so on wide screens the
+		squares only cover the left portion and the spotlight looks "cut off" on
+		the right. Instead, pin the grid to a fixed square box centred on the hero
+		copy (not the section centre — the content sits 4rem lower because of
+		`mt-32`), and mask a 500px-radius spotlight at that box's centre. The
+		1000px spotlight then always lands fully on the grid: symmetric and
+		viewport-independent. Box is 26×40px = 1040px, a touch larger than the
+		spotlight so its edges stay masked.
 	-->
 	{#if showInteractiveElements}
-		<InteractiveGridPattern
-			class="inset-0 h-full [mask-image:radial-gradient(500px_circle_at_50%_calc(50%_+_4rem),white,transparent)] opacity-30"
-		/>
+		<div
+			class="absolute top-[calc(50%+4rem)] left-1/2 h-[1040px] w-[1040px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(circle_500px_at_center,white,transparent)] opacity-30"
+		>
+			<InteractiveGridPattern squares={[26, 26]} class="h-full w-full" />
+		</div>
 	{/if}
 
 	<!-- Hero Content -->
