@@ -51,7 +51,7 @@
 -->
 <figure
 	class={cn(
-		"relative block w-75 overflow-hidden rounded-xl border p-4 transition-all duration-300",
+		"relative block w-95 overflow-hidden rounded-xl border p-4 transition-all duration-300",
 		"border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
 		"dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
 		className
