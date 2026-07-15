@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { SectionLabel, Tag, MediaFrame } from "$lib/portfolio/work/index.js";
+	import AnsysLogo from "$lib/portfolio/AnsysLogo.svelte";
+	import { LineHoverLink } from "fancy-ui-svelte";
 	import { c, cList } from "$lib/content/index.js";
 </script>
 
@@ -23,12 +25,31 @@
 			</p>
 		</div>
 
-		<!-- 01 · Fleur de Papier — links to the case study -->
-		<a
-			href="/projects/fleur-de-papier"
-			class="group border-border/50 hover:bg-foreground/[0.02] grid grid-cols-1 items-center gap-12 border-t py-10 transition-colors lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
+		<!-- 01 · Fleur de Papier — whole card is clickable via a stretched link;
+		     the "View the case study" CTA (scribble) is the keyboard/SR link. -->
+		<div
+			class="group/card border-border/50 hover:bg-foreground/[0.02] relative grid grid-cols-1 items-center gap-12 border-t py-10 transition-colors lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]"
 		>
-			<MediaFrame aspect="16 / 10">
+			<!--
+				Stretched link: covers the whole card for mouse clicks (z-[1] so it
+				sits above the positioned MediaFrame; the CTA below is z-10, so it
+				stays independently clickable). Hidden from the a11y tree + focus
+				order so it doesn't duplicate the CTA link, which is the real
+				accessible link.
+			-->
+			<a
+				href="/projects/fleur-de-papier"
+				aria-hidden="true"
+				tabindex="-1"
+				class="absolute inset-0 z-[1]"
+			></a>
+
+			<!-- glow moved to card-level hover, since the stretched link sits over the media -->
+			<MediaFrame
+				aspect="16 / 10"
+				glow={false}
+				class="transition-shadow duration-300 group-hover/card:shadow-[0_0_60px_oklch(0.32_0.015_80_/_0.3)]"
+			>
 				<img
 					src="/videos/fleur-de-papier/bnf-richelieu-poster.jpg"
 					alt=""
@@ -72,14 +93,16 @@
 						<span data-edit-item={i}><Tag label={t} /></span>
 					{/each}
 				</div>
-				<span
-					class="text-foreground group-hover:border-foreground border-border mt-6 inline-flex items-center gap-2.5 border-b pb-1 text-[15px] font-semibold transition-colors"
+				<LineHoverLink
+					href="/projects/fleur-de-papier"
+					variant="scribble"
+					class="text-foreground relative z-10 mt-6 inline-flex items-center text-[15px] font-semibold"
 				>
 					<span data-edit="home.projects.fdp.cta">{c("home.projects.fdp.cta")}</span>
-					<span class="text-accent-work" aria-hidden="true">&rarr;</span>
-				</span>
+					<span class="text-accent-work ml-2" aria-hidden="true">&rarr;</span>
+				</LineHoverLink>
 			</div>
-		</a>
+		</div>
 
 		<!-- 02 · Ansys — confidential, not a link -->
 		<div
@@ -132,32 +155,26 @@
 				</div>
 			</div>
 
-			<div
-				class="border-border/60 bg-surface-raised relative overflow-hidden rounded-[14px] border bg-[repeating-linear-gradient(-45deg,transparent,transparent_12px,var(--color-border)_12px,var(--color-border)_24px)]"
-			>
-				<div class="flex aspect-[16/10] flex-col items-center justify-center gap-3.5">
-					<svg
-						class="text-muted-foreground h-7 w-7"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-						></path>
-					</svg>
-					<span
-						class="text-muted-foreground font-mono text-[11px] tracking-[0.16em]"
-						data-edit="home.projects.ansys.nda-label"
-					>
-						{c("home.projects.ansys.nda-label")}
+			<MediaFrame aspect="16 / 10" class="bg-black">
+				<div class="absolute inset-0 flex items-center justify-center p-12 sm:p-16">
+					<AnsysLogo class="h-auto w-[55%] max-w-[260px]" />
+				</div>
+				<div
+					class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
+				>
+					<span class="flex items-center gap-1.5">
+						<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+							></path>
+						</svg>
+						<span data-edit="home.projects.ansys.nda-label">{c("home.projects.ansys.nda-label")}</span>
 					</span>
 				</div>
-			</div>
+			</MediaFrame>
 		</div>
 
 		<!-- 03 · Personal Projects -->
@@ -217,3 +234,16 @@
 		</div>
 	</div>
 </section>
+
+<style>
+	/*
+		Draw the "View the case study" scribble on hover of the WHOLE card, not
+		only the link itself. LineHoverLink only triggers the draw on the link's
+		own :hover; replicate its drawn state (stroke-dashoffset: 0 — see the
+		component's own `:hover .link-hover__graphic--stroke path` rule) under the
+		card's group-hover. The path keeps the component's 0.6s transition.
+	*/
+	:global(.group\/card:hover .link-hover__graphic--scribble path) {
+		stroke-dashoffset: 0;
+	}
+</style>
