@@ -179,10 +179,10 @@
 		<div
 			class="bg-background relative flex h-[400px] w-full flex-col items-center justify-center overflow-hidden rounded-lg md:shadow-xl"
 		>
-			<div bind:this={scrollEl} class="flex w-full items-center gap-4 overflow-hidden px-2">
+			<div bind:this={scrollEl} class="flex w-full items-stretch gap-4 overflow-hidden px-2 py-1">
 				{#each Array(COPIES) as _, copy (copy)}
 					{#each testimonials as review (review.id)}
-						<div data-tid={review.id} class="shrink-0">
+						<div data-tid={review.id} class="flex shrink-0">
 							<ReviewCard
 								img={review.image}
 								imgWebp={review.imageWebp}
