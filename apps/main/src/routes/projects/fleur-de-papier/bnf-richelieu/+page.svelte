@@ -38,10 +38,10 @@
 {/snippet}
 
 <svelte:head>
-	<title>BnF Richelieu — Fleur de Papier — Rama Herbin</title>
+	<title>BnF Richelieu · Fleur de Papier · Rama Herbin</title>
 	<meta
 		name="description"
-		content="An interactive digital experience for the Richelieu site of the Bibliothèque nationale de France — collection highlights explorable by touch."
+		content="An interactive digital experience for the Richelieu site of the Bibliothèque nationale de France: collection highlights explorable by touch."
 	/>
 </svelte:head>
 
@@ -110,7 +110,7 @@
 			>
 				<img
 					src={video.poster}
-					alt={`${production.title} — video poster`}
+					alt={`${production.title}, video poster`}
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
 			</MediaFrame>
@@ -162,7 +162,7 @@
 		<div class="mb-12 grid grid-cols-1 gap-12 lg:[grid-template-columns:minmax(0,7fr)_minmax(0,5fr)]">
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-a.jpg`,
-				"Screen capture — cleaning the coins with a fingertip",
+				"Screen capture: cleaning the coins with a fingertip",
 				"bnf.detail.fig-a.label",
 				"bnf.detail.fig-a.tag"
 			)}
@@ -201,13 +201,13 @@
 		<div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-b.jpg`,
-				"Screen capture — illustrated narrative of Joseph Pellerin's coin inventory",
+				"Screen capture: illustrated narrative of Joseph Pellerin's coin inventory",
 				"bnf.detail.fig-b.label",
 				"bnf.detail.fig-b.tag"
 			)}
 			{@render figure(
 				`${FIG_BASE}/bnf-richelieu-fig-c.jpg`,
-				"Screen capture — the 169 BCE coin-hoard opening scene with the DÉBUT / START / INICIO language bar",
+				"Screen capture: the 169 BCE coin-hoard opening scene with the DÉBUT / START / INICIO language bar",
 				"bnf.detail.fig-c.label",
 				"bnf.detail.fig-c.tag"
 			)}

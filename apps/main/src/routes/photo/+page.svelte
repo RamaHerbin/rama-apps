@@ -14,9 +14,9 @@
 </script>
 
 <svelte:head>
-	<title>Rama — Photography</title>
+	<title>Rama · Photography</title>
 	<meta name="description" content="Photography by Rama Herbin" />
-	<meta property="og:title" content="Rama — Photography" />
+	<meta property="og:title" content="Rama · Photography" />
 	<meta property="og:description" content="Photography by Rama Herbin" />
 	<meta property="og:url" content="https://photo.rama.app" />
 </svelte:head>
