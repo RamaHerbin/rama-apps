@@ -151,6 +151,33 @@
 		const r = best.getBoundingClientRect();
 		scrollEl.scrollTo({ left: scrollEl.scrollLeft + (r.left + r.width / 2 - cMid), behavior: "smooth" });
 	}
+
+	// Shared "active colleague": set by hovering an avatar OR a card. Drives the
+	// avatar tooltip + enlargement (via TestimonialAvatars) and the pause+centre.
+	let activeId = $state<number | string | null>(null);
+
+	function activate(id: number | string | null) {
+		activeId = id;
+		centerOnAvatar(id);
+	}
+
+	// Hovering a card centres it (smooth), which slides cards under the cursor.
+	// Lock briefly so that motion doesn't re-trigger a different card mid-scroll.
+	let centerLock = false;
+
+	function onCardEnter(id: number | string) {
+		if (centerLock) return;
+		activate(id);
+		centerLock = true;
+		setTimeout(() => {
+			centerLock = false;
+		}, 500);
+	}
+
+	function onCarouselLeave() {
+		centerLock = false;
+		activate(null);
+	}
 </script>
 
 <section id="testimonials" class="px-6 py-20">
@@ -172,17 +199,27 @@
 
 		<!-- Colleague avatars — hover/focus centres their card; click opens LinkedIn -->
 		<div class="flex w-full flex-row items-center justify-center">
-			<TestimonialAvatars items={tooltipItems} onHoverChange={centerOnAvatar} />
+			<TestimonialAvatars items={tooltipItems} onHoverChange={activate} {activeId} />
 		</div>
 
 		<!-- Auto-scrolling carousel (see script) -->
 		<div
 			class="bg-background relative flex h-[400px] w-full flex-col items-center justify-center overflow-hidden rounded-lg md:shadow-xl"
 		>
-			<div bind:this={scrollEl} class="flex w-full items-stretch gap-4 overflow-hidden px-2 py-1">
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div
+				bind:this={scrollEl}
+				class="flex w-full items-stretch gap-4 overflow-hidden px-2 py-1"
+				onmouseleave={onCarouselLeave}
+			>
 				{#each Array(COPIES) as _, copy (copy)}
 					{#each testimonials as review (review.id)}
-						<div data-tid={review.id} class="flex shrink-0">
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							data-tid={review.id}
+							class="flex shrink-0"
+							onmouseenter={() => onCardEnter(review.id)}
+						>
 							<ReviewCard
 								img={review.image}
 								imgWebp={review.imageWebp}
@@ -195,7 +232,8 @@
 								linkedinHrefKey={`testimonials.${review.id}.linkedin.href`}
 								date={review.date}
 								dateKey={`testimonials.${review.id}.date`}
-								onReadMore={hasMore(review) ? () => openFull(review) : undefined}
+								onOpen={() => openFull(review)}
+								showReadMore={hasMore(review)}
 							/>
 						</div>
 					{/each}
