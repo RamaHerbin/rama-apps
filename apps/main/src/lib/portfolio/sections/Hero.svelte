@@ -102,20 +102,4 @@
 			{c("home.hero.badge.version")}
 		</span>
 	</div>
-
-	<!-- AI-Powered Badge - Top Right -->
-	<div class="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
-		<span
-			class="text-muted-foreground/60 bg-background/80 border-border/20 rounded-md border px-3 py-1.5 font-mono text-xs backdrop-blur-sm"
-			data-edit="home.hero.badge.ai"
-		>
-			{c("home.hero.badge.ai")}
-		</span>
-		<span
-			class="text-muted-foreground/40 bg-background/60 border-border/10 rounded-sm border px-2 py-1 font-mono text-[10px] backdrop-blur-sm"
-			data-edit="home.hero.badge.ai-note"
-		>
-			{c("home.hero.badge.ai-note")}
-		</span>
-	</div>
 </div>
