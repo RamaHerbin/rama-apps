@@ -15,10 +15,12 @@
 
 	interface Props {
 		items: AvatarItem[];
+		/** Fired with the hovered/focused avatar id, or null when it leaves. */
+		onHoverChange?: (id: number | string | null) => void;
 		class?: string;
 	}
 
-	let { items, class: className }: Props = $props();
+	let { items, onHoverChange, class: className }: Props = $props();
 
 	// Faithful port of fancy-ui-svelte's AnimatedTooltip, with one change: each
 	// avatar is wrapped in an <a> so clicking a colleague opens their LinkedIn
@@ -35,6 +37,7 @@
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 		mouseX = event.clientX - rect.left - rect.width / 2;
 		hoveredIndex = itemId;
+		onHoverChange?.(itemId);
 	}
 
 	function handleMouseMove(event: MouseEvent) {
@@ -46,6 +49,19 @@
 	function handleMouseLeave() {
 		hoveredIndex = null;
 		mouseX = 0;
+		onHoverChange?.(null);
+	}
+
+	// Keyboard parity: focusing an avatar (tab) centres its card too.
+	function handleFocus(itemId: number | string) {
+		hoveredIndex = itemId;
+		onHoverChange?.(itemId);
+	}
+
+	function handleBlur() {
+		hoveredIndex = null;
+		mouseX = 0;
+		onHoverChange?.(null);
 	}
 
 	const avatarClass =
@@ -59,6 +75,8 @@
 			onmouseenter={(e) => handleMouseEnter(e, item.id)}
 			onmouseleave={handleMouseLeave}
 			onmousemove={handleMouseMove}
+			onfocusin={() => handleFocus(item.id)}
+			onfocusout={handleBlur}
 			role="button"
 			tabindex="0"
 		>

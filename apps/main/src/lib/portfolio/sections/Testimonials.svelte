@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Marquee } from "fancy-ui-svelte";
+	import { onMount } from "svelte";
 	import ReviewCard from "$lib/portfolio/ReviewCard.svelte";
 	import Avatar from "$lib/portfolio/Avatar.svelte";
 	import TestimonialAvatars from "$lib/portfolio/TestimonialAvatars.svelte";
@@ -77,6 +77,80 @@
 	function hasMore(t: Testimonial): boolean {
 		return t.body.length > 1 || t.body[0] !== t.excerpt;
 	}
+
+	// ── Auto-scrolling carousel ─────────────────────────────────────────────
+	// Replaces fancy-ui's Marquee (CSS keyframe) with a scrollLeft-driven track,
+	// so we can both auto-advance AND jump-centre a specific card when its avatar
+	// is hovered. The cards are duplicated COPIES times for a seamless loop; the
+	// track lives in [setWidth, 2·setWidth) with a full copy of content on each
+	// side, and wraps by one setWidth so the seam is never visible.
+	const COPIES = 3;
+	const SPEED = 45; // px/s
+
+	let scrollEl = $state<HTMLDivElement | null>(null);
+	let paused = $state(false);
+	let pos = 0; // float scroll position (scrollLeft rounds, so we track our own)
+	let setWidth = 0;
+
+	function measure() {
+		if (scrollEl) setWidth = scrollEl.scrollWidth / COPIES;
+	}
+
+	onMount(() => {
+		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		measure();
+		pos = setWidth;
+		if (scrollEl) scrollEl.scrollLeft = pos;
+
+		let raf = 0;
+		let last = 0;
+		function frame(now: number) {
+			raf = requestAnimationFrame(frame);
+			const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+			last = now;
+			if (paused || reduce || !scrollEl) return;
+			if (!setWidth) measure();
+			pos += SPEED * dt;
+			if (setWidth && pos >= setWidth * 2) pos -= setWidth;
+			scrollEl.scrollLeft = pos;
+		}
+		raf = requestAnimationFrame(frame);
+
+		const onResize = () => measure();
+		window.addEventListener("resize", onResize);
+		return () => {
+			cancelAnimationFrame(raf);
+			window.removeEventListener("resize", onResize);
+		};
+	});
+
+	/** Avatar hover/focus: centre that person's nearest card and stop; null resumes. */
+	function centerOnAvatar(id: number | string | null) {
+		if (id == null) {
+			if (scrollEl) pos = scrollEl.scrollLeft; // resume from where the smooth scroll left off
+			paused = false;
+			return;
+		}
+		paused = true;
+		if (!scrollEl) return;
+		const cRect = scrollEl.getBoundingClientRect();
+		const cMid = cRect.left + cRect.width / 2;
+		const instances = [...scrollEl.querySelectorAll<HTMLElement>(`[data-tid="${id}"]`)];
+		if (!instances.length) return;
+		// Pick the instance nearest the current centre → minimal travel.
+		let best = instances[0];
+		let bestDist = Infinity;
+		for (const el of instances) {
+			const r = el.getBoundingClientRect();
+			const d = Math.abs(r.left + r.width / 2 - cMid);
+			if (d < bestDist) {
+				bestDist = d;
+				best = el;
+			}
+		}
+		const r = best.getBoundingClientRect();
+		scrollEl.scrollTo({ left: scrollEl.scrollLeft + (r.left + r.width / 2 - cMid), behavior: "smooth" });
+	}
 </script>
 
 <section id="testimonials" class="px-6 py-20">
@@ -96,33 +170,37 @@
 			</p>
 		</div>
 
-		<!-- Colleague avatars — click opens the LinkedIn profile -->
+		<!-- Colleague avatars — hover/focus centres their card; click opens LinkedIn -->
 		<div class="flex w-full flex-row items-center justify-center">
-			<TestimonialAvatars items={tooltipItems} />
+			<TestimonialAvatars items={tooltipItems} onHoverChange={centerOnAvatar} />
 		</div>
 
-		<!-- Marquee -->
+		<!-- Auto-scrolling carousel (see script) -->
 		<div
 			class="bg-background relative flex h-[400px] w-full flex-col items-center justify-center overflow-hidden rounded-lg md:shadow-xl"
 		>
-			<Marquee reverse pauseOnHover class="[--duration:20s]">
-				{#each testimonials as review (review.id)}
-					<ReviewCard
-						img={review.image}
-						imgWebp={review.imageWebp}
-						name={review.name}
-						nameKey={`testimonials.${review.id}.name`}
-						username={review.designation}
-						body={review.excerpt}
-						bodyKey={`testimonials.${review.id}.excerpt`}
-						linkedinUrl={review.linkedinUrl}
-						linkedinHrefKey={`testimonials.${review.id}.linkedin.href`}
-						date={review.date}
-						dateKey={`testimonials.${review.id}.date`}
-						onReadMore={hasMore(review) ? () => openFull(review) : undefined}
-					/>
+			<div bind:this={scrollEl} class="flex w-full items-center gap-4 overflow-hidden px-2">
+				{#each Array(COPIES) as _, copy (copy)}
+					{#each testimonials as review (review.id)}
+						<div data-tid={review.id} class="shrink-0">
+							<ReviewCard
+								img={review.image}
+								imgWebp={review.imageWebp}
+								name={review.name}
+								nameKey={`testimonials.${review.id}.name`}
+								username={review.designation}
+								body={review.excerpt}
+								bodyKey={`testimonials.${review.id}.excerpt`}
+								linkedinUrl={review.linkedinUrl}
+								linkedinHrefKey={`testimonials.${review.id}.linkedin.href`}
+								date={review.date}
+								dateKey={`testimonials.${review.id}.date`}
+								onReadMore={hasMore(review) ? () => openFull(review) : undefined}
+							/>
+						</div>
+					{/each}
 				{/each}
-			</Marquee>
+			</div>
 
 			<!-- Left Gradient -->
 			<div
