@@ -34,10 +34,16 @@
 	<!-- Fluid Cursor - contained to this section only, never full-screen/global -->
 	<FluidCursor contained simResolution={128} class="absolute inset-0 -z-10" />
 
-	<!-- Interactive Grid Pattern Background -->
+	<!--
+		Interactive Grid Pattern Background.
+		The spotlight mask is nudged down by 4rem to sit on the hero copy rather
+		than the section's geometric centre: the content carries `mt-32` (8rem),
+		which shifts a vertically-centred flex child down by half that (4rem). Keep
+		this offset in sync with that margin.
+	-->
 	{#if showInteractiveElements}
 		<InteractiveGridPattern
-			class="inset-0 h-full [mask-image:radial-gradient(500px_circle_at_center,white,transparent)] opacity-30"
+			class="inset-0 h-full [mask-image:radial-gradient(500px_circle_at_50%_calc(50%_+_4rem),white,transparent)] opacity-30"
 		/>
 	{/if}
 
