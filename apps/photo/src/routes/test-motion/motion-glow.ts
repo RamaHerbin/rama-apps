@@ -224,6 +224,7 @@ export async function createMotionGlow(canvas: HTMLCanvasElement): Promise<Motio
 	function disposePipeline() {
 		for (const tex of detectionTextures) tex.dispose();
 		for (const node of bloomNodes) node.dispose();
+		for (const pipeline of pipelines) pipeline.dispose();
 		detectionTextures = [];
 		computeNodes = [];
 		pipelines = [];

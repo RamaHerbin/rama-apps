@@ -69,7 +69,13 @@
 	</button>
 </div>
 
-<section class="h-[100svh] w-full overflow-hidden bg-neutral-950">
+<!--
+	fixed inset-0 (not h-[100svh] in flow): the shared photo layout wraps routes
+	in <main class="pt-16"> between a fixed header and a footer, which would
+	offset the canvas below the header and make the page scroll. The playground
+	overlays all of that for a true full-screen canvas.
+-->
+<section class="fixed inset-0 z-[100] overflow-hidden bg-neutral-950">
 	{#if error}
 		<div class="flex h-full w-full items-center justify-center px-6 text-center">
 			<p class="max-w-md text-sm text-white/70">
