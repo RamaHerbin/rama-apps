@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/* WP4 owns the design tokens and global styles. */
+:root {
+	--bg: #050505;
+	--fg: #f4f4f5;
+	--muted: #a1a1aa;
+}
+
+html,
+body {
+	background: var(--bg);
+	color: var(--fg);
+	min-height: 100%;
+}

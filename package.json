@@ -7,12 +7,16 @@
 		"dev:photo": "pnpm --filter photo dev",
 		"dev:main": "pnpm --filter main dev",
 		"dev:langtree": "pnpm --filter langtree dev",
+		"dev:hdr": "pnpm --filter hdr dev",
 		"build:photo": "pnpm --filter photo build",
 		"build:main": "pnpm --filter main build",
 		"build:langtree": "pnpm --filter langtree build",
+		"build:hdr": "pnpm --filter hdr build",
 		"check:photo": "pnpm --filter photo check",
 		"check:main": "pnpm --filter main check",
 		"check:langtree": "pnpm --filter langtree check",
+		"check:hdr": "pnpm --filter hdr check",
+		"test:hdr": "pnpm --filter hdr test",
 		"prepare": "pnpm -r prepare"
 	}
 }
