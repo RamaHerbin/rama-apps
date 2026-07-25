@@ -16,11 +16,19 @@
 		sub: string;
 	}
 
+	// Diacritic-insensitive fold so "maori" finds "Māori", "moore" finds "Mooré".
+	function fold(s: string): string {
+		return s
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '');
+	}
+
 	const results = $derived.by((): Result[] => {
-		const query = q.trim().toLowerCase();
+		const query = fold(q.trim());
 		if (query.length < 2) return [];
 		return Object.values(scene.reg)
-			.filter((n) => n.name.toLowerCase().includes(query))
+			.filter((n) => fold(n.name).includes(query))
 			.sort(
 				(a, b) =>
 					(Number(b.kind === 'Language') - Number(a.kind === 'Language')) || b.s - a.s

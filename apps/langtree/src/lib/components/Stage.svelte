@@ -101,7 +101,11 @@
 		const v = view;
 		const mx = e.clientX - b.left;
 		const my = e.clientY - b.top;
-		const nk = Math.max(0.1, Math.min(6, v.k * Math.exp(-e.deltaY * 0.0016)));
+		// deltaY is in pixels only when deltaMode === 0; Firefox mouse wheels
+		// report lines (mode 1), some browsers pages (mode 2). Normalize first,
+		// or the pixel-tuned factor makes wheel zoom imperceptible there.
+		const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+		const nk = Math.max(0.1, Math.min(6, v.k * Math.exp(-dy * 0.0016)));
 		const f = nk / v.k;
 		setView({ k: nk, tx: mx - (mx - v.tx) * f, ty: my - (my - v.ty) * f, anim: false });
 	}
@@ -214,7 +218,10 @@
 		{/each}
 	</div>
 
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		onpointerdown={(e) => e.stopPropagation()}
+		onwheel={(e) => e.stopPropagation()}
 		style="position:absolute;top:14px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:4;"
 	>
 		<button
