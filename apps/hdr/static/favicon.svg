@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+	<title>Is your screen HDR?</title>
+	<defs>
+		<radialGradient id="blob" cx="50%" cy="52%" r="50%">
+			<stop offset="0%" stop-color="#ffffff" />
+			<stop offset="22%" stop-color="#ffd9f6" />
+			<stop offset="48%" stop-color="#ff2fd6" />
+			<stop offset="72%" stop-color="#a142ff" stop-opacity="0.85" />
+			<stop offset="100%" stop-color="#a142ff" stop-opacity="0" />
+		</radialGradient>
+		<radialGradient id="rim" cx="50%" cy="50%" r="50%">
+			<stop offset="60%" stop-color="#42cfff" stop-opacity="0" />
+			<stop offset="100%" stop-color="#42cfff" stop-opacity="0.55" />
+		</radialGradient>
+	</defs>
+
+	<rect width="64" height="64" rx="15" fill="#050505" />
+	<rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="#ffffff" stroke-opacity="0.12" />
+
+	<!-- Highlight blob: a specular core that only an HDR display can push past white. -->
+	<circle cx="32" cy="33" r="26" fill="url(#rim)" />
+	<circle cx="32" cy="33" r="22" fill="url(#blob)" />
+	<circle cx="32" cy="33" r="7" fill="#ffffff" />
+</svg>
