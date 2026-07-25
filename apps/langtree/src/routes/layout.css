@@ -1,0 +1,28 @@
+html,
+body {
+	margin: 0;
+	height: 100%;
+	background: #e9e1cf;
+}
+
+body {
+	font-family: 'EB Garamond', Georgia, serif;
+	color: #243441;
+}
+
+a {
+	color: #3c5a72;
+}
+
+a:hover {
+	color: #16222c;
+}
+
+::selection {
+	background: #46698a;
+	color: #f2ecdd;
+}
+
+input {
+	outline: none;
+}
