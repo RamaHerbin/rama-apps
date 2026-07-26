@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createFluid } from '$lib/engine/create-fluid.js';
-	import { DEFAULT_FLUID_OPTIONS, type FluidHandle } from '$lib/engine/types.js';
-	import { hexToRgb, type ColorRGB } from '$lib/engine/fluid-shared.js';
+	import { FluidCursor, type FluidCursorHandle } from 'fancy-ui-svelte';
+	import type { FluidHandle, ColorRGB } from '$lib/engine/types.js';
 
 	let {
 		onready
@@ -19,7 +18,18 @@
 	} = $props();
 
 	/** Hot, wide-gamut hues — the ones an HDR display can actually show off. */
-	const PALETTE = ['#a142ff', '#42cfff', '#ff2fd6'].map(hexToRgb);
+	const PALETTE_HEX = ['#a142ff', '#42cfff', '#ff2fd6'];
+	const PALETTE = PALETTE_HEX.map(hexToRgb);
+
+	function hexToRgb(hex: string): ColorRGB {
+		const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		if (!m) return { r: 1, g: 1, b: 1 };
+		return {
+			r: parseInt(m[1], 16) / 255,
+			g: parseInt(m[2], 16) / 255,
+			b: parseInt(m[3], 16) / 255
+		};
+	}
 
 	let colorIndex = 0;
 
@@ -30,69 +40,62 @@
 		return { r: base.r * jitter, g: base.g * jitter, b: base.b * jitter };
 	}
 
-	let canvas: HTMLCanvasElement | undefined = $state();
+	let container: HTMLDivElement | undefined = $state();
 	let engineLive = $state(true);
+	let settled = false;
+
+	/** Fire `onready` exactly once — from FluidCursor's `onReady`, or the fallback. */
+	function settle(handle: FluidHandle | null) {
+		if (settled) return;
+		settled = true;
+		engineLive = handle !== null;
+		// FluidCursor owns the canvas; hand it up for aspect measurement.
+		const canvas = container?.querySelector('canvas') ?? null;
+		onready({ handle, canvas, nextColor });
+	}
+
+	// FluidCursor hands us moveTo/penUp/burst + the real renderLevel once its
+	// engine is live. It owns its own lifecycle (unmounting it tears the engine
+	// down), so the app-side cleanup is a no-op.
+	function handleReady(h: FluidCursorHandle) {
+		settle({
+			moveTo: h.moveTo,
+			penUp: h.penUp,
+			burst: h.burst,
+			renderLevel: h.renderLevel,
+			cleanup: () => {}
+		});
+	}
 
 	onMount(() => {
-		let handle: FluidHandle | null = null;
-		let disposed = false;
-
-		(async () => {
-			const el = canvas;
-			try {
-				if (!el) throw new Error('canvas missing');
-				// Give the engine a correctly sized buffer for its first frame; it
-				// owns every resize after that.
-				const dpr = Math.min(window.devicePixelRatio || 1, 2);
-				el.width = Math.max(1, Math.floor(el.clientWidth * dpr));
-				el.height = Math.max(1, Math.floor(el.clientHeight * dpr));
-				// Slower dye dissipation + a thinner splat than the library defaults:
-				// the traced "HDR?" must stay legible on screen until the last letter
-				// lands, and thick blobs smear the glyphs into clouds.
-				handle = await createFluid(el, {
-					...DEFAULT_FLUID_OPTIONS,
-					densityDissipation: 1.1,
-					splatRadius: 0.05,
-					splatForce: 2800,
-					generateColor: nextColor
-				});
-			} catch (err) {
-				console.warn('[hdr] fluid engine unavailable', err);
-				handle = null;
-			}
-			if (disposed) {
-				handle?.cleanup();
-				return;
-			}
-			engineLive = handle !== null;
-			onready({ handle, canvas: handle ? (el ?? null) : null, nextColor });
-		})();
-
-		return () => {
-			disposed = true;
-			handle?.cleanup();
-		};
+		// FluidCursor only calls onReady when a GPU path initialised. If neither
+		// WebGPU nor WebGL is available it stays silent — after a generous grace
+		// period assume no engine and fall back to the static hero (the verdict
+		// then reports renderLevel "none"). A real WebGPU init is well under a
+		// second, so this never misfires on a working display.
+		const timer = setTimeout(() => settle(null), 4000);
+		return () => clearTimeout(timer);
 	});
 </script>
 
-<!-- The engine attaches its own window-level pointer listeners, so the canvas
-     itself never needs to receive events. -->
-<canvas
-	bind:this={canvas}
-	class={engineLive ? 'fixed inset-0 z-0 block h-full w-full select-none' : 'hidden'}
-	aria-hidden="true"
-></canvas>
+<!-- Full-viewport background layer, below the page content (main is z-10). The
+     engine attaches its own window-level pointer listeners, so a deliberate
+     mouse move still splats even though the autopilot drives the trace. -->
+<div bind:this={container} class="fixed inset-0 z-0" class:hidden={!engineLive} aria-hidden="true">
+	<FluidCursor
+		hdr
+		hdrBoost={3.5}
+		densityDissipation={1.1}
+		splatRadius={0.05}
+		splatForce={2800}
+		fluidColors={PALETTE_HEX}
+		colorIntensity={1}
+		onReady={handleReady}
+	/>
+</div>
 
 {#if !engineLive}
 	<div class="stage-fallback" aria-hidden="true">
 		<span class="fallback-mark">HDR?</span>
 	</div>
 {/if}
-
-<style>
-	canvas {
-		/* Belt and braces: keep pointer events on the window, never the canvas. */
-		pointer-events: none;
-		touch-action: none;
-	}
-</style>

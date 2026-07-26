@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Let Tailwind scan the fancy-ui-svelte package (FluidCursor et al.) so its
+   utility classes are not purged from the build. */
+@source "../node_modules/fancy-ui-svelte";
+
 /* WP4 owns the design tokens and global styles. */
 :root {
 	--bg: #050505;

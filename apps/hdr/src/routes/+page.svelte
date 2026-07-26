@@ -5,8 +5,7 @@
 	import ProofStrip from '$lib/components/ProofStrip.svelte';
 	import ReplayButton from '$lib/components/ReplayButton.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
-	import type { FluidHandle, RenderLevel } from '$lib/engine/types.js';
-	import type { ColorRGB } from '$lib/engine/fluid-shared.js';
+	import type { FluidHandle, RenderLevel, ColorRGB } from '$lib/engine/types.js';
 	import { HDR_GLYPHS, layoutText, type Stroke } from '$lib/autopilot/letters.js';
 	import { createAutopilot, type Autopilot } from '$lib/autopilot/scheduler.js';
 	import { readDisplaySignals, watchDisplaySignals, type DisplaySignals } from '$lib/hdr/detect.js';

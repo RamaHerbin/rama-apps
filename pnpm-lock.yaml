@@ -9,6 +9,10 @@ importers:
   .: {}
 
   apps/hdr:
+    dependencies:
+      fancy-ui-svelte:
+        specifier: link:../../../fancy-ui
+        version: link:../../../fancy-ui
     devDependencies:
       '@sveltejs/adapter-cloudflare':
         specifier: ^5.0.0
