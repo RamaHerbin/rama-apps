@@ -1,0 +1,39 @@
+# Repo-root .dockerignore.
+#
+# Only apps/ssh is containerized today (deployed to Fly.io — see
+# apps/ssh/Dockerfile). Its build context is the whole monorepo root (it
+# needs apps/main/content/site-content.json alongside apps/ssh/), so this
+# file is scoped to be safe for every app in the repo, not just ssh:
+# it strips build/dependency output that no Dockerfile needs and that would
+# otherwise get tarred up into the build context on every `docker build` /
+# `fly deploy`. apps/main and apps/photo deploy via Cloudflare Workers
+# (wrangler), not Docker, so excluding their heavy static/ dirs here can't
+# affect their deploys.
+
+# Dependencies (reinstalled inside the image; never needed from the host)
+**/node_modules
+
+# SvelteKit build output (apps/main, apps/photo, apps/hdr, apps/langtree)
+**/.svelte-kit
+**/build
+**/.wrangler
+**/.output
+**/.vercel
+**/.netlify
+
+# VCS / editor
+.git
+.github
+.vscode
+.DS_Store
+
+# Gallery/portfolio static assets — large, and not read by the ssh app
+apps/*/static
+
+# Repo-root scratch media that isn't part of any app's source (already
+# git-ignored, but .dockerignore is independent — without this these get
+# sent to the Docker daemon/remote builder on every build)
+*.mp4
+*.mov
+*.pdf
+design-refs

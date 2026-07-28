@@ -1,8 +1,10 @@
 packages:
   - "apps/*"
 allowBuilds:
+  cpu-features: true
   esbuild: true
   sharp: true
+  ssh2: true
   workerd: true
 minimumReleaseAgeExclude:
   - fancy-ui-svelte@0.7.0

@@ -1,0 +1,79 @@
+# fly.toml for apps/ssh — SSH terminal portfolio
+#
+# This config does NOT live at the repo root, and its [build] section is
+# intentionally still root-relative: per Fly's docs, `dockerfile` is resolved
+# relative to flyctl's *working directory* (the build context), which stays
+# the project root by default regardless of where fly.toml sits — moving
+# fly.toml into apps/ssh/ does not move the context with it. So every
+# `fly deploy` for this app must be run FROM THE REPO ROOT, pointing both
+# flags at apps/ssh explicitly:
+#
+#   fly deploy --config apps/ssh/fly.toml --dockerfile apps/ssh/Dockerfile
+#
+# Running it any other way (e.g. `cd apps/ssh && fly deploy`) changes the
+# build context to apps/ssh/ and breaks the COPY of apps/main/content/ in the
+# Dockerfile. Full provisioning steps: see apps/ssh/TODO.md.
+
+app = 'ssh-rama'
+primary_region = 'cdg' # Paris — closest region to Lyon
+
+[build]
+dockerfile = 'apps/ssh/Dockerfile'
+
+[[vm]]
+size = 'shared-cpu-1x'
+memory = '512mb'
+
+# Host key persistence: SSH_HOST_KEY_PATH=/data/host_key (see Dockerfile ENV)
+# is written here so re-deploys and machine restarts keep the same host key
+# instead of forcing every SSH client to flush a "host key changed" warning.
+[[mounts]]
+source = 'host_keys'
+destination = '/data'
+initial_size = '1gb'
+
+# --- Service 1: SSH, raw TCP on the real port 22 -----------------------------
+# No `handlers` here on purpose: the SSH protocol does its own framing and
+# crypto over the raw TCP stream, so this must NOT go through Fly's HTTP/TLS
+# proxying (that's for services 2 below).
+[[services]]
+internal_port = 2222
+protocol = 'tcp'
+auto_stop_machines = 'off'
+auto_start_machines = true
+min_machines_running = 1
+
+[[services.ports]]
+port = 22
+
+[[services.tcp_checks]]
+interval = '15s'
+timeout = '2s'
+grace_period = '5s'
+
+[services.concurrency]
+type = 'connections'
+hard_limit = 100
+soft_limit = 75
+
+# --- Service 2: plain HTTP(S) → redirects to rama.app ------------------------
+# Exists only so `https://ssh.rama.app` doesn't dead-end in a browser; the
+# actual portfolio content is SSH-only. See REDIRECT_TARGET below.
+[[services]]
+internal_port = 8080
+protocol = 'tcp'
+auto_stop_machines = 'off'
+auto_start_machines = true
+min_machines_running = 1
+
+[[services.ports]]
+port = 80
+handlers = ['http']
+force_https = true
+
+[[services.ports]]
+port = 443
+handlers = ['tls', 'http']
+
+[env]
+REDIRECT_TARGET = 'https://rama.app'

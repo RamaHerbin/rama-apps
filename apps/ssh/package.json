@@ -1,0 +1,25 @@
+{
+	"name": "ssh",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run --watch src/dev.tsx",
+		"ssh": "bun run src/ssh-server.tsx",
+		"ssh:watch": "bun run --watch src/ssh-server.tsx",
+		"check": "tsc --noEmit",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@opentui/core": "0.4.5",
+		"@opentui/react": "0.4.5",
+		"@opentui/ssh": "0.4.5",
+		"react": "^19.2.0"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.3.0",
+		"@types/react": "^19.2.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	}
+}
