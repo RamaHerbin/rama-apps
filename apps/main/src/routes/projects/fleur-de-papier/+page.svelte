@@ -14,7 +14,8 @@
 		productions,
 		fdpHeroMeta,
 		approach,
-		type Production
+		type Production,
+		type ProductionCredit
 	} from "$lib/portfolio/work/index.js";
 
 	// --- Selected-productions rows ------------------------------------------
@@ -105,6 +106,55 @@
 			<span data-edit-item={i}
 				><Tag label={tag} class={size === "xs" ? "text-[11px]" : "text-xs"} /></span
 			>
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet credits(list: ProductionCredit[])}
+	<!-- Creative-team credit block: mono micro-labels matching the ROLE/TECH
+	     rows above, each collaborator's name links out to their Instagram. -->
+	<div class="mt-5 flex flex-col gap-3 border-t border-border/50 pt-4">
+		<span
+			class="font-mono text-[10px] tracking-[0.14em] text-muted-foreground/70"
+			data-edit="fdp.production-media.credits-label"
+		>
+			{c("fdp.production-media.credits-label")}
+		</span>
+		{#each list as cr (cr.url)}
+			<a
+				href={cr.url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="group flex items-center justify-between gap-4 text-sm"
+			>
+				<span class="pt-[3px] font-mono text-[10px] tracking-[0.14em] text-muted-foreground/70 uppercase">
+					{cr.role}
+				</span>
+				<span
+					class="flex items-center gap-2 text-foreground transition-colors group-hover:text-accent-work"
+				>
+					<span>{cr.name}</span>
+					<svg
+						class="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-accent-work"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<rect x="2" y="2" width="20" height="20" rx="5" />
+						<circle cx="12" cy="12" r="4" />
+						<circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+					</svg>
+					<span
+						class="font-mono text-[12px] text-muted-foreground transition-colors group-hover:text-accent-work"
+					>
+						{cr.instagram}
+					</span>
+				</span>
+			</a>
 		{/each}
 	</div>
 {/snippet}
@@ -494,6 +544,7 @@
 									{@render tagList(p.slug)}
 								</div>
 							</div>
+							{#if p.credits?.length}{@render credits(p.credits)}{/if}
 						</div>
 					</article>
 				{:else if p.layout === "slim"}

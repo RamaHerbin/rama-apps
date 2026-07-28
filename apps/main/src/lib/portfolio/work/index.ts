@@ -20,6 +20,7 @@ export {
 } from "./productions.js";
 export type {
 	Production,
+	ProductionCredit,
 	ProductionIndex,
 	ProductionLayout,
 	ProductionVideo,
