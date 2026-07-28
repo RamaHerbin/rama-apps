@@ -29,6 +29,18 @@ export interface ProductionVideo {
 	fileLabel: string;
 }
 
+/** A collaborator credit — the creative team behind a production. */
+export interface ProductionCredit {
+	/** Discipline, e.g. "Illustration" or "Design" */
+	role: string;
+	/** Collaborator's display name */
+	name: string;
+	/** Instagram handle, including the leading @ */
+	instagram: string;
+	/** Full profile URL */
+	url: string;
+}
+
 export interface Production {
 	slug: string;
 	index: ProductionIndex;
@@ -41,6 +53,8 @@ export interface Production {
 	featured: boolean;
 	layout: ProductionLayout;
 	video?: ProductionVideo;
+	/** Creative collaborators to credit (illustration, design, …) */
+	credits?: ProductionCredit[];
 	/** true when specifics (institution / stack / year) are still to be confirmed */
 	tbc?: boolean;
 	/** internal link to a dedicated detail page, if one exists */
@@ -96,7 +110,21 @@ export const productions: Production[] = [
 		tags: cList("productions.terre-adelice.tags"),
 		featured: true,
 		layout: "split-right",
-		video: video("terre-adelice", "00:51", "TERRE-ADELICE_BD")
+		video: video("terre-adelice", "00:51", "TERRE-ADELICE_BD"),
+		credits: [
+			{
+				role: "Illustration",
+				name: "Nicolas",
+				instagram: "@nicolart_dumanoir",
+				url: "https://www.instagram.com/nicolart_dumanoir/"
+			},
+			{
+				role: "Design",
+				name: "Elia",
+				instagram: "@pierrrenoire",
+				url: "https://www.instagram.com/pierrrenoire/"
+			}
+		]
 	},
 	{
 		slug: "atrium-de-rouen",
