@@ -1,0 +1,40 @@
+name: Deploy apps/ssh to Fly.io
+
+# Manual trigger ONLY for now. There's no `FLY_API_TOKEN` repo secret yet
+# (Fly app isn't provisioned — see apps/ssh/TODO.md), so a push trigger would
+# just fail on every commit. Once the app exists and the secret is added,
+# flip this to also run on pushes to main that touch apps/ssh/** or
+# apps/main/content/site-content.json.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Only one deploy of this app at a time; a second manual run supersedes an
+# in-flight one rather than racing it.
+concurrency:
+  group: fly-deploy-ssh
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      # Run from the repo root: the Dockerfile's build context must be the
+      # monorepo root (it copies apps/main/content/site-content.json in
+      # alongside apps/ssh/), so both --config and --dockerfile point *into*
+      # apps/ssh explicitly rather than relying on flyctl's directory
+      # defaults. See the comment header in apps/ssh/fly.toml.
+      - name: Deploy
+        run: |
+          flyctl deploy \
+            --config apps/ssh/fly.toml \
+            --dockerfile apps/ssh/Dockerfile \
+            --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

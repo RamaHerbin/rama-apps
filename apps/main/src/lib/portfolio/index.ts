@@ -20,4 +20,5 @@ export { default as Testimonials } from "./sections/Testimonials.svelte";
 export { default as Passions } from "./sections/Passions.svelte";
 export { default as Creative } from "./sections/Creative.svelte";
 export { default as Contact } from "./sections/Contact.svelte";
+export { default as Terminal } from "./sections/Terminal.svelte";
 export { default as Footer } from "./sections/Footer.svelte";

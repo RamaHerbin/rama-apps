@@ -9,6 +9,7 @@
 		Passions,
 		Creative,
 		Contact,
+		Terminal,
 		Footer,
 		ScrollBlurOverlay,
 	} from "$lib/portfolio/index.js";
@@ -33,6 +34,7 @@
 	<Passions />
 	<Creative />
 	<Contact />
+	<Terminal />
 </main>
 
 <Footer />
