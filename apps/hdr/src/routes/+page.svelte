@@ -25,6 +25,11 @@
 	let autopilot: Autopilot | null = null;
 	let stageCanvas: HTMLCanvasElement | null = null;
 	let nextColor: (() => ColorRGB) | null = null;
+	// Set once the component is torn down. `autopilot.stop()` resolves the
+	// awaited playTrace() promise, so a trace suspended at that await would
+	// otherwise resume post-teardown and start the ambient rAF loop on an
+	// already-cleaned handle.
+	let disposed = false;
 
 	const verdictKey = $derived(verdict ? verdict.case : 'pending');
 	const statusLabel = $derived(
@@ -150,6 +155,10 @@
 		} catch (err) {
 			console.warn('[hdr] playTrace', err);
 		}
+		// Teardown (or a cancelled trace) resolves the await above — don't
+		// resurrect work, and above all don't start the ambient loop, after the
+		// component is gone.
+		if (disposed) return;
 		popQuestionDot(strokes);
 		reveal();
 		run('startAmbient', () => autopilot?.startAmbient());
@@ -202,6 +211,7 @@
 		);
 
 		return () => {
+			disposed = true;
 			window.removeEventListener('mousemove', notifyActive);
 			window.removeEventListener('touchstart', notifyActive);
 			run('unwatch', unwatch);
