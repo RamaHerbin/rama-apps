@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import FluidStage from '$lib/components/FluidStage.svelte';
+	import GlassPanel from '$lib/components/GlassPanel.svelte';
+	import EyebrowBadge from '$lib/components/EyebrowBadge.svelte';
 	import VerdictCard from '$lib/components/VerdictCard.svelte';
 	import ProofStrip from '$lib/components/ProofStrip.svelte';
 	import ReplayButton from '$lib/components/ReplayButton.svelte';
@@ -223,6 +225,13 @@
 <svelte:head>
 	<title>Is your screen HDR?</title>
 	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	<link
+		rel="preload"
+		href="/fonts/InterDisplay-ExtraBold.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin="anonymous"
+	/>
 	<meta name="theme-color" content="#050505" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Is your screen HDR?" />
@@ -235,52 +244,45 @@
 
 <FluidStage onready={handleStage} />
 
-<main class="relative z-10 flex min-h-[100svh] flex-col px-5 pt-5 pb-8 sm:px-10 sm:pt-7">
+<main class="relative z-10 flex min-h-[100svh] flex-col p-3 sm:p-[4vw]">
 	<h1 class="sr-only">Is your screen HDR?</h1>
 
-	<div class="flex items-baseline justify-between gap-4">
-		<p class="eyebrow">
-			<span class="dot" data-live={phase === 'tracing'} data-yes={verdict?.yes === true}></span>
-			display probe
-		</p>
-		<p class="eyebrow">{statusLabel}</p>
-	</div>
-
-	<!-- The fluid writes "HDR?" through this gap. -->
-	<div class="h-[34svh] min-h-[120px] shrink-0 sm:h-[42svh]" aria-hidden="true"></div>
-
-	<div class="mx-auto w-full max-w-[36rem]" aria-live="polite">
-		<!-- A replay dims the answer rather than removing it: no layout jump, and
-		     the letters get the stage back for five seconds. -->
-		<div class="transition-opacity duration-500" style:opacity={phase === 'tracing' ? 0.3 : 1}>
-			{#key verdictKey}
-				{#if revealed && verdict}
-					<VerdictCard {verdict} />
-				{/if}
-			{/key}
-		</div>
-	</div>
-
-	{#if revealed}
-		<div
-			class="mx-auto mt-9 flex w-full max-w-[36rem] flex-col gap-8 sm:flex-row sm:items-end sm:justify-between"
-		>
-			<ProofStrip />
-
-			{#if engineReady}
-				<div class="flex flex-col items-start gap-3 sm:items-end">
-					<!-- Reduced motion means there is no autopilot to re-run; the fluid
-					     still answers to a deliberate cursor, so the hint stays. -->
-					{#if canTrace}
-						<ReplayButton onreplay={replay} disabled={phase === 'tracing'} />
-					{/if}
-					<p class="caption sm:text-right">Move your cursor. The fluid follows.</p>
-				</div>
-			{/if}
+	{#if phase !== 'verdict'}
+		<div class="topchrome flex items-baseline justify-between gap-4">
+			<p class="eyebrow">
+				<EyebrowBadge live={phase === 'tracing'} yes={verdict?.yes === true} /> display probe
+			</p>
+			<p class="eyebrow">{statusLabel}</p>
 		</div>
 	{/if}
 
-	<div class="mt-auto pt-12">
+	<div
+		class="bigcard-holder flex flex-1 flex-col"
+		data-tracing={phase === 'tracing'}
+		aria-live="polite"
+	>
+		{#if revealed && verdict}
+			<GlassPanel verdictCase={verdict.case}>
+				<VerdictCard {verdict} {statusLabel} live={phase === 'tracing'}>
+					{#snippet swatches()}
+						<ProofStrip />
+					{/snippet}
+					{#snippet actions()}
+						{#if engineReady}
+							<!-- Reduced motion means there is no autopilot to re-run; the fluid
+							     still answers to a deliberate cursor, so the hint stays. -->
+							{#if canTrace}
+								<ReplayButton onreplay={replay} disabled={phase === 'tracing'} />
+							{/if}
+							<p class="caption sm:text-right">Move your cursor. The fluid follows.</p>
+						{/if}
+					{/snippet}
+				</VerdictCard>
+			</GlassPanel>
+		{/if}
+	</div>
+
+	<div class="mt-3 pt-4">
 		<SiteFooter />
 	</div>
 </main>
