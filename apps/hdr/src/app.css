@@ -273,7 +273,7 @@ body {
 		background-size: 260% 100%;
 		background-position: 0% 50%;
 		background-repeat: no-repeat;
-		animation: sheen 14s linear infinite;
+		animation: sheen 14s linear infinite alternate;
 	}
 
 	@supports (background-clip: text) or (-webkit-background-clip: text) {
@@ -564,9 +564,12 @@ body {
 	}
 }
 
+/* With a 260%-wide no-repeat image, any position inside [0%, 100%] keeps the
+   whole text covered; past that range the image slides off and clipped glyphs
+   turn invisible. Ping-pong within the safe range. */
 @keyframes sheen {
 	to {
-		background-position: -160% 50%;
+		background-position: 100% 50%;
 	}
 }
 
