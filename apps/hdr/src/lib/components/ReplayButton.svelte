@@ -18,5 +18,5 @@
 		/>
 		<path d="M10.6 1v2.2H8.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
 	</svg>
-	Trace it again
+	Light it again
 </button>

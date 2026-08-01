@@ -3,9 +3,9 @@
  * [0,1], top-left origin (y grows downward).
  *
  * The shapes are deliberately blunt — thick single-line strokes, no serifs,
- * wide apertures, one stroke per structural part. The fluid simulation smears
- * dye outward from everything it traces, so anything finer than this stops
- * reading as a letter a few hundred milliseconds after the pen passes.
+ * wide apertures, one stroke per structural part. Each stroke is sampled into
+ * seeker particles that hold the glyph for only a beat before the shell
+ * releases, so anything finer than this stops reading as a letter.
  */
 
 export interface PathPoint {
@@ -112,8 +112,8 @@ const R: Glyph = {
 /**
  * Hook and dot. The hook is one continuous stroke: three quarters of an
  * ellipse (left -> up -> right -> down, ending at mid height) followed by the
- * short vertical descender. The dot is a stub segment — the page may also fire
- * a burst() at the same spot for extra punch.
+ * short vertical descender. The dot is a stub segment — the choreographer also
+ * pops a small peony at the same spot for extra punch.
  */
 const QUESTION: Glyph = {
 	width: 0.6,

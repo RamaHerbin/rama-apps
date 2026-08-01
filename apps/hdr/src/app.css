@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Let Tailwind scan the fancy-ui-svelte package (FluidCursor et al.) so its
+/* Let Tailwind scan the fancy-ui-svelte package (FireworksHdr et al.) so its
    utility classes are not purged from the build. */
 @source "../node_modules/fancy-ui-svelte";
 
@@ -21,9 +21,10 @@
 	--hair: rgba(255, 255, 255, 0.1);
 	--hair-bright: rgba(255, 255, 255, 0.2);
 
-	/* Same three colours the fluid splats with, reused as UI accents. */
-	--violet: #a142ff;
+	/* Same hues the fireworks burst with, reused as UI accents. */
 	--cyan: #42cfff;
+	--blue: #3d5bff;
+	--violet: #a142ff;
 	--magenta: #ff2fd6;
 
 	--radius-card: 28px;
@@ -155,17 +156,17 @@ body {
 	}
 
 	/* A replay dims the answer rather than removing it: no layout jump, and
-	   the letters get the stage back for five seconds. */
+	   the fireworks get the sky back while the intro re-runs. */
 	.bigcard-holder {
 		transition: opacity 500ms ease;
 	}
 
-	.bigcard-holder[data-tracing='true'] {
+	.bigcard-holder[data-show='true'] {
 		opacity: 0.04;
 		pointer-events: none;
 	}
 
-	.bigcard-holder[data-tracing='true'] .bigcard {
+	.bigcard-holder[data-show='true'] .bigcard {
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
 	}
