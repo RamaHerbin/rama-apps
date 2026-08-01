@@ -11,8 +11,8 @@ importers:
   apps/hdr:
     dependencies:
       fancy-ui-svelte:
-        specifier: link:../../../fancy-ui
-        version: link:../../../fancy-ui
+        specifier: ^0.9.0
+        version: 0.9.0(svelte@5.53.10)(tailwindcss@4.2.1)
     devDependencies:
       '@sveltejs/adapter-cloudflare':
         specifier: ^5.0.0
@@ -1997,6 +1997,13 @@ packages:
 
   fancy-ui-svelte@0.7.0:
     resolution: {integrity: sha512-jc7KDKjyEW3H5ia4vXUWd4o5QXeiF6KwPlWx6fimYolfDQkEmANIkfTM44/RoeKUCKL3FSJHlyHsU9SW4EdUQA==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+      tailwindcss: ^4.0.0
+
+  fancy-ui-svelte@0.9.0:
+    resolution: {integrity: sha512-N3dMviLL7eVjtkHMcikBVoCfTFutYs3gRn8JRg96dISaZ461wixSqcnYC7oyaG0s3sIFu/Ozu3ip8EIukj8PGw==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       svelte: ^5.0.0
@@ -4405,6 +4412,17 @@ snapshots:
   expect-type@1.4.0: {}
 
   fancy-ui-svelte@0.7.0(svelte@5.53.10)(tailwindcss@4.2.1):
+    dependencies:
+      '@chenglou/pretext': 0.0.5
+      canvas-confetti: 1.9.4
+      clsx: 2.1.1
+      gsap: 3.14.2
+      svelte: 5.53.10
+      tailwind-merge: 3.5.0
+      tailwindcss: 4.2.1
+      three: 0.183.2
+
+  fancy-ui-svelte@0.9.0(svelte@5.53.10)(tailwindcss@4.2.1):
     dependencies:
       '@chenglou/pretext': 0.0.5
       canvas-confetti: 1.9.4
