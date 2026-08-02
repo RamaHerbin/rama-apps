@@ -9,7 +9,7 @@
 		{ name: "Synopsys Inc", path: "/portfolio/Synopsys_Logo.svg" },
 		{ name: "Fleur de Papier", path: "/portfolio/FleurdePapier.svg" },
 		{ name: "Ansys", path: "/portfolio/Ansys_logo_(2019).svg" },
-		{ name: "Claude", path: "/portfolio/claude-logo.svg" },
+		{ name: "Claude for Open Source", path: "/portfolio/claude-logo.svg" },
 	];
 </script>
 

@@ -26,8 +26,19 @@
 	bind:this={heroSectionRef}
 	class="relative flex min-h-[90vh] items-center justify-center overflow-hidden"
 >
-	<!-- Fluid Cursor - contained to this section only, never full-screen/global -->
-	<FluidCursor contained simResolution={128} class="absolute inset-0 -z-10" />
+	<!--
+		Fluid Cursor - contained to this section only, never full-screen/global.
+		HDR path: WebGPU rgba16float + display-p3 with extended tone mapping, so
+		the splats glow past SDR white on an HDR display in a WebGPU browser;
+		gracefully falls back to the WebGL cursor everywhere else.
+	-->
+	<FluidCursor
+		contained
+		simResolution={128}
+		hdr
+		hdrBoost={2}
+		class="absolute inset-0 -z-10"
+	/>
 
 	<!--
 		Interactive Grid Pattern Background.

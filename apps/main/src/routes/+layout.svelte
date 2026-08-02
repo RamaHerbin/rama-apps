@@ -3,6 +3,7 @@
 	import { onMount, type Component } from "svelte";
 	import { dev } from "$app/environment";
 	import { injectAnalytics } from "@vercel/analytics/sveltekit";
+  import { ScrollBlurOverlay } from '$lib/portfolio';
 
 	let { children } = $props();
 
@@ -66,3 +67,5 @@
 	{@const Overlay = EditOverlay}
 	<Overlay {studioOrigin} />
 {/if}
+
+<ScrollBlurOverlay />
