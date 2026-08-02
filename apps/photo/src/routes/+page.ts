@@ -1,37 +1,24 @@
-import { getFeaturedPhotos, getPhotos, getFeaturedCollections, getPhotosByCollection, getPhotoBySlug } from '$lib/data/index.js';
+import { getPhotos, getPhotoById, getSiteConfig } from '$lib/data/index.js';
+import { editorialHomeConstellation } from '$lib/data/editorial-home.js';
+import type { ResolvedConstellationEntry } from '$lib/types/index.js';
 
 export function load() {
-	const recentPhotos = getPhotos().slice(0, 12);
-	const featuredPhotos = getFeaturedPhotos().slice(0, 8);
-	const featuredCollections = getFeaturedCollections().slice(0, 4);
+	const site = getSiteConfig();
+	const photoCount = getPhotos().length;
 
-	const collectionsWithCover = featuredCollections.map((c) => ({
-		collection: c,
-		coverPhoto: c.coverPhotoId ? getPhotoBySlug(c.coverPhotoId) : undefined,
-		photoCount: getPhotosByCollection(c.id).length
-	}));
-
-	// Use recent photo thumbnails for the cursor trail, fallback to static images
-	let trailImages: string[] = recentPhotos
-		.slice(0, 10)
-		.map((p) => p.variants?.thumb?.jpg?.url)
-		.filter((url): url is string => typeof url === 'string');
-
-	if (trailImages.length === 0) {
-		trailImages = [
-			'/DSCF0385-ed.jpg',
-			'/DSCF0404.jpg',
-			'/DSCF0501test.webp',
-			'/DSCF0548test.webp',
-			'/DSCF0703test2_1.webp',
-			'/IMG_0318.jpg'
-		];
-	}
+	// Resolve the centralized constellation config against the real photo
+	// catalog. Entries whose photoId no longer exists in data/photos.json
+	// are silently dropped so editing editorial-home.ts never 404s the page.
+	const constellation: ResolvedConstellationEntry[] = editorialHomeConstellation
+		.map((entry) => {
+			const photo = getPhotoById(entry.photoId);
+			return photo ? { ...entry, photo } : null;
+		})
+		.filter((entry): entry is ResolvedConstellationEntry => entry !== null);
 
 	return {
-		recentPhotos,
-		featuredPhotos,
-		featuredCollections: collectionsWithCover,
-		trailImages
+		site,
+		photoCount,
+		constellation
 	};
 }
