@@ -17,6 +17,8 @@
 
 	let phase = $state<Phase>('boot');
 	let verdict = $state<Verdict | null>(null);
+	/** True on touch-first devices — the fluid hint speaks finger, not cursor. */
+	let coarsePointer = $state(false);
 	/** Once the answer has been shown it stays on screen, replays included. */
 	let revealed = $state(false);
 	let engineReady = $state(false);
@@ -205,6 +207,12 @@
 		window.addEventListener('mousemove', notifyActive, { passive: true });
 		window.addEventListener('touchstart', notifyActive, { passive: true });
 
+		// Word the fluid hint for the input the device actually has.
+		const coarseQuery = window.matchMedia('(pointer: coarse)');
+		coarsePointer = coarseQuery.matches;
+		const onCoarseChange = (e: MediaQueryListEvent) => (coarsePointer = e.matches);
+		coarseQuery.addEventListener('change', onCoarseChange);
+
 		// Live re-measure: drag the window to another monitor and the answer flips.
 		const unwatch = attempt(
 			'watchDisplaySignals',
@@ -216,6 +224,7 @@
 			disposed = true;
 			window.removeEventListener('mousemove', notifyActive);
 			window.removeEventListener('touchstart', notifyActive);
+			coarseQuery.removeEventListener('change', onCoarseChange);
 			run('unwatch', unwatch);
 			run('autopilot.stop', () => autopilot?.stop());
 		};
@@ -244,7 +253,7 @@
 
 <FluidStage onready={handleStage} />
 
-<main class="relative z-10 flex min-h-[100svh] flex-col p-3 sm:p-[4vw]">
+<main class="page-shell relative z-10 flex min-h-[100svh] flex-col">
 	<h1 class="sr-only">Is your screen HDR?</h1>
 
 	{#if phase !== 'verdict'}
@@ -274,7 +283,11 @@
 							{#if canTrace}
 								<ReplayButton onreplay={replay} disabled={phase === 'tracing'} />
 							{/if}
-							<p class="caption sm:text-right">Move your cursor. The fluid follows.</p>
+							<p class="caption sm:text-right">
+								{coarsePointer
+									? 'Drag your finger. The fluid follows.'
+									: 'Move your cursor. The fluid follows.'}
+							</p>
 						{/if}
 					{/snippet}
 				</VerdictCard>

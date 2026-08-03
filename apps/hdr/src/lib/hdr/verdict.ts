@@ -44,7 +44,7 @@ export function computeVerdict(display: DisplaySignals, render: RenderLevel): Ve
 
 	if (display.dynamicRangeHigh) {
 		let body =
-			'This display speaks HDR, but this browser clamps the canvas to plain old SDR. Try Chrome or Edge on this same machine and watch it glow.';
+			'This display speaks HDR, but this browser clamps the canvas to plain old SDR. Try a browser with HDR WebGPU support — on desktop, Chrome or Edge — and watch it glow.';
 		if (render === 'none') {
 			body += " (This browser couldn't start GPU rendering at all.)";
 		}
@@ -62,7 +62,7 @@ export function computeVerdict(display: DisplaySignals, render: RenderLevel): Ve
 			case: 'screen-sdr',
 			yes: false,
 			title: "Browser's ready. Screen says no.",
-			body: "Your browser would happily paint brighter-than-white — this display (or its current mode) can't show it. On some laptops HDR headroom also vanishes at max brightness.",
+			body: "Your browser would happily paint brighter-than-white — this display (or its current mode) can't show it. On some devices HDR headroom also vanishes at max brightness.",
 			detail
 		};
 	}

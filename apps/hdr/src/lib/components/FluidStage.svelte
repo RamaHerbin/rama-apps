@@ -44,6 +44,16 @@
 	let engineLive = $state(true);
 	let settled = false;
 
+	// Touch-first or narrow viewports get a lighter simulation: phone GPUs
+	// throttle hard on sustained full-res fluid, and the visual difference at
+	// phone sizes is negligible. Evaluated once, pre-mount (false during SSR).
+	const lightStage =
+		typeof window !== 'undefined' &&
+		(window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 640);
+	// Desktop values match FluidCursor's own defaults (128 / 1440).
+	const SIM_RESOLUTION = lightStage ? 96 : 128;
+	const DYE_RESOLUTION = lightStage ? 512 : 1440;
+
 	/** Fire `onready` exactly once — from FluidCursor's `onReady`, or the fallback. */
 	function settle(handle: FluidHandle | null) {
 		if (settled) return;
@@ -85,6 +95,8 @@
 	<FluidCursor
 		hdr
 		hdrBoost={3.5}
+		simResolution={SIM_RESOLUTION}
+		dyeResolution={DYE_RESOLUTION}
 		densityDissipation={1.1}
 		splatRadius={0.05}
 		splatForce={2800}
