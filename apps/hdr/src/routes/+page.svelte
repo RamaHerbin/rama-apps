@@ -32,6 +32,8 @@
 
 	let phase = $state<Phase>('boot');
 	let verdict = $state<Verdict | null>(null);
+	/** True on touch-first devices — the sky invitation speaks tap, not click. */
+	let coarsePointer = $state(false);
 	/** Once the answer has been shown it stays on screen, replays included. */
 	let revealed = $state(false);
 	let engineReady = $state(false);
@@ -292,6 +294,12 @@
 		window.addEventListener('click', launchAtPointer);
 		window.addEventListener('resize', handleResize);
 
+		// Word the sky invitation for the input the device actually has.
+		const coarseQuery = window.matchMedia('(pointer: coarse)');
+		coarsePointer = coarseQuery.matches;
+		const onCoarseChange = (e: MediaQueryListEvent) => (coarsePointer = e.matches);
+		coarseQuery.addEventListener('change', onCoarseChange);
+
 		// Live re-measure: drag the window to another monitor and the answer flips.
 		const unwatch = attempt(
 			'watchDisplaySignals',
@@ -304,6 +312,7 @@
 			window.removeEventListener('click', launchAtPointer);
 			window.removeEventListener('resize', handleResize);
 			if (resizeTimer) clearTimeout(resizeTimer);
+			coarseQuery.removeEventListener('change', onCoarseChange);
 			run('unwatch', unwatch);
 			// FireworksHdr owns its own teardown (unmounting it cleans the engine),
 			// so the app only stops the choreographer here — no handle.cleanup().
@@ -334,7 +343,7 @@
 
 <FireworksStage onready={handleStage} />
 
-<main class="relative z-10 flex min-h-[100svh] flex-col p-3 sm:p-[4vw]">
+<main class="page-shell relative z-10 flex min-h-[100svh] flex-col">
 	<h1 class="sr-only">Is your screen HDR?</h1>
 
 	{#if phase !== 'verdict'}
@@ -365,7 +374,9 @@
 							{#if canReplay}
 								<ReplayButton onreplay={replay} disabled={phase === 'show'} />
 							{/if}
-							<p class="caption sm:text-right">Click the sky. Send one up.</p>
+							<p class="caption sm:text-right">
+								{coarsePointer ? 'Tap the sky. Send one up.' : 'Click the sky. Send one up.'}
+							</p>
 						{/if}
 					{/snippet}
 				</VerdictCard>
