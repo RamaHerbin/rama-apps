@@ -83,3 +83,61 @@ html.boot-pending::after {
 		visibility: hidden;
 	}
 }
+
+/* ==========================================================================
+ * Scatter home (photo.rama.app) — gregorcollienne.com-style scattered gallery
+ * Styles shared by the intro pile-disperse, the parallax scatter field, and
+ * the focus overlay. Toggle classes are driven from Svelte; these are the
+ * static base rules only.
+ * ========================================================================== */
+
+/*
+ * Center name reveal. Sits fixed at the exact viewport center, above the
+ * scatter field but below the focus overlay. Hidden by default; the intro
+ * timeline adds .is-visible once the pile has begun to disperse.
+ */
+.scatter-name {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	margin: 0;
+	font-family: var(--font-sans);
+	font-weight: 900;
+	font-size: clamp(2.2rem, 7vw, 6rem);
+	line-height: 1;
+	letter-spacing: -0.04em;
+	text-transform: uppercase;
+	text-align: center;
+	color: var(--color-foreground);
+	pointer-events: none;
+	z-index: 30;
+	opacity: 0;
+	transition: opacity 600ms ease;
+}
+
+.scatter-name.is-visible {
+	opacity: 1;
+}
+
+/*
+ * Vertical caption for the focus overlay (right-hand rail). Reads
+ * bottom-to-top, muted, spaced. Used by FocusView.svelte.
+ */
+.focus-caption {
+	writing-mode: vertical-rl;
+	font-size: 12px;
+	letter-spacing: 0.02em;
+	color: var(--color-muted-foreground);
+}
+
+/*
+ * Base for every absolutely-positioned photo in the enhanced scatter field.
+ * Per-item x/y/w/h/z-index come from inline styles; transforms are animated
+ * by the intro (WAAPI) and scroll (GSAP) engines.
+ */
+.scatter-item {
+	position: absolute;
+	will-change: transform;
+	box-shadow: 0 2px 24px -12px rgba(0, 0, 0, 0.35);
+}
