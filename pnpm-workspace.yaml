@@ -7,3 +7,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - fancy-ui-svelte@0.7.0
   - fancy-ui-svelte@0.9.0
+  - fancy-ui-svelte@0.9.1

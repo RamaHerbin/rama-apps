@@ -1,53 +1,76 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import FluidStage from '$lib/components/FluidStage.svelte';
+	import FireworksStage from '$lib/components/FireworksStage.svelte';
 	import GlassPanel from '$lib/components/GlassPanel.svelte';
 	import EyebrowBadge from '$lib/components/EyebrowBadge.svelte';
 	import VerdictCard from '$lib/components/VerdictCard.svelte';
 	import ProofStrip from '$lib/components/ProofStrip.svelte';
 	import ReplayButton from '$lib/components/ReplayButton.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
-	import type { FluidHandle, RenderLevel, ColorRGB } from '$lib/engine/types.js';
-	import { HDR_GLYPHS, layoutText, type Stroke } from '$lib/autopilot/letters.js';
-	import { createAutopilot, type Autopilot } from '$lib/autopilot/scheduler.js';
+	import type { FireworksHandle, RenderLevel } from '$lib/engine/types.js';
+	import {
+		buildGlyphTargets,
+		fitGlyphHeight,
+		GLYPH_CENTER_X,
+		GLYPH_GAP,
+		type GlyphTarget
+	} from '$lib/fireworks/glyph-targets.js';
+	import { createChoreographer, type Choreographer } from '$lib/fireworks/choreographer.js';
 	import { readDisplaySignals, watchDisplaySignals, type DisplaySignals } from '$lib/hdr/detect.js';
 	import { computeVerdict, type Verdict } from '$lib/hdr/verdict.js';
 
-	type Phase = 'boot' | 'tracing' | 'verdict';
+	type Phase = 'boot' | 'show' | 'verdict';
+
+	/** Structurally identical to the engine's `Rect` — no import needed to call `setKeepClear`. */
+	type KeepClearRect = { x0: number; y0: number; x1: number; y1: number };
+	// Spec §4.5 fallback rects — used until the card can be measured, or if a
+	// measurement ever comes back degenerate (zero-size, detached, etc).
+	const KEEP_CLEAR_FALLBACK_DESKTOP: KeepClearRect = { x0: 0.28, y0: 0.3, x1: 0.72, y1: 0.82 };
+	const KEEP_CLEAR_FALLBACK_MOBILE: KeepClearRect = { x0: 0.1, y0: 0.22, x1: 0.9, y1: 0.9 };
+	const KEEP_CLEAR_MARGIN = 0.03;
+	const MOBILE_BREAKPOINT = 640; // matches the page's own `sm:` usage
 
 	let phase = $state<Phase>('boot');
 	let verdict = $state<Verdict | null>(null);
-	/** True on touch-first devices — the fluid hint speaks finger, not cursor. */
+	/** True on touch-first devices — the sky invitation speaks tap, not click. */
 	let coarsePointer = $state(false);
 	/** Once the answer has been shown it stays on screen, replays included. */
 	let revealed = $state(false);
 	let engineReady = $state(false);
-	/** The autopilot exists, so "trace it again" has something to replay. */
-	let canTrace = $state(false);
+	/** The choreographer exists, so "light it again" has an intro to replay. */
+	let canReplay = $state(false);
+	/** The verdict card's holder — measured into a keep-clear rect for the sky. */
+	let bigcardHolderEl: HTMLDivElement | undefined = $state();
 
-	let handle: FluidHandle | null = null;
-	let autopilot: Autopilot | null = null;
+	let handle: FireworksHandle | null = null;
+	let choreographer: Choreographer | null = null;
 	let stageCanvas: HTMLCanvasElement | null = null;
-	let nextColor: (() => ColorRGB) | null = null;
-	// Set once the component is torn down. `autopilot.stop()` resolves the
-	// awaited playTrace() promise, so a trace suspended at that await would
-	// otherwise resume post-teardown and start the ambient rAF loop on an
-	// already-cleaned handle.
+	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+	// Set once the component is torn down. `choreographer.stop()` resolves the
+	// awaited playIntro() promise, so an intro suspended at that await would
+	// otherwise resume post-teardown and drive an already-cleaned handle.
 	let disposed = false;
 
 	const verdictKey = $derived(verdict ? verdict.case : 'pending');
 	const statusLabel = $derived(
 		phase === 'boot'
 			? 'waking the gpu'
-			: phase === 'tracing'
-				? 'measuring'
+			: phase === 'show'
+				? 'launching'
 				: engineReady
 					? 'measured'
 					: 'no gpu render'
 	);
 
+	/** Real clock/rAF for the choreographer; a fake pair drives it under test. */
+	const clockDeps = {
+		clock: () => (typeof performance !== 'undefined' ? performance.now() : Date.now()),
+		raf: (cb: FrameRequestCallback) => requestAnimationFrame(cb),
+		caf: (id: number) => cancelAnimationFrame(id)
+	};
+
 	/**
-	 * Every call into the engine / autopilot / verdict modules is guarded: a
+	 * Every call into the engine / choreographer / verdict modules is guarded: a
 	 * throw in any one of them must not cost the visitor the whole page.
 	 */
 	function attempt<T>(label: string, fn: () => T, fallback: T): T {
@@ -113,101 +136,165 @@
 		revealed = true;
 	}
 
-	/** Small upward pop where the pen finished — the dot of the question mark. */
-	function popQuestionDot(strokes: Stroke[]) {
-		const tip = strokes[strokes.length - 1]?.at(-1);
-		if (!tip || !handle || !nextColor) return;
-		// One splat has to hold its own against a five-second trace, so the dot
-		// gets the same brightness push the engine gives a click. Same hue.
-		const base = nextColor();
-		const color = { r: base.r * 4, g: base.g * 4, b: base.b * 4 };
-		// Top-left origin, so a negative dy sends the impulse upward.
-		run('burst', () => handle?.burst(tip.x, tip.y, (Math.random() - 0.5) * 2, -6, color));
-	}
-
-	function buildStrokes(): Stroke[] {
+	/** "HDR?" laid out for the current viewport, ready to hand to the choreographer. */
+	function buildTargets(): GlyphTarget[] {
 		const width = stageCanvas?.clientWidth || window.innerWidth;
 		const height = stageCanvas?.clientHeight || window.innerHeight;
+		const aspect = width / height;
+		// Scale the run down (and nudge it up on portrait) so "HDR?" always fits
+		// the launch band instead of clamping flat against the viewport edges on a
+		// narrow phone. Seeker counts are unaffected — sampling is glyph-local.
+		const fit = fitGlyphHeight(aspect);
 		return attempt(
-			'layoutText',
+			'buildGlyphTargets',
 			() =>
-				// Big letters, thin splats: the dye blob around each stroke is wide,
-				// so glyphs must dwarf it or they smear into clouds.
-				layoutText([HDR_GLYPHS.H, HDR_GLYPHS.D, HDR_GLYPHS.R, HDR_GLYPHS['?']], {
-					center: { x: 0.5, y: 0.4 },
-					height: 0.44,
-					gap: 0.1,
-					aspect: width / height
+				buildGlyphTargets({
+					center: { x: GLYPH_CENTER_X, y: fit.centerY },
+					height: fit.height,
+					gap: GLYPH_GAP,
+					aspect
 				}),
-			[] as Stroke[]
+			[] as GlyphTarget[]
 		);
 	}
 
-	async function trace() {
-		if (!handle || !autopilot) {
-			reveal();
-			return;
-		}
-		const strokes = buildStrokes();
-		if (strokes.length === 0) {
-			reveal();
-			return;
-		}
-		phase = 'tracing';
+	function clamp01(v: number): number {
+		return Math.max(0, Math.min(1, v));
+	}
+
+	function fallbackKeepClear(): KeepClearRect {
+		return window.innerWidth < MOBILE_BREAKPOINT
+			? KEEP_CLEAR_FALLBACK_MOBILE
+			: KEEP_CLEAR_FALLBACK_DESKTOP;
+	}
+
+	/** The card's live bounding rect, normalized to the viewport and padded. */
+	function measureKeepClear(): KeepClearRect {
+		if (!bigcardHolderEl) return fallbackKeepClear();
+		const rect = bigcardHolderEl.getBoundingClientRect();
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+		if (rect.width <= 0 || rect.height <= 0 || vw <= 0 || vh <= 0) return fallbackKeepClear();
+		return {
+			x0: clamp01(rect.left / vw - KEEP_CLEAR_MARGIN),
+			y0: clamp01(rect.top / vh - KEEP_CLEAR_MARGIN),
+			x1: clamp01(rect.right / vw + KEEP_CLEAR_MARGIN),
+			y1: clamp01(rect.bottom / vh + KEEP_CLEAR_MARGIN)
+		};
+	}
+
+	/** Re-measure the card and hand the sky its keep-clear rect. No-op pre-reveal. */
+	function applyKeepClear() {
+		if (!handle || !revealed) return;
+		run('setKeepClear', () =>
+			handle?.setKeepClear(attempt('measureKeepClear', measureKeepClear, fallbackKeepClear()))
+		);
+	}
+
+	function handleResize() {
+		if (resizeTimer) clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(applyKeepClear, 150);
+	}
+
+	/**
+	 * After the intro settles, ease down to the ambient exposure and hand the
+	 * sky over to the engine's own scheduler — a short pause first, then a low
+	 * steady drizzle of shells.
+	 */
+	function settleToAmbient() {
+		window.setTimeout(() => {
+			if (disposed) return;
+			run('setExposure', () => handle?.setExposure(2.2));
+			run('setAmbient', () => handle?.setAmbient(true, 0.35));
+		}, 900);
+	}
+
+	async function playIntro() {
+		if (!handle || !choreographer) return;
+		phase = 'show';
 		try {
-			await autopilot.playTrace(strokes);
+			await choreographer.playIntro(buildTargets());
 		} catch (err) {
-			console.warn('[hdr] playTrace', err);
+			console.warn('[hdr] playIntro', err);
 		}
-		// Teardown (or a cancelled trace) resolves the await above — don't
-		// resurrect work, and above all don't start the ambient loop, after the
-		// component is gone.
+		// Teardown (or a stopped intro) resolves the await above — don't resurrect
+		// work, and above all don't touch the handle, after the component is gone.
 		if (disposed) return;
-		popQuestionDot(strokes);
 		reveal();
-		run('startAmbient', () => autopilot?.startAmbient());
+		settleToAmbient();
 	}
 
 	function handleStage(stage: {
-		handle: FluidHandle | null;
+		handle: FireworksHandle | null;
 		canvas: HTMLCanvasElement | null;
-		nextColor: () => ColorRGB;
 	}) {
 		handle = stage.handle;
 		stageCanvas = stage.canvas;
-		nextColor = stage.nextColor;
 		engineReady = stage.handle !== null;
 
 		// No engine, or the visitor asked for less motion: answer immediately.
-		// The engine stays mounted either way, so a deliberate mouse move still
-		// splats — it just never performs on its own.
+		// The engine stays mounted either way, so a deliberate click still sends
+		// a shell up — it just never performs the intro or the ambient drizzle.
 		if (!handle || prefersReducedMotion()) {
 			reveal();
 			return;
 		}
 
-		// 3.2s trace: fast enough that the first letter is still on screen when
-		// the question mark lands (dye dissipation erases slower strokes).
-		autopilot = attempt<Autopilot | null>(
-			'createAutopilot',
-			() => createAutopilot(handle!, { traceDurationMs: 3200 }),
+		const targets = buildTargets();
+		if (targets.length === 0) {
+			reveal();
+			return;
+		}
+
+		choreographer = attempt<Choreographer | null>(
+			'createChoreographer',
+			() => createChoreographer(handle!, clockDeps),
 			null
 		);
-		canTrace = autopilot !== null;
-		trace();
+		if (!choreographer) {
+			reveal();
+			return;
+		}
+		canReplay = true;
+		playIntro();
 	}
 
 	function replay() {
-		if (phase === 'tracing') return;
-		trace();
+		if (phase === 'show' || !handle || !choreographer) return;
+		run('setAmbient', () => handle?.setAmbient(false));
+		run('setExposure', () => handle?.setExposure(2.6));
+		playIntro();
 	}
 
-	onMount(() => {
-		const notifyActive = () => autopilot?.notifyUserActive();
-		window.addEventListener('mousemove', notifyActive, { passive: true });
-		window.addEventListener('touchstart', notifyActive, { passive: true });
+	// Re-measure the card once it appears, and again on resize — the sky must
+	// never learn a stale keep-clear rect and start dropping shells on the text.
+	$effect(() => {
+		if (revealed) requestAnimationFrame(applyKeepClear);
+	});
 
-		// Word the fluid hint for the input the device actually has.
+	onMount(() => {
+		// A click anywhere on the sky sends a shell toward the pointer. We listen
+		// for `click`, not `pointerdown`: on touch a `pointerdown` fires even when
+		// the tap turns into a scroll, so a swipe would launch a stray rocket —
+		// `click` is suppressed by the browser after a scroll/drag and only fires
+		// on a settled tap. Clicks on the card's own controls (buttons/links) and
+		// on the revealed card surface itself are left alone — that's UI, not sky.
+		// During a replay the card holder is pointer-events:none, so a click over
+		// it targets the sky below and still launches, as intended.
+		const launchAtPointer = (event: MouseEvent) => {
+			if ((event.target as Element | null)?.closest('button, a, [role="button"], .bigcard')) return;
+			if (!handle) return;
+			run('launch', () =>
+				handle?.launch({
+					apex: { x: event.clientX / window.innerWidth, y: event.clientY / window.innerHeight },
+					intensity: 'ambient'
+				})
+			);
+		};
+		window.addEventListener('click', launchAtPointer);
+		window.addEventListener('resize', handleResize);
+
+		// Word the sky invitation for the input the device actually has.
 		const coarseQuery = window.matchMedia('(pointer: coarse)');
 		coarsePointer = coarseQuery.matches;
 		const onCoarseChange = (e: MediaQueryListEvent) => (coarsePointer = e.matches);
@@ -222,11 +309,14 @@
 
 		return () => {
 			disposed = true;
-			window.removeEventListener('mousemove', notifyActive);
-			window.removeEventListener('touchstart', notifyActive);
+			window.removeEventListener('click', launchAtPointer);
+			window.removeEventListener('resize', handleResize);
+			if (resizeTimer) clearTimeout(resizeTimer);
 			coarseQuery.removeEventListener('change', onCoarseChange);
 			run('unwatch', unwatch);
-			run('autopilot.stop', () => autopilot?.stop());
+			// FireworksHdr owns its own teardown (unmounting it cleans the engine),
+			// so the app only stops the choreographer here — no handle.cleanup().
+			run('choreographer.stop', () => choreographer?.stop());
 		};
 	});
 </script>
@@ -246,12 +336,12 @@
 	<meta property="og:title" content="Is your screen HDR?" />
 	<meta
 		property="og:description"
-		content="Watch a GPU fluid simulation write the question, then find out in five seconds."
+		content="Watch GPU fireworks burn the question into the sky, then find out in five seconds."
 	/>
 	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
-<FluidStage onready={handleStage} />
+<FireworksStage onready={handleStage} />
 
 <main class="page-shell relative z-10 flex min-h-[100svh] flex-col">
 	<h1 class="sr-only">Is your screen HDR?</h1>
@@ -259,7 +349,7 @@
 	{#if phase !== 'verdict'}
 		<div class="topchrome flex items-baseline justify-between gap-4">
 			<p class="eyebrow">
-				<EyebrowBadge live={phase === 'tracing'} yes={verdict?.yes === true} /> display probe
+				<EyebrowBadge live={phase === 'show'} yes={verdict?.yes === true} /> display probe
 			</p>
 			<p class="eyebrow">{statusLabel}</p>
 		</div>
@@ -267,26 +357,25 @@
 
 	<div
 		class="bigcard-holder flex flex-1 flex-col"
-		data-tracing={phase === 'tracing'}
+		data-show={phase === 'show'}
 		aria-live="polite"
+		bind:this={bigcardHolderEl}
 	>
 		{#if revealed && verdict}
 			<GlassPanel verdictCase={verdict.case}>
-				<VerdictCard {verdict} {statusLabel} live={phase === 'tracing'}>
+				<VerdictCard {verdict} {statusLabel} live={phase === 'show'}>
 					{#snippet swatches()}
 						<ProofStrip />
 					{/snippet}
 					{#snippet actions()}
 						{#if engineReady}
-							<!-- Reduced motion means there is no autopilot to re-run; the fluid
-							     still answers to a deliberate cursor, so the hint stays. -->
-							{#if canTrace}
-								<ReplayButton onreplay={replay} disabled={phase === 'tracing'} />
+							<!-- Reduced motion means there is no intro to re-run; the sky
+							     still answers a deliberate click, so the hint stays. -->
+							{#if canReplay}
+								<ReplayButton onreplay={replay} disabled={phase === 'show'} />
 							{/if}
 							<p class="caption sm:text-right">
-								{coarsePointer
-									? 'Drag your finger. The fluid follows.'
-									: 'Move your cursor. The fluid follows.'}
+								{coarsePointer ? 'Tap the sky. Send one up.' : 'Click the sky. Send one up.'}
 							</p>
 						{/if}
 					{/snippet}

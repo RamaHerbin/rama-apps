@@ -47,7 +47,10 @@
 
 <div class="card-eyebrow-row">
 	<p class="eyebrow"><EyebrowBadge {live} yes={verdict.yes === true} /> HDR display test</p>
-	<p class="eyebrow">{statusLabel}</p>
+	<!-- Decorative GPU-status readout. It lives inside the card's aria-live
+	     holder, so leaving it announceable would re-read "launching"/"measured"
+	     on every replay; the verdict itself is what should be spoken. -->
+	<p class="eyebrow" aria-hidden="true">{statusLabel}</p>
 </div>
 
 {#key verdict.case}

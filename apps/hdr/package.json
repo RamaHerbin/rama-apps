@@ -12,7 +12,7 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"fancy-ui-svelte": "^0.9.0"
+		"fancy-ui-svelte": "^0.9.1"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^5.10.2",
