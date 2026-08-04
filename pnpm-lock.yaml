@@ -11,8 +11,8 @@ importers:
   apps/hdr:
     dependencies:
       fancy-ui-svelte:
-        specifier: ^0.9.0
-        version: 0.9.0(svelte@5.53.10)(tailwindcss@4.2.1)
+        specifier: ^0.9.1
+        version: 0.9.1(svelte@5.53.10)(tailwindcss@4.2.1)
     devDependencies:
       '@sveltejs/adapter-vercel':
         specifier: ^5.10.2
@@ -2009,8 +2009,8 @@ packages:
       svelte: ^5.0.0
       tailwindcss: ^4.0.0
 
-  fancy-ui-svelte@0.9.0:
-    resolution: {integrity: sha512-N3dMviLL7eVjtkHMcikBVoCfTFutYs3gRn8JRg96dISaZ461wixSqcnYC7oyaG0s3sIFu/Ozu3ip8EIukj8PGw==}
+  fancy-ui-svelte@0.9.1:
+    resolution: {integrity: sha512-ef8VCNMG/Edby8xWltAMLNAV3LEgMSxwEwLq7fcWO3P8AHfEAuRYTzctn0hc0vMNAxTJZNLxId7qpdgh30XT8A==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       svelte: ^5.0.0
@@ -4440,7 +4440,7 @@ snapshots:
       tailwindcss: 4.2.1
       three: 0.183.2
 
-  fancy-ui-svelte@0.9.0(svelte@5.53.10)(tailwindcss@4.2.1):
+  fancy-ui-svelte@0.9.1(svelte@5.53.10)(tailwindcss@4.2.1):
     dependencies:
       '@chenglou/pretext': 0.0.5
       canvas-confetti: 1.9.4
