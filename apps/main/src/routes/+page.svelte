@@ -36,5 +36,3 @@
 </main>
 
 <Footer />
-
-<ScrollBlurOverlay />
