@@ -158,7 +158,7 @@ export const PAGES: Record<SitePath, PageSeo> = {
 	"/projects/personal": {
 		title: "Personal Projects · Rama Herbin",
 		description:
-			"Side projects by Rama Herbin: FancyUI, an open-source Svelte 5 component library on npm, a blog platform, WebGL experiments and a 2023 portfolio archive.",
+			"Side projects by Rama Herbin: a WebGPU test for whether your screen is truly HDR, FancyUI — an open-source Svelte 5 component library on npm — and a blog.",
 		name: "Personal Projects",
 		jsonLd: ["identity", "breadcrumbs"],
 		breadcrumb: ["/"],
