@@ -52,9 +52,17 @@
 			Exactly ONE theme-color tag, no media="(prefers-color-scheme:…)" pair.
 			$lib/stores/theme.svelte.ts rewrites this element's content unconditionally via a
 			first-match querySelector, so a second, media-scoped tag would get clobbered with
-			the wrong value. #0a0a0a === oklch(0.145 0 0) === --background in .dark.
+			the wrong value.
+
+			The static value is the LIGHT one on purpose: the `dark` class is only ever
+			added by script, so with scripting disabled the CSS falls through to :root,
+			which is the light palette. A hardcoded #0a0a0a would leave those visitors
+			with a white page under a permanently dark mobile chrome bar. The script
+			below flips it to #0a0a0a before first paint whenever it resolves dark.
+			#ffffff === oklch(1 0 0) === --background in :root;
+			#0a0a0a === oklch(0.145 0 0) === --background in .dark.
 		-->
-		<meta name="theme-color" content="#0a0a0a" />
+		<meta name="theme-color" content="#ffffff" />
 
 		<script type="text/javascript">
 			/*

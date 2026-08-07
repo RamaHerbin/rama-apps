@@ -74,10 +74,21 @@
 
 	const pathname = $derived(normalisePath(path ?? page.url.pathname));
 	const matchedPath = $derived<SitePath | null>(isSitePath(pathname) ? pathname : null);
-	const seo = $derived(matchedPath ? PAGES[matchedPath] : DEFAULT_PAGE);
 
 	/** 4xx/5xx must never be indexed, whatever the table says. */
 	const isError = $derived(page.status >= 400);
+
+	/**
+	 * On an error response the table is ignored even when the pathname IS
+	 * registered. SvelteKit renders `+error.svelte` through this same layout, so
+	 * `/photo` returning 500 would otherwise ship that route's title, description
+	 * and `og:image` — and, worse, its `CreativeWork` JSON-LD, publishing
+	 * structured data for content that just failed to render — while `og:url`
+	 * below already points at the home page. Falling back wholesale keeps the
+	 * copy, the image, the graph and the URL telling the same story.
+	 */
+	const seoPath = $derived<SitePath | null>(isError ? null : matchedPath);
+	const seo = $derived(seoPath ? PAGES[seoPath] : DEFAULT_PAGE);
 
 	const resolvedTitle = $derived(title ?? seo.title);
 	const resolvedDescription = $derived(description ?? seo.description);
@@ -107,7 +118,7 @@
 	const ogImage = $derived(image ?? seo.image ?? SITE.ogImage);
 	const ogImageUrl = $derived(absoluteUrl(ogImage.url));
 
-	const jsonLd = $derived(serializeGraph(buildGraph(matchedPath, seo)));
+	const jsonLd = $derived(serializeGraph(buildGraph(seoPath, seo)));
 
 	// Loud where it counts: `building` is true during prerender, so an
 	// unregistered route prints in the production build log — not only in dev,

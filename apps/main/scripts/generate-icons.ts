@@ -373,6 +373,54 @@ async function verifyIco(file: string): Promise<void> {
 	}
 }
 
+/**
+ * The manifest is hand-written on purpose — it is configuration (name, display
+ * mode, categories), not derived art, and burying it in this script would make it
+ * hard to find. The cost of that choice is drift: it names icon files, sizes and
+ * colours that live in this file as constants, and nothing otherwise stops the
+ * two from diverging while this command still exits 0.
+ *
+ * So the script does not generate it, it VALIDATES it. Rename an icon, resize
+ * one, or repaint the tile, and the run fails instead of quietly shipping a
+ * manifest that points at the previous family.
+ */
+async function verifyManifest(file: string, generated: Set<string>): Promise<void> {
+	const manifest = JSON.parse(await fs.readFile(file, "utf8"));
+
+	for (const key of ["background_color", "theme_color"] as const) {
+		if (String(manifest[key]).toLowerCase() !== TILE_BG.toLowerCase()) {
+			throw new Error(`${file}: ${key} is ${manifest[key]}, expected ${TILE_BG} (TILE_BG)`);
+		}
+	}
+
+	const icons: { src: string; sizes: string; purpose?: string }[] = manifest.icons ?? [];
+	if (icons.length === 0) throw new Error(`${file}: declares no icons`);
+
+	for (const icon of icons) {
+		const name = icon.src.replace(/^\//, "");
+		if (!generated.has(name)) {
+			throw new Error(`${file}: icons[] names "${icon.src}", which this script does not generate`);
+		}
+		const meta = await sharp(path.join(path.dirname(file), name)).metadata();
+		const [w, h] = icon.sizes.split("x").map(Number);
+		if (meta.width !== w || meta.height !== h) {
+			throw new Error(
+				`${file}: "${icon.src}" declares ${icon.sizes} but the file is ${meta.width}x${meta.height}`
+			);
+		}
+	}
+
+	// The maskable pair is the entire reason this manifest exists: without a
+	// purpose:"maskable" entry Android never uses the safe-zone art and instead
+	// letterboxes the rounded tile inside its own mask.
+	if (!icons.some((i) => i.purpose === "maskable")) {
+		throw new Error(`${file}: no purpose:"maskable" icon — the maskable PNGs would go unused`);
+	}
+
+	console.log(`  ${icons.length} icons declared, all present at their declared size`);
+	console.log(`  background_color / theme_color match TILE_BG ${TILE_BG}`);
+}
+
 // --- Output -----------------------------------------------------------------
 
 interface Written {
@@ -426,6 +474,12 @@ async function main(): Promise<void> {
 	if (!dryRun) {
 		console.log("\nico verification");
 		await verifyIco(path.join(staticDir, "favicon.ico"));
+
+		console.log("\nmanifest cross-check");
+		await verifyManifest(
+			path.join(staticDir, "site.webmanifest"),
+			new Set(written.map((w) => w.name))
+		);
 	}
 
 	// Crop safety: 2:1 crops keep the centred 1200x600 band, so everything must
