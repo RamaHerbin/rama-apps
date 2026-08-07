@@ -103,6 +103,9 @@
 	onpointerenter={startPreview}
 	onpointerleave={endPreview}
 >
+	<!-- bg-black on both branches is deliberate and NOT theme-driven: object-contain letterboxes
+	     arbitrary media, the bars must not change colour when the poster swaps to the video
+	     mid-interaction, and they must not erode the play button's contrast underneath it. -->
 	{#if showVideo}
 		<!-- svelte-ignore a11y_media_has_caption -->
 		<video
@@ -127,6 +130,9 @@
 	{/if}
 
 	{#if !activated}
+		<!-- Player control: needs guaranteed contrast over an arbitrary poster frame, so the
+		     glass/white/focus-ring values stay fixed rather than following the theme.
+		     Mirrors the centre button in MediaFrame.svelte — keep the two in sync. -->
 		<button
 			type="button"
 			onclick={activate}

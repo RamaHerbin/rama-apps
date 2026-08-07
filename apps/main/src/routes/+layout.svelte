@@ -1,14 +1,49 @@
 <script lang="ts">
 	import "./layout.css";
+
+	// Cameleon per-skin CSS, straight from the engine. Both are loaded
+	// unconditionally: every rule in them is scoped by `[data-skin="…"]`, so a
+	// visitor on the default skin matches nothing at all.
+	//
+	// There is deliberately no <FancyProvider> and no wrapper element here. The
+	// engine scopes these files by `[data-skin="…"]` and NOT by `.cameleon-root`,
+	// so they apply verbatim to the <html data-skin="…"> that src/app.html's
+	// anti-FOUC IIFE writes before first paint — which is the whole point: the
+	// site is fully prerendered, and anything Svelte mounts exists only after
+	// hydration, one paint too late to avoid a flash of the default skin.
+	//
+	// Mounting the provider *as well* would be actively wrong, not merely
+	// redundant: it stamps its own `data-skin` on its own div, and
+	// `[data-skin="retro-os"]:not(.docs-skin)::after` — the scanline overlay —
+	// would then match twice, stacking two layers of it.
+	//
+	// The token layer these files read (`--skin-*`) is written by hand in
+	// src/routes/skins.css, since nothing serialises the provider's tokens now.
+	import "fancy-ui-svelte/cameleon/skins/retro-os/retro-os.css";
+	import "fancy-ui-svelte/cameleon/skins/brutal/brutal.css";
+
 	import { onMount, type Component } from "svelte";
 	import { dev } from "$app/environment";
+	import { page } from "$app/state";
 	import { injectAnalytics } from "@vercel/analytics/sveltekit";
 	import { Seo } from "$lib/seo/index.js";
+	import { refreshSkinForRoute } from "$lib/stores/skin.svelte.js";
   import { ScrollBlurOverlay } from '$lib/portfolio';
 
 	let { children } = $props();
 
 	injectAnalytics({ mode: dev ? "development" : "production" });
+
+	// Skins are suppressed on /photo and /carbon (see SKIN_EXCLUDED_PATHS).
+	// app.html's IIFE enforces that before first paint, but it only runs on a full
+	// document load — a client-side navigation from / to /photo would otherwise
+	// carry `data-skin` onto a page that commits to `bg-black` and renders no
+	// switcher. Re-evaluating per navigation closes that hole; the stored
+	// preference is never touched, so navigating back restores the skin.
+	$effect(() => {
+		page.url.pathname;
+		refreshSkinForRoute();
+	});
 
 	// Edit mode is opt-in via ?edit=1&studioOrigin=…, resolved client-side only.
 	// The overlay + runtime are dynamically imported (including the param parser)

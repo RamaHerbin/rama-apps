@@ -6,6 +6,7 @@
  */
 
 import { browser } from "$app/environment";
+import { SKINS, isSkinName } from "$lib/skins/registry.js";
 
 // =============================================================================
 // Types
@@ -113,29 +114,77 @@ function applyTheme() {
 		root.classList.remove("dark");
 	}
 
-	// Update meta theme-color for mobile browsers.
-	//
-	// Three-way contract — all three must agree or the browser chrome desyncs from the page:
-	//   1. src/app.html ships exactly ONE <meta name="theme-color" content="#0a0a0a">,
-	//      matching the dark default the anti-FOUC script resolves to.
-	//   2. src/routes/layout.css  :root { --background: oklch(1 0 0) }     → #ffffff (light)
-	//      src/routes/layout.css  .dark { --background: oklch(0.145 0 0) } → #0a0a0a (dark)
-	//   3. this block, which swaps between the two at runtime.
-	// oklch(0.145 0 0) is #0a0a0a exactly; do not "fix" it to #252525, which is
-	// oklch(0.269 0 0) — that is --border, not --background.
-	//
-	// The values are hardcoded on purpose rather than read from
-	// getComputedStyle(document.documentElement).getPropertyValue("--background"):
-	// that returns the literal "oklch(0.145 0 0)" string, and theme-color parsing of
-	// oklch() is not universally supported (older iOS Safari drops the tag entirely,
-	// leaving the status bar on the previous theme's color).
-	//
-	// Note: until the icons/SEO work added the meta tag to app.html, this querySelector
-	// found nothing and the whole block was a permanent no-op. It only does something now
-	// because that tag exists — if you ever remove it from app.html, remove this too.
+	// Update meta theme-color for mobile browsers. Light/dark is only half the
+	// answer now that a skin can repaint the page — see syncThemeColor() below.
+	syncThemeColor();
+}
+
+/**
+ * Point <meta name="theme-color"> at whatever is actually painting the page:
+ * the active skin's background if there is one, otherwise the light/dark theme's.
+ *
+ * Four-way contract — all four must agree or the mobile browser chrome desyncs
+ * from the page:
+ *
+ *   1. src/app.html — exactly ONE <meta name="theme-color">, shipped holding the
+ *      LIGHT value (#ffffff) because the `dark` class is only ever added by script:
+ *      a scripting-disabled visitor renders :root and must not get a white page
+ *      under a dark chrome bar. The anti-FOUC IIFE below it corrects that tag
+ *      before first paint — to #0a0a0a when it resolves dark, or to the skin's
+ *      themeColor when it restores a skin from localStorage. It has to happen
+ *      there: the site is fully prerendered (adapter-vercel), so there is no
+ *      server render to do it and no request to read a cookie from.
+ *   2. src/routes/layout.css  :root { --background: oklch(1 0 0) }     → #ffffff (light)
+ *      src/routes/layout.css  .dark { --background: oklch(0.145 0 0) } → #0a0a0a (dark)
+ *      …overridden, when a skin is active, by --skin-page-bg in src/routes/skins.css,
+ *      whose html[data-skin="…"] selector outranks both :root and .dark.
+ *   3. THIS function, which swaps between all of the above at runtime — from
+ *      applyTheme() on a light/dark change, and from $lib/stores/skin.svelte.ts
+ *      on a skin change.
+ *   4. src/lib/skins/registry.ts — SKINS[skin].themeColor, the hex used here. It
+ *      MUST equal that skin's --skin-page-bg in skins.css.
+ *
+ * What enforces it: skinContractGuard() in vite.config.ts, which imports the
+ * registry at build time and fails the build when the hand-written copies in
+ * app.html and skins.css drift from it. Nothing else turns a mismatch red —
+ * svelte.config.js sets prerender.handleHttpError: 'warn', so a broken build
+ * stays green.
+ *
+ * oklch(0.145 0 0) is #0a0a0a exactly; do not "fix" it to #252525, which is
+ * oklch(0.269 0 0) — that is --border, not --background.
+ *
+ * The light/dark pair stays hardcoded rather than read from
+ * getComputedStyle(document.documentElement).getPropertyValue("--background"):
+ * that returns the literal "oklch(0.145 0 0)" string, and theme-color parsing of
+ * oklch() is not universally supported (older iOS Safari drops the tag entirely,
+ * leaving the status bar on the previous theme's color). The skin hexes are safe
+ * to emit only because the engine's tokens are plain hex — that is precisely why
+ * registry.ts carries them instead of skins.css being read back.
+ *
+ * The active skin is read off <html>, NOT from the skin store: that store imports
+ * this function, so importing it back would be a cycle. <html> is the
+ * authoritative surface anyway — app.html writes data-skin there before first
+ * paint, long before either store exists.
+ *
+ * Note: until the icons/SEO work added the meta tag to app.html, the querySelector
+ * below found nothing and this was a permanent no-op. It only does something now
+ * because that tag exists — if you ever remove it from app.html, remove this too.
+ */
+export function syncThemeColor() {
+	if (!browser) return;
+
+	// Absent attribute → undefined → not a skin name → standard. "standard" is
+	// never written to the DOM, but it survives the same path: its themeColor is
+	// null, which falls through to the light/dark pair below.
+	const skin = document.documentElement.dataset.skin;
+	const skinColor = isSkinName(skin) ? SKINS[skin].themeColor : null;
+
 	const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 	if (metaThemeColor) {
-		metaThemeColor.setAttribute("content", resolved === "dark" ? "#0a0a0a" : "#ffffff");
+		metaThemeColor.setAttribute(
+			"content",
+			skinColor ?? (resolvedTheme === "dark" ? "#0a0a0a" : "#ffffff")
+		);
 	}
 }
 

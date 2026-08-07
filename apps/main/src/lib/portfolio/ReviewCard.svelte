@@ -62,8 +62,12 @@
 	onclick={onOpen}
 	class={cn(
 		"relative block w-95 overflow-hidden rounded-xl border p-4 transition-all duration-300",
-		"border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-		"dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+		// A wash of the theme's ink over the page, not a fixed grey: the surface has
+		// to stay a hair off the section background in every palette. The light/dark
+		// pair survives because the two ALPHAS genuinely differ (a 1% wash reads on
+		// white, but needs 10% to read on near-black) — it is not a colour mirror.
+		"border-border bg-foreground/[.01] hover:bg-foreground/[.05]",
+		"dark:bg-foreground/[.10] dark:hover:bg-foreground/[.15]",
 		onOpen && "cursor-pointer",
 		className
 	)}
@@ -87,8 +91,8 @@
 			<Avatar src={img} webp={imgWebp} {name} size={32} class="h-8 w-8" />
 		</a>
 		<div class="flex flex-col">
-			<div class="text-sm font-medium dark:text-white" data-edit={nameKey}>{name}</div>
-			<p class="text-xs font-medium dark:text-white/60">{username}</p>
+			<div class="text-foreground text-sm font-medium" data-edit={nameKey}>{name}</div>
+			<p class="text-muted-foreground text-xs font-medium">{username}</p>
 		</div>
 		<span class="text-muted-foreground ml-auto text-xs" data-edit={dateKey}>{date}</span>
 	</div>

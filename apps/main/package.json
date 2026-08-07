@@ -13,7 +13,7 @@
 	},
 	"dependencies": {
 		"@vercel/analytics": "^2.0.1",
-		"fancy-ui-svelte": "^0.8.0"
+		"fancy-ui-svelte": "link:../../../../../../fancy-ui"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^5.10.2",
