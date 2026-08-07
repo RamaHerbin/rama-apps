@@ -44,7 +44,15 @@
 				class="absolute inset-0 z-[1]"
 			></a>
 
-			<!-- glow moved to card-level hover, since the stretched link sits over the media -->
+			<!--
+				glow moved to card-level hover, since the stretched link sits over the media.
+				The shadow colour stays a literal on purpose: it must remain identical to the
+				one MediaFrame paints for its own `glow` prop (this card only re-hosts it on
+				the outer hover target), and a blurred halo composites over whatever surface is
+				beneath it rather than declaring one. The only warm token, --accent-work,
+				inverts lightness between light and dark, so binding to it would turn a soft
+				shadow into a bright cream halo — a redesign, not a tokenisation.
+			-->
 			<MediaFrame
 				aspect="16 / 10"
 				glow={false}
@@ -56,6 +64,9 @@
 					class="absolute inset-0 h-full w-full object-cover"
 					loading="lazy"
 				/>
+				<!-- Scrim + caption keep hardcoded dark/white: they sit ON the poster photo, so
+				     their contrast comes from the image underneath, never from the page theme.
+				     A themed surface token here would go light and erase the caption. -->
 				<div
 					class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
 				>
@@ -155,10 +166,16 @@
 				</div>
 			</div>
 
+			<!-- bg-black overrides MediaFrame's bg-surface-raised on purpose: it is a brand
+			     canvas, not a themed surface. AnsysLogo has fill="#fff" and #fdb61a baked into
+			     its paths, so it needs a dark backdrop in every theme and every skin; any
+			     surface token would go light under one of them and swallow the wordmark. -->
 			<MediaFrame aspect="16 / 10" class="bg-black">
 				<div class="absolute inset-0 flex items-center justify-center p-12 sm:p-16">
 					<AnsysLogo class="h-auto w-[55%] max-w-[260px]" />
 				</div>
+				<!-- Same scrim as the FDP card, over the brand canvas rather than a photo:
+				     stays dark/white so the NDA caption keeps its contrast on black. -->
 				<div
 					class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
 				>

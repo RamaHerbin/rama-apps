@@ -10,10 +10,44 @@
    source of the webfont. If you need to change the font, change it there. */
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Runtime skin bridge: the Cameleon token block, written under html[data-skin="…"].
+   CSS requires every @import to precede all other rules, so it can only go here — but the
+   placement carries no cascade meaning, and that is by design. The whole skin design is ordered
+   by SPECIFICITY, not by source: `html[data-skin="brutal"]` is (0,1,1) and outranks both `:root`
+   and `.dark` at (0,1,0). So this file wins over the base theme below no matter which side of it
+   the base theme sits on — exactly the same argument the :root/:root.dark pair relies on. */
+@import "./skins.css";
 
-@source "../../node_modules/fancy-ui-svelte";
+/* Scan the PUBLISHED subtree, not the package root.
+   `fancy-ui-svelte` ships everything it publishes under dist/fancy-ui — the package's own
+   `exports` map points "." at ./dist/fancy-ui/index.js, and the only files outside that
+   directory are dist/types.* and dist/utils/* (pure geometry/color/animation helpers with
+   zero class strings). So this narrower root is LOSSLESS: every component apps/main renders
+   (FluidCursor, InteractiveGridPattern, BlurReveal, RainbowButton, LiquidGlass, LineHoverLink,
+   AnimatedLogoCloud → logo-cloud/, ImageTrailCursor) lives under it.
 
-@custom-variant dark (&:is(.dark *));
+   Why it matters: when the dependency is installed as `link:` — which it is while the
+   unpublished Cameleon engine is being consumed — node_modules/fancy-ui-svelte resolves to the
+   WHOLE fancy-ui checkout, not a tarball. Scanning the package root then drags in fancy-ui's
+   own docs site: measured 11784 Tailwind candidates vs 4735 for the published tarball, a 2.5x
+   blow-up of scan work and of speculative utilities in our bundle.
+
+   Correct for BOTH installs: the path exists identically in the published tarball and in the
+   checkout, so this does not need to be reverted when fancy-ui goes back to a version range. */
+@source "../../node_modules/fancy-ui-svelte/dist/fancy-ui";
+
+/* Dark mode is opt-in via `.dark` on <html>, EXCEPT under a runtime skin.
+   Both Cameleon skins (brutal, retro-os) are light-only — they ship no dark variant — so every
+   `dark:` utility must go inert while one is active. Doing that structurally here beats patching
+   utilities by hand: there are 52 `dark:` occurrences across 6 files today, and a hand-patched
+   list rots silently the moment someone adds the 53rd.
+
+   The `:where()` is LOAD-BEARING, not cosmetic. A naked `:not([data-skin] *)` compiles to
+   specificity (0,3,0), which would make EVERY `dark:` utility outrank EVERY `hover:` utility
+   (0,2,0) — including on unskinned visits, where nothing about dark mode should have changed.
+   `:where()` contributes zero specificity, so the compiled rule stays at (0,2,0): byte-identical
+   weight to `&:is(.dark *)`, the form this replaces. */
+@custom-variant dark (&:is(.dark *):not(:where([data-skin]) *));
 
 /* Tell the UA which palette to render its own widgets in: form controls, scrollbars,
    the canvas behind the page during overscroll, and the default text-selection colors.
@@ -35,6 +69,26 @@
 }
 
 :root {
+	/* Font — the real, cascading definition. @theme inline below only POINTS at this.
+
+	   Why the indirection exists: `@theme inline { --font-sans: '<literal>' }` bakes the literal
+	   straight into every use site (`body { font-family: Bricolage Grotesque, … }`) and never
+	   emits `--font-sans` as a custom property at all. Measured: zero occurrences of
+	   `--font-sans` in the built stylesheet. So a skin that redefines `--font-sans` overrides
+	   nothing — a SILENT no-op, no warning, no visible failure, just the wrong font.
+
+	   Routing it through `--app-font-sans` gives skins one real variable to override, and
+	   html[data-skin="…"] at (0,1,1) outranks this :root at (0,1,0), so the override lands.
+
+	   No matching --app-font-mono is needed: `--font-mono` is NOT declared in the @theme inline
+	   block, so it keeps Tailwind's default non-inline behaviour and IS emitted as a real
+	   property (`@layer theme { :root, :host { --font-mono: … } }`). `.font-mono` therefore
+	   already compiles to `font-family: var(--font-mono)`, which a skin can override directly —
+	   on specificity AND on layer order, since skin rules are unlayered. That matters: apps/main
+	   uses `font-mono` 43 times across 11 files, versus zero `font-sans` utilities in markup
+	   (the sole `font-sans` consumer is the @apply in @layer base at the bottom of this file). */
+	--app-font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+
 	/* Layout */
 	--radius: 0.625rem;
 
@@ -167,8 +221,9 @@
 }
 
 @theme inline {
-	/* Font */
-	--font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+	/* Font — one indirection, deliberately. The literal lives in :root as --app-font-sans;
+	   see the comment there for why a literal HERE cannot be overridden by a skin. */
+	--font-sans: var(--app-font-sans);
 
 	/* Radius */
 	--radius-sm: calc(var(--radius) - 4px);

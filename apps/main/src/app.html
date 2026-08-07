@@ -61,14 +61,20 @@
 			below flips it to #0a0a0a before first paint whenever it resolves dark.
 			#ffffff === oklch(1 0 0) === --background in :root;
 			#0a0a0a === oklch(0.145 0 0) === --background in .dark.
+
+			A fourth writer joins the contract when a skin is active: both skins are
+			light-only, so the script below overrides the pair above with the skin's own
+			--skin-page-bg. Light/dark still resolves underneath (the `dark` class is
+			still toggled) — it just stops owning this tag. See the skin block there.
 		-->
 		<meta name="theme-color" content="#ffffff" />
 
 		<script type="text/javascript">
 			/*
-				Anti-FOUC: resolve the theme before first paint.
+				Anti-FOUC: resolve the theme AND the skin before first paint.
 
-				This MUST mirror $lib/stores/theme.svelte.ts exactly — same storage key
+				--- THEME half ---
+				MUST mirror $lib/stores/theme.svelte.ts exactly — same storage key
 				(STORAGE_KEY = "fancy-ui-theme"), same allow-list, same "system" resolution.
 				Any divergence and the store recomputes a different class on hydration, which
 				is the flash we are trying to avoid.
@@ -76,30 +82,115 @@
 				(Previously this read the key "theme", which the store never writes, so the
 				lookup always missed and fell through to a hardcoded 'dark' — meaning a user
 				who had chosen light flashed dark on every single load.)
+
+				--- SKIN half ---
+				src/lib/skins/registry.ts is THE source of truth for the storage key, the
+				name allow-list, the theme-color hexes and the font URLs. An .html file
+				cannot import anything, so the literals below are hand-copies;
+				vite.config.ts's skinContractGuard() reads the registry at buildStart and
+				fails the build when they drift. NEVER edit one side alone.
+
+				It runs here rather than in a component because the site is fully
+				prerendered — no request to read a cookie from, no visitor at prerender
+				time — and anything Svelte mounts exists only after hydration, one full
+				paint too late. See registry.ts for the long form.
 			*/
 			(function () {
-				var stored = null;
+				var root = document.documentElement;
+
+				var storedTheme = null;
 				try {
-					stored = localStorage.getItem('fancy-ui-theme');
+					storedTheme = localStorage.getItem('fancy-ui-theme');
 				} catch (e) {
 					// Safari private mode / storage blocked by policy: fall through to the OS preference.
 				}
 				// The store validates against ["light","dark","system"] and keeps its "system"
 				// default for anything else, including absent and malformed values.
-				var theme = stored === 'light' || stored === 'dark' ? stored : 'system';
+				var theme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'system';
 				var dark =
 					theme === 'dark' ||
 					(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-				document.documentElement.classList.toggle('dark', dark);
+				// Toggled unconditionally, skin or no skin. theme.svelte.ts knows nothing about
+				// skins, so withholding the class here would desync the store from the DOM on
+				// hydration. Both skins are light-only, but their `dark:` utilities are
+				// neutralised structurally instead — by the `dark` @custom-variant in
+				// src/routes/layout.css, never by suppressing this class.
+				root.classList.toggle('dark', dark);
 
-				// The meta above is declared statically as #0a0a0a, but the class we just
-				// resolved may be light — so correct it here, before first paint, rather than
-				// leaving it to applyTheme() on hydration. Without this a light-mode visitor
-				// on iOS Safari / Chrome Android gets a white page under a dark chrome bar
-				// until the JS chunk evaluates, then watches the bar snap. The tag is declared
-				// above this script, so querySelector always finds it.
+				// The two real skins, keyed by the exact strings in registry.ts's SKIN_NAMES.
+				// "standard" is deliberately absent: standard IS the absence of data-skin, and
+				// the attribute's mere presence is what the CSS keys off.
+				// Each themeColor MUST equal that skin's --skin-page-bg in src/routes/skins.css,
+				// or the mobile chrome bar desyncs from the page.
+				var SKINS = {
+					brutal: {
+						themeColor: '#F4EEE0',
+						// Archivo + Space Mono
+						fontHref:
+							'https://fonts.googleapis.com/css2?family=Archivo:wght@400..900&family=Space+Mono:wght@400;700&display=swap'
+					},
+					'retro-os': {
+						themeColor: '#F1E9D4',
+						// Archivo + IBM Plex Mono. Silkscreen dropped: the engine wants it for the
+						// titlebars/taskbar chassis, and no chassis is ported.
+						fontHref:
+							'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'
+					}
+				};
+
+				var storedSkin = null;
+				try {
+					storedSkin = localStorage.getItem('rama-skin');
+				} catch (e) {
+					// Storage blocked: no stored choice is readable, so standard it is.
+				}
+				// Same semantics as isSkinName(): unknown, malformed and absent all resolve to
+				// standard, and a near-miss is never repaired (no trim, no lowercase). Compared
+				// with === rather than looked up on SKINS, so a stored "constructor" or
+				// "__proto__" can never reach the prototype chain and pass as a skin.
+				var skinName = storedSkin === 'brutal' || storedSkin === 'retro-os' ? storedSkin : null;
+				var skin = skinName ? SKINS[skinName] : null;
+				if (skinName) root.setAttribute('data-skin', skinName);
+				else root.removeAttribute('data-skin');
+
+				// ORDER IS LOAD-BEARING: the skin is resolved above, so this single write is
+				// already final. Writing the light/dark hex first and correcting it after
+				// would leave the wrong color in the tag for a frame.
+				//
+				// The meta above is declared statically as #ffffff, but the state just resolved
+				// may be dark or skinned — correct it before first paint rather than leaving it
+				// to applyTheme() on hydration, or a dark-mode visitor on iOS Safari / Chrome
+				// Android gets a dark page under a white chrome bar until the JS chunk
+				// evaluates, then watches the bar snap. The tag is declared above this script,
+				// so querySelector always finds it.
 				var meta = document.querySelector('meta[name="theme-color"]');
-				if (meta) meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
+				if (meta)
+					meta.setAttribute('content', skin ? skin.themeColor : dark ? '#0a0a0a' : '#ffffff');
+
+				// Skin webfont, non-blocking, only for the skin actually in use. Same preload +
+				// onload rel-swap as the Bricolage link at the top of this head, and for the
+				// same reason: a plain <link rel="stylesheet"> injected here would be
+				// render-blocking and would rebuild the serialised third-party critical path
+				// that layout.css:1-10 documents removing. The preconnects up there already
+				// cover both font origins, so no extra hint is needed. No <noscript>
+				// counterpart either — with scripting off nothing sets data-skin, so there is
+				// no skin whose font would be wanted.
+				//
+				// The id matches the engine's own (cameleon/skins/<skin>/index.js), so a
+				// runtime skin switch — or FancyProvider, were it ever mounted — dedupes
+				// against this element instead of appending a second copy.
+				if (skin && !document.getElementById('cam-font-' + skinName)) {
+					var link = document.createElement('link');
+					link.id = 'cam-font-' + skinName;
+					link.rel = 'preload';
+					link.as = 'style';
+					link.href = skin.fontHref;
+					link.onload = function () {
+						this.onload = null;
+						this.rel = 'stylesheet';
+					};
+					document.head.appendChild(link);
+				}
 			})();
 		</script>
 		%sveltekit.head%

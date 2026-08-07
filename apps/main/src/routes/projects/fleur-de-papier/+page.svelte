@@ -270,10 +270,22 @@
 					><span data-edit="fdp.hero.intro.body">{c("fdp.hero.intro.body")}</span>
 				</p>
 				<div class="flex items-start lg:items-end lg:justify-end">
+					<!-- The artwork in FleurdePapier.svg is a single path with fill="white", so it
+					     needs inverting on a LIGHT page and left alone on a dark one. The filter is
+					     therefore the BASE state and `dark:` is the escape hatch — not the other way
+					     round, which is what this was until the skin work measured it: a `dark:`-only
+					     invert rendered white-on-white in standard light, and inverted the artwork to
+					     black-on-near-black in standard dark, i.e. it was invisible in BOTH themes.
+
+					     Written this way it is also automatically right under a runtime skin. Both
+					     skins are light-only, so the `dark` custom-variant in layout.css makes
+					     `dark:[filter:none]` inert while one is active, leaving the base invert on and
+					     the wordmark black on cream. Do not "simplify" this back to a dark:-only
+					     filter. -->
 					<img
 						src="/portfolio/FleurdePapier.svg"
 						alt="Fleur de Papier logo"
-						class="h-16 max-w-full object-contain opacity-85 dark:[filter:grayscale(1)_invert(1)_brightness(1.5)]"
+						class="h-16 max-w-full object-contain opacity-85 [filter:grayscale(1)_invert(1)] dark:[filter:none]"
 					/>
 				</div>
 			</div>
@@ -393,6 +405,10 @@
 										{c(`productions.${p.slug}.title`)}
 									</h3>
 									{#if p.featured}
+										<!-- Ink stays a fixed near-black literal rather than a semantic token:
+										     it has to read on the accent-work fill, which is mid olive in light
+										     mode and cream in dark, so any theme-flipping foreground token would
+										     go white-on-cream in dark. -->
 										<span
 											class="-translate-y-1 rounded bg-accent-work px-2 py-1 font-mono text-[10px] tracking-[0.12em] text-[oklch(0.145_0_0)]"
 											data-edit="fdp.production-media.featured-chip"

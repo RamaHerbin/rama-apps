@@ -53,6 +53,18 @@
 	});
 </script>
 
+<!--
+	COLOUR POLICY — every literal in this file is deliberate, none of it is theme-driven.
+	The backdrop is a cinema scrim: near-black at 0.88 alpha whatever the theme or runtime
+	skin, because it exists to dim the page around a playing video. Over a cream skin it
+	still composites to L ≈ 0.18, i.e. dark.
+
+	Everything inside it — the header row, the close button, the video's border, letterbox
+	fill and drop shadow — sits ON that fixed scrim, so it is fixed white / near-black to
+	match. Swapping any of it for --foreground/--background/--border would paint dark text
+	and near-invisible hairlines onto a black scrim the moment the light theme is active,
+	which is the exact bug tokenising is meant to prevent.
+-->
 {#if open}
 	<div
 		role="dialog"

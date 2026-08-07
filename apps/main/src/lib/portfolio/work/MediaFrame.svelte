@@ -60,6 +60,20 @@
 <!--
 	When onplay is set the whole frame is clickable (mouse convenience); the
 	centre <button> below stays the real, keyboard-focusable control.
+
+	COLOUR POLICY — read before "fixing" the literals below.
+	The frame CHASSIS is tokenised (border-border / bg-surface-raised) so it follows the
+	theme and any runtime skin. Everything painted INSIDE the frame — caption scrim, chip,
+	play button — is deliberately fixed white-on-dark-glass: it composites over arbitrary
+	media (posters, video frames), so it cannot inherit --foreground/--background without
+	going unreadable over a light poster or under a light-only skin.
+
+	The hover glow is fixed for a different reason: oklch(0.32 …) is mid-lightness ON
+	PURPOSE, so the one value composites as a soft shadow on a light surface (L 1.0 → 0.80,
+	cream skins 0.93 → 0.75) and as a glow on a dark one (L 0.145 → 0.20). Re-expressing it
+	as --accent-work or --foreground would flip its appearance between themes rather than
+	preserve it. NOTE: the same literal is mirrored in sections/Projects.svelte
+	(group-hover/card:shadow-…) for the non-glow card variant — keep the two in sync.
 -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
@@ -75,6 +89,8 @@
 		{@render children?.()}
 
 		{#if caption}
+			<!-- Fixed scrim + white caption: painted directly on the media, so its contrast
+			     comes from the gradient underneath it, not from the theme. -->
 			<div
 				class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[oklch(0.1_0_0_/_0.85)] to-transparent px-5 pt-10 pb-3.5 font-mono text-[10px] tracking-[0.1em] text-white/75"
 			>
@@ -84,6 +100,9 @@
 		{/if}
 
 		{#if chip}
+			<!-- Self-contained dark glass pill. It renders over media AND, in the "demo in
+			     preparation" frame (projects/fleur-de-papier), directly over bg-surface-raised —
+			     so it carries its own backdrop and stays fixed in both contexts. -->
 			<div
 				class="pointer-events-none absolute top-4 right-4 flex items-center gap-2 rounded-full border border-white/20 bg-[oklch(0.1_0_0_/_0.6)] px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] text-white/80 backdrop-blur-md"
 			>
@@ -97,6 +116,8 @@
 		{/if}
 
 		{#if playSize && onplay}
+			<!-- Player control: needs guaranteed contrast over an arbitrary poster frame, so the
+			     glass/white/focus-ring values stay fixed rather than following the theme. -->
 			<button
 				type="button"
 				onclick={(e) => {

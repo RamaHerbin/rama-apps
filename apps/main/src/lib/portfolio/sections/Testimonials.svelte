@@ -247,14 +247,14 @@
 				{/each}
 			</div>
 
-			<!-- Left Gradient -->
+			<!-- Left Gradient — fades the carousel into the page, so it must BE the page colour -->
 			<div
-				class="dark:from-background pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white"
+				class="from-background pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r"
 			></div>
 
 			<!-- Right Gradient -->
 			<div
-				class="dark:from-background pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white"
+				class="from-background pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l"
 			></div>
 		</div>
 	</div>
@@ -263,13 +263,17 @@
 <!--
 	The full recommendation. Native <dialog> (focus trap + Escape come free); no
 	dialog primitive ships in fancy-ui-svelte.
+
+	`backdrop:bg-black/60` is deliberately a literal: the ::backdrop is a scrim that
+	dims whatever sits behind the modal, so it has to read as shade in every theme
+	and every skin. A themed token would flip it to near-white in dark mode.
 -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <dialog
 	bind:this={dialogEl}
 	onclick={onDialogClick}
 	onclose={() => (active = null)}
-	class="bg-background text-foreground m-auto w-[min(38rem,calc(100vw-2rem))] rounded-xl border border-gray-950/[.1] p-0 shadow-xl backdrop:bg-black/60 dark:border-gray-50/[.1]"
+	class="bg-background text-foreground border-border m-auto w-[min(38rem,calc(100vw-2rem))] rounded-xl border p-0 shadow-xl backdrop:bg-black/60"
 >
 	{#if active}
 		<article class="p-6">
@@ -285,6 +289,8 @@
 					<span class="flex items-center gap-1.5 font-medium">
 						{active.name}
 						{#if active.linkedinUrl}
+							<!-- #0A66C2 is LinkedIn's brand blue — a trademark colour, not a theme
+							     surface, so it stays a literal under every theme and skin. -->
 							<a
 								href={active.linkedinUrl}
 								target="_blank"

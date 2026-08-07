@@ -15,8 +15,14 @@
 	let textareaVisible = $state(false);
 	const textareaRadius = 100;
 
+	// The halo is a hover affordance, so it must follow a repainted palette — but it
+	// cannot ride --ring: that token is a pure neutral grey in BOTH standard themes
+	// (oklch(0.708 0 0) light, oklch(0.439 0 0) dark), so pointing at it turned the
+	// blue spotlight into a grey wash that is invisible over bg-muted at oklch(0.97).
+	// --field-halo is therefore defined only under html[data-skin] (see skins.css);
+	// unskinned, the fallback chain leaves standard byte-identical to before.
 	let textareaBg = $derived(
-		`radial-gradient(${textareaVisible ? textareaRadius + "px" : "0px"} circle at ${textareaMouse.x}px ${textareaMouse.y}px, var(--color-blue-500, #3b82f6), transparent 80%)`
+		`radial-gradient(${textareaVisible ? textareaRadius + "px" : "0px"} circle at ${textareaMouse.x}px ${textareaMouse.y}px, var(--field-halo, var(--color-blue-500, #3b82f6)), transparent 80%)`
 	);
 
 	function handleTextareaMouseMove(e: MouseEvent) {
@@ -65,8 +71,12 @@
 	<!-- Global Success/Error Messages -->
 	{#if success}
 		<div class="mb-6">
+			<!-- There is no --success token in this app's palette, so the green stays literal.
+			     The panel surface is translucent instead of an opaque green-50/green-900 pair:
+			     one value reads correctly over any page colour (white, near-black, cream) and
+			     never punches an opaque light-grey hole into a repainted background. -->
 			<div
-				class="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20"
+				class="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-500/10 p-4"
 			>
 				<div class="flex items-center">
 					<svg
@@ -103,12 +113,14 @@
 
 	{#if globalError}
 		<div class="mb-6">
+			<!-- Surface, border and the red-600-grade foregrounds all ride --destructive, so the
+			     whole panel follows the palette. The dark-mode reds stay literal — see below. -->
 			<div
-				class="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
+				class="border-destructive/30 bg-destructive/10 flex items-center justify-between rounded-lg border p-4"
 			>
 				<div class="flex items-center">
 					<svg
-						class="mr-3 h-5 w-5 text-red-600 dark:text-red-400"
+						class="text-destructive mr-3 h-5 w-5 dark:text-red-400"
 						fill="currentColor"
 						viewBox="0 0 20 20"
 					>
@@ -118,11 +130,19 @@
 							clip-rule="evenodd"
 						/>
 					</svg>
+					<!-- Why every red here is `token dark:literal` rather than just the token:
+					     --destructive is red-600 in light mode (oklch(0.577 0.245 27.325), the
+					     exact Tailwind value — 4.83:1 on the light background, AA-clean) but
+					     red-900 in dark mode (oklch(0.396 0.141 25.723) — 1.97:1 on #0a0a0a,
+					     a background-grade red that is unreadable as text). So the token carries
+					     light + both skins, where it is also the only way a repainted palette can
+					     ever reach this copy, and the dark literal covers the one case it cannot.
+					     The darker/lighter tints below (red-800/red-200) have no token at all. -->
 					<p class="text-sm font-medium text-red-800 dark:text-red-200">{globalError}</p>
 				</div>
 				<button
 					onclick={dismissError}
-					class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+					class="text-destructive hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
 					aria-label="Dismiss error message"
 				>
 					<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -141,9 +161,16 @@
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<!-- Name Field -->
 		<div>
-			<label for="name" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+			<label for="name" class="text-foreground mb-2 block text-sm font-medium">
 				Name *
 			</label>
+			<!-- All three fields share this class string. Two of its classes look like dead
+			     leftovers and are not: in Tailwind v4 `shadow-input` is the shadow-COLOR utility
+			     (`--tw-shadow-color: var(--input)`, no size, so nothing paints on its own), and
+			     `dark:shadow-[…]` compiles to `var(--tw-shadow-color, var(--neutral-700))` — the
+			     fallback is never reached because `shadow-input` supplies the colour. Together
+			     they are the 1px hairline the fields carry in dark mode, already riding --input.
+			     Delete either one and the hairline disappears. -->
 			<input
 				id="name"
 				type="text"
@@ -151,14 +178,16 @@
 				placeholder="Your full name"
 				disabled={isSubmitting}
 				class={cn(
-					"shadow-input dark:placeholder-text-neutral-600 flex w-full rounded-md border-none bg-gray-50 px-3 py-2 text-sm text-black transition duration-400 placeholder:text-neutral-400 focus-visible:ring-[2px] focus-visible:ring-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:text-white dark:shadow-[0px_0px_1px_1px_var(--neutral-700)] dark:focus-visible:ring-neutral-600",
-					fieldErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""
+					"shadow-input bg-muted text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border-none px-3 py-2 text-sm transition duration-400 focus-visible:ring-[2px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-[0px_0px_1px_1px_var(--neutral-700)]",
+					fieldErrors.name ? "border-destructive focus-visible:ring-destructive" : ""
 				)}
 				aria-describedby="name-error"
 				required
 			/>
 			{#if fieldErrors.name}
-				<p id="name-error" class="mt-1 text-sm text-red-600 dark:text-red-400">
+				<!-- `text-destructive dark:text-red-400`, same split as the global error panel:
+				     the token is red-900 in dark mode and would be unreadable there. -->
+				<p id="name-error" class="text-destructive mt-1 text-sm dark:text-red-400">
 					{fieldErrors.name}
 				</p>
 			{/if}
@@ -166,7 +195,7 @@
 
 		<!-- Email Field -->
 		<div>
-			<label for="email" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+			<label for="email" class="text-foreground mb-2 block text-sm font-medium">
 				Email *
 			</label>
 			<input
@@ -176,14 +205,14 @@
 				placeholder="your.email@example.com"
 				disabled={isSubmitting}
 				class={cn(
-					"shadow-input dark:placeholder-text-neutral-600 flex w-full rounded-md border-none bg-gray-50 px-3 py-2 text-sm text-black transition duration-400 placeholder:text-neutral-400 focus-visible:ring-[2px] focus-visible:ring-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:text-white dark:shadow-[0px_0px_1px_1px_var(--neutral-700)] dark:focus-visible:ring-neutral-600",
-					fieldErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""
+					"shadow-input bg-muted text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border-none px-3 py-2 text-sm transition duration-400 focus-visible:ring-[2px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-[0px_0px_1px_1px_var(--neutral-700)]",
+					fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""
 				)}
 				aria-describedby="email-error"
 				required
 			/>
 			{#if fieldErrors.email}
-				<p id="email-error" class="mt-1 text-sm text-red-600 dark:text-red-400">
+				<p id="email-error" class="text-destructive mt-1 text-sm dark:text-red-400">
 					{fieldErrors.email}
 				</p>
 			{/if}
@@ -191,7 +220,7 @@
 
 		<!-- Message Field -->
 		<div>
-			<label for="message" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+			<label for="message" class="text-foreground mb-2 block text-sm font-medium">
 				Message *
 			</label>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -210,15 +239,15 @@
 					placeholder="Tell me about your project or just say hello..."
 					disabled={isSubmitting}
 					class={cn(
-						"shadow-input dark:placeholder-text-neutral-600 flex w-full resize-none rounded-md border-none bg-gray-50 px-3 py-2 text-sm text-black transition duration-400 group-hover/input:shadow-none placeholder:text-neutral-400 focus-visible:ring-[2px] focus-visible:ring-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:text-white dark:shadow-[0px_0px_1px_1px_var(--neutral-700)] dark:focus-visible:ring-neutral-600",
-						fieldErrors.message ? "border-red-500 focus-visible:ring-red-500" : ""
+						"shadow-input bg-muted text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none px-3 py-2 text-sm transition duration-400 group-hover/input:shadow-none focus-visible:ring-[2px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-[0px_0px_1px_1px_var(--neutral-700)]",
+						fieldErrors.message ? "border-destructive focus-visible:ring-destructive" : ""
 					)}
 					aria-describedby="message-error"
 					required
 				></textarea>
 			</div>
 			{#if fieldErrors.message}
-				<p id="message-error" class="mt-1 text-sm text-red-600 dark:text-red-400">
+				<p id="message-error" class="text-destructive mt-1 text-sm dark:text-red-400">
 					{fieldErrors.message}
 				</p>
 			{/if}
@@ -228,12 +257,12 @@
 		<button
 			type="submit"
 			disabled={isSubmitting}
-			class="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:bg-blue-400 dark:focus:ring-offset-gray-900"
+			class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring focus:ring-offset-background flex w-full items-center justify-center rounded-lg px-4 py-2 font-medium transition-colors duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
 			aria-label={isSubmitting ? "Sending message..." : "Send message"}
 		>
 			{#if isSubmitting}
 				<svg
-					class="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
+					class="text-primary-foreground mr-3 -ml-1 h-5 w-5 animate-spin"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"

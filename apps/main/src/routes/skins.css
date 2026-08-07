@@ -1,0 +1,474 @@
+/* ============================================================================
+   Runtime skin bridge — maps apps/main's semantic design tokens onto the
+   Cameleon engine's --skin-* palette.
+
+   HOW IT WORKS
+   layout.css declares every semantic color once in `:root` (--background,
+   --foreground, …) and then re-exports it through `@theme inline
+   { --color-background: var(--background) }`. Because that mapping is a
+   `var()` and not a literal, Tailwind emits `background-color: var(--background)`
+   at the USE SITE rather than baking a value — measured, e.g.
+   `.text-muted-foreground\/70 { color: color-mix(in oklab, var(--muted-foreground) 70%, transparent) }`.
+   So re-declaring `--background` on a matching ancestor re-skins every utility
+   in the app at once, with zero markup changes. That is the whole trick; this
+   file is nothing but that re-declaration, twice.
+
+   WHY THE SELECTOR IS `html[data-skin=…]` AND NOT A PROVIDER DIV
+   rama.app is fully prerendered (`prerender = true`, adapter-vercel), so there
+   is no request and no server render in which to resolve a cookie. A Svelte
+   <FancyProvider> wrapper would only exist after hydration, so every skinned
+   visit would flash the standard theme first. The anti-FOUC IIFE in app.html
+   writes `data-skin` onto <html> before first paint; <html> is the only element
+   that exists that early, so it is the only possible host. The engine's own
+   per-skin CSS is scoped by `[data-skin="…"]` (verified: zero `.cameleon-root`
+   occurrences in brutal.css / retro-os.css), so it lands on <html> unchanged
+   and no provider is needed. "standard" is the ABSENCE of the attribute.
+
+   WHY SPECIFICITY AND NOT SOURCE ORDER
+   `@import "./skins.css"` has to sit with the other @imports at the top of
+   layout.css — CSS forbids @import after ordinary rules — so this file is
+   emitted BEFORE the `:root` and `.dark` blocks it has to beat. Source order is
+   therefore working against us and cannot be relied on. Specificity is what
+   actually decides:
+       :root                     (0,1,0)
+       .dark                     (0,1,0)
+       html[data-skin="brutal"]  (0,1,1)   <- wins both, from anywhere in the file
+   Layer order backs this up: Tailwind parks its own theme defaults in
+   `@layer theme { :root, :host { … } }`, and unlayered declarations beat every
+   layered one regardless of specificity. This file is unlayered. That is what
+   makes the --font-mono override below work.
+
+   WHY THE `dark:` UTILITIES ARE NOT THIS FILE'S PROBLEM
+   Both skins are light-only. This file already neutralises dark mode at the
+   TOKEN layer (`html[data-skin]` outranks `.dark`), but `dark:`-prefixed
+   utilities that hardcode a palette color — `dark:bg-zinc-800`,
+   `dark:text-white`, 52 of them across 6 files — bypass tokens entirely. Those
+   are handled structurally by the `@custom-variant dark` in layout.css, which
+   appends `:not(:where([data-skin]) *)`. Do not hand-patch them here.
+
+   TOKEN VALUES ARE INLINED BY HAND
+   No CSS file in the engine defines a single --skin-* variable (`grep -o
+   '--skin-[a-z0-9-]*' brutal.css retro-os.css` returns nothing; both hardcode
+   raw hex). FancyProvider.svelte is what normally serialises `skin.tokens` into
+   an inline `style=` attribute — and we do not mount it. So the token blocks
+   below are transcribed from
+   fancy-ui/dist/cameleon/skins/<skin>/tokens.js. They are the source of truth;
+   if that file changes, this one has to change with it.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   Cross-skin world rules
+   --------------------------------------------------------------------------- */
+
+/* cameleon.css applies these to `.cameleon-root`, a class that never appears in
+   this app, so they would otherwise be lost. `background`, `color` and
+   `font-family` from that file are already covered — `body { @apply
+   bg-background text-foreground font-sans }` in layout.css resolves them
+   through the tokens mapped below — leaving only the smoothing hint, which is
+   part of how both skins are calibrated to render. */
+html[data-skin="brutal"],
+html[data-skin="retro-os"] {
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Pin the UA's own widget palette to light while a skin is active.
+   layout.css sets `:root.dark { color-scheme: dark }` at (0,2,0), which a plain
+   `html[data-skin]` at (0,1,1) would LOSE to — leaving a visitor who had dark
+   mode on before switching skins with dark scrollbars, a dark overscroll
+   canvas, dark ContactForm inputs and dark selection colors on a cream page.
+   The two-selector list fixes that branch by branch: `html[data-skin].dark` is
+   (0,2,1) and beats `:root.dark`; `html[data-skin]` is (0,1,1) and beats the
+   bare `:root`. Both skins are colorScheme "light" with no dark variant, so
+   there is no case in which this should not hold.
+   Unqualified `[data-skin]` is safe here: the attribute is only ever present
+   for a real skin. */
+html[data-skin].dark,
+html[data-skin] {
+	color-scheme: light;
+}
+
+/* ---------------------------------------------------------------------------
+   brutal — engine tokens (fancy-ui/dist/cameleon/skins/brutal/tokens.js)
+   "Swiss Grid x Playful Brutalism x Editorial": paper stack, ink hairlines,
+   five flat accents. 15 tokens; brutal ships NO --skin-muted and NO --skin-desk.
+   --------------------------------------------------------------------------- */
+html[data-skin="brutal"] {
+	--skin-page-bg: #f4eee0;
+	--skin-page-fg: #141414;
+	--skin-paper: #f4eee0;
+	--skin-card: #fbf7eb;
+	--skin-surface: #fffcf2;
+	--skin-ink: #141414;
+	--skin-line: #141414;
+	--skin-blue: #1b6ef3;
+	--skin-blue-700: #144fb0; /* brutal-only: the one shade in the system, a:hover in the reference */
+	--skin-red: #e5372b;
+	--skin-yellow: #f5b40c;
+	--skin-green: #12a147;
+	--skin-purple: #8e55e9;
+	--skin-font-sans: "Archivo", Helvetica, Arial, sans-serif;
+	--skin-font-mono: "Space Mono", monospace;
+
+	/* GAP FILL — not an engine token. brutal has no --skin-muted, but apps/main
+	   leans on --muted-foreground harder than on anything else (108 uses of
+	   `text-muted-foreground`, the most-consumed color token in the app), so it
+	   cannot go unmapped.
+	   Value = 65% --skin-ink composited over --skin-page-bg, i.e. the same
+	   "ink, faded into the paper" construction retro-os ships as #5C5340.
+	   Measured 5.40:1 on the page background and 5.83:1 on --skin-card, against
+	   4.73:1 for the standard light theme's oklch(0.556 0 0) on white — so
+	   secondary text gets slightly MORE contrast under the skin, not less.
+	   Written as a literal rather than color-mix() so the value is greppable and
+	   so Tailwind's `/70`-style opacity modifiers do not have to nest one
+	   color-mix inside another. */
+	--skin-muted: #62605b;
+
+	/* Per-skin overrides of tokens whose value is not the same for both skins;
+	   everything derivable purely from --skin-* lives in the shared block below. */
+
+	/* --radius: reduced, NOT flattened to zero. The prompt assumed brutal is the
+	   hard-edged skin; the engine says otherwise — brutal.css ships
+	   `border-radius: 999px` on its slider track and `50%` on its thumb, so in
+	   the design system this skin comes from, brutalism is carried by ink
+	   hairlines and flat accents rather than by square corners. 0.25rem keeps
+	   that reading while cutting the standard 0.625rem by 60% (at a 16px root:
+	   rounded-lg 10px -> 4px, rounded-xl 14px -> 8px). It also lands
+	   `calc(var(--radius) - 4px)` — what `rounded-sm` compiles to — on exactly
+	   0px instead of an invalid -4px, and it matches the one radius Tailwind
+	   bakes and this file cannot reach (bare `rounded`, 11 uses in src/), so the
+	   whole surface converges on a single corner size. */
+	--radius: 0.25rem;
+
+	/* --accent-work: the portfolio's small-caps mono accent — section indices,
+	   "( 01 )" eyebrows, the live dots, the ContextBar bullet. 23 of its 28 uses
+	   are `text-accent-work` at 10-11px, mostly straight on the page background,
+	   so legibility governs.
+	   --skin-blue-700 measures 6.54:1 there, beating the standard theme's own
+	   5.98:1, and it is the skin's designated darker accent — exactly the role
+	   this token plays. The vivid --skin-blue (3.97:1), --skin-red (3.69:1) and
+	   --skin-purple (3.92:1) all fall short of AA at this size. */
+	--accent-work: #144fb0;
+
+	/* Rainbow source values — see the shared --rainbow-* mapping below for why
+	   these are named --app-rainbow-* rather than assigned to --rainbow-*
+	   directly. Slot order is chosen for the gradient RainbowButton actually
+	   paints, which is (1, 5, 3, 4, 2): red -> yellow -> green -> blue -> purple,
+	   a clean warm-to-cool sweep across brutal's five flat accents. */
+	--app-rainbow-1: #e5372b; /* red */
+	--app-rainbow-5: #f5b40c; /* yellow */
+	--app-rainbow-3: #12a147; /* green */
+	--app-rainbow-4: #1b6ef3; /* blue */
+	--app-rainbow-2: #8e55e9; /* purple */
+}
+
+/* ---------------------------------------------------------------------------
+   retro-os — engine tokens (fancy-ui/dist/cameleon/skins/retro-os/tokens.js)
+   "Hard-shadow desktop chrome": desk/panel/card paper stack, ink borders.
+   17 tokens; two are deliberately omitted here:
+     --skin-desk (#E5DCC2) is the surface OUTSIDE the window chassis, and the
+       chassis is explicitly not being ported. Declaring it would invite someone
+       to reach for it as a page background, which is wrong.
+     --skin-font-pixel ('Silkscreen', 'IBM Plex Mono', monospace) exists only for
+       titlebars and the taskbar — again, chassis. app.html does not request
+       Silkscreen, so the token would silently resolve to its IBM Plex Mono
+       fallback: a variable whose name lies about what it renders.
+   --------------------------------------------------------------------------- */
+html[data-skin="retro-os"] {
+	--skin-page-bg: #f1e9d4;
+	--skin-page-fg: #191308;
+	--skin-paper: #f1e9d4;
+	--skin-card: #faf5e6;
+	--skin-surface: #fdfaf0;
+	--skin-ink: #191308;
+	--skin-line: #191308;
+	--skin-muted: #5c5340; /* retro-only; brutal's equivalent is derived above */
+	--skin-blue: #3f62a7;
+	--skin-red: #a0442f;
+	--skin-yellow: #b8912b;
+	--skin-green: #3a6b42;
+	--skin-purple: #7d6414; /* not purple: a dark-gold stand-in so the five-accent contract still yields 5 */
+	--skin-font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+	--skin-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+	/* --radius: flattened to zero, unlike brutal — because here the engine asks
+	   for it. retro-os.css squares its own primitives outright (`.ds-card
+	   { border-radius: 0 }`, `.cam-range { border-radius: 0 }`) and then cuts
+	   stair-step pixel corners with clip-path.
+
+	   `0px`, not a unitless `0`. --radius is only ever consumed through the
+	   compiled utilities `calc(var(--radius) - 4px)` / `- 2px` / `+ 4px`, and
+	   calc() requires both operands of +/- to share a type: a unitless 0 is a
+	   <number>, so `calc(0 + 4px)` is a type mismatch and `rounded-xl` (7 uses)
+	   would be thrown away rather than computed. With `0px` every calc stays
+	   well-typed and the outcome is deliberate rather than accidental:
+	     rounded-sm  calc(0px - 4px) = -4px  invalid for border-radius, dropped -> 0
+	     rounded-md  calc(0px - 2px) = -2px  same -> 0
+	     rounded-lg  0px
+	     rounded-xl  calc(0px + 4px) = 4px
+	   Residue this cannot reach, all harmless: bare `rounded` (11 uses) stays at
+	   Tailwind's baked 0.25rem — the same 4px rounded-xl lands on — the five
+	   `rounded-[14px]` panels keep 14px, and `rounded-full` (18 uses: status
+	   dots, avatars, the ContextBar pill) stays round by design. */
+	--radius: 0px;
+
+	/* --accent-work: --skin-purple is the dark-gold #7D6414 here, not a purple.
+	   It is the closest hue match to the standard theme's oklch(0.5 0.045 95)
+	   (a dark cream/olive) AND the only member of the retro palette in the right
+	   lightness band: 4.68:1 on the page background, or 4.62:1 once the skin's
+	   own scanline overlay is composited in — still AA. The obvious-looking
+	   --skin-yellow (#B8912B) is the same hue family but only reaches 2.44:1 and
+	   would be unreadable at 10px. */
+	--accent-work: #7d6414;
+
+	/* Same slot order as brutal (RainbowButton paints 1, 5, 3, 4, 2), rendered in
+	   retro-os's muted earth accents instead of brutal's saturated ones. */
+	--app-rainbow-1: #a0442f; /* red */
+	--app-rainbow-5: #b8912b; /* yellow */
+	--app-rainbow-3: #3a6b42; /* green */
+	--app-rainbow-4: #3f62a7; /* blue */
+	--app-rainbow-2: #7d6414; /* dark gold (the "purple" slot) */
+}
+
+/* ---------------------------------------------------------------------------
+   Semantic token map — identical for both skins, so written once.
+
+   Every right-hand side is a --skin-* variable, which is why this block can be
+   shared: the two skins differ only in the token VALUES declared above. The
+   selector lists both skins explicitly rather than using a bare `html[data-skin]`
+   so that adding a third skin is a compile-visible decision here, not a silent
+   half-mapping.
+
+   Placed after the token blocks purely for readability; the two are disjoint
+   (they declare no property in common), so order is not load-bearing.
+   --------------------------------------------------------------------------- */
+html[data-skin="brutal"],
+html[data-skin="retro-os"] {
+	/* --- Fonts ------------------------------------------------------------ */
+
+	/* --app-font-sans is the indirection layout.css introduces so a skin CAN
+	   change the sans stack at all: `@theme inline { --font-sans: '<literal>' }`
+	   bakes the literal into every use site and never emits --font-sans as a
+	   custom property, so overriding --font-sans directly is a silent no-op. */
+	--app-font-sans: var(--skin-font-sans);
+
+	/* --font-mono needs no such indirection and is overridden directly.
+	   layout.css never touches it, so it keeps Tailwind's default non-inline
+	   behaviour: the value IS emitted as a real property
+	   (`@layer theme { :root, :host { --font-mono: … } }`) and `.font-mono`
+	   compiles to `font-family: var(--font-mono)`. This rule is unlayered, so it
+	   beats `@layer theme` on layer precedence alone, before specificity is even
+	   consulted. Worth doing: apps/main uses `font-mono` 45 times, on exactly the
+	   editorial chrome (eyebrows, indices, the ContextBar) where a skin's
+	   monospace face reads loudest — and Space Mono / IBM Plex Mono are already
+	   in the font URL each skin requests. */
+	--font-mono: var(--skin-font-mono);
+
+	/* --- Surfaces --------------------------------------------------------- */
+	/* Note the paper stack runs the opposite way to shadcn's: the standard theme
+	   goes white page -> slightly DARKER grey fills, whereas both skins go cream
+	   page -> slightly LIGHTER panels. That inversion is deliberate in the
+	   engine (raised paper catches more light) and is preserved here rather than
+	   fought, so --muted / --surface-raised read as lifted rather than recessed. */
+	--background: var(--skin-page-bg);
+	--foreground: var(--skin-ink); /* == --skin-page-fg in both skins; --skin-ink is the semantic name */
+	--card: var(--skin-card);
+	--card-foreground: var(--skin-ink);
+	--popover: var(--skin-surface); /* popovers sit above cards -> the lightest paper */
+	--popover-foreground: var(--skin-ink);
+
+	/* --- Primary ---------------------------------------------------------- */
+	/* The standard theme's primary is near-black on near-white; the skin's
+	   ink-on-paper pair is the same relationship (15.9:1 brutal, 15.2:1 retro).
+	   Consumed by the Testimonials "load more" button and NavAnchor's focus ring. */
+	--primary: var(--skin-ink);
+	--primary-foreground: var(--skin-paper);
+
+	/* --- Secondary / muted ------------------------------------------------ */
+	/* In the standard theme --secondary, --muted and --accent are all the SAME
+	   oklch(0.97 0 0), so there is no hierarchy here to preserve — only a
+	   distinction between "quiet fill" and "accent fill". --secondary and
+	   --muted take the quiet one. --muted's real consumers are the
+	   CarbonNeutralBadge pill (bg-muted/40) and the NavAnchor button
+	   (bg-muted/50, hover bg-muted); both keep a text-foreground child, so this
+	   must stay a light surface. */
+	--secondary: var(--skin-card);
+	--secondary-foreground: var(--skin-ink);
+	--muted: var(--skin-card);
+	--muted-foreground: var(--skin-muted);
+
+	/* --- Accent ----------------------------------------------------------- */
+	/* The only `bg-accent` consumers are hover states on the three outlined
+	   Contact buttons (`bg-background hover:bg-accent hover:text-accent-foreground`),
+	   where a flat accent fill is precisely the skins' signature interaction —
+	   this follows the engine's own docs bridge, which also picks --skin-yellow.
+	   Ink on it measures 10.76:1 (brutal) / 6.71:1 (retro).
+	   --accent-foreground has one standalone use, the Footer "made with"
+	   highlight, which sits on the page background; resolving it to ink keeps
+	   that exactly as emphatic as the standard theme's oklch(0.205 0 0). */
+	--accent: var(--skin-yellow);
+	--accent-foreground: var(--skin-ink);
+
+	/* --- Lines, fields, focus --------------------------------------------- */
+	/* The single highest-impact mapping in the file. The standard --border is
+	   oklch(0.922 0 0), a barely-there grey; --skin-line is full ink. Every
+	   `border-border` hairline — including the 26 `border-border/50` and 12
+	   `border-border/20` rules and the global `* { @apply border-border }` —
+	   becomes a hard ink rule. That IS the look of both skins. */
+	--border: var(--skin-line);
+	--input: var(--skin-line);
+	/* --ring is what `ring-ring` / `outline-ring/50` / `focus-visible:ring-ring`
+	   paint. --skin-blue is not a guess: the engine's own focus states use these
+	   exact hexes (brutal.css `box-shadow: 0 0 0 3px rgba(27,110,243,.35)`,
+	   retro-os.css `0 0 0 2px #3f62a7`), so focus rings stay consistent between
+	   this bridge and any engine-styled control. */
+	--ring: var(--skin-blue);
+	--destructive: var(--skin-red);
+
+	/* --field-halo: ContactForm's cursor-follow spotlight on the textarea. Defined
+	   ONLY here, never in :root — the component falls back to its original blue, so
+	   the unskinned themes stay byte-identical. It cannot ride --ring: that token is
+	   a pure neutral grey in both standard themes, so reusing it turned the spotlight
+	   into an invisible wash over bg-muted. --skin-blue keeps it a real accent. */
+	--field-halo: var(--skin-blue);
+
+	/* --- Portfolio "work" redesign tokens --------------------------------- */
+	/* --accent-work is per-skin (see the token blocks above). --surface-raised
+	   is the MediaFrame / bnf-richelieu panel fill; "raised" resolves to
+	   --skin-card in both skins, matching the dark theme's own convention where
+	   raised is lighter than the page. */
+	--surface-raised: var(--skin-card);
+
+	/* --- Rainbow ---------------------------------------------------------- */
+	/* Indirected through --app-rainbow-* declared per skin above, for one
+	   reason: RainbowButton ships a Svelte-scoped <style> that sets
+	   `--rainbow-1..5` ON THE BUTTON ITSELF (compiled:
+	   `.rainbow-button.svelte-jnph8o { --rainbow-1: hsl(0 100% 63%); … }`).
+	   A custom property declared on an element always beats one inherited from
+	   an ancestor, so this :root-level block alone would never reach the Hero
+	   CTA — hence the extra rule below. That rule has to re-point --rainbow-N at
+	   something, and `--rainbow-1: var(--rainbow-1)` on the same element is a
+	   self-reference cycle (invalid at computed-value time), so a second name is
+	   structurally required. Same one-indirection shape as --app-font-sans.
+	   These four consumers all read the RAW names: RainbowButton's border
+	   gradient and its blurred ::before glow, --gradient-rainbow in layout.css,
+	   and Tailwind's `--color-rainbow-*` theme aliases. */
+	--rainbow-1: var(--app-rainbow-1);
+	--rainbow-2: var(--app-rainbow-2);
+	--rainbow-3: var(--app-rainbow-3);
+	--rainbow-4: var(--app-rainbow-4);
+	--rainbow-5: var(--app-rainbow-5);
+
+	/* --- Charts ----------------------------------------------------------- */
+	/* Zero consumers in apps/main today and none plausible (this is a portfolio,
+	   not a dashboard). Mapped anyway because the failure mode of NOT mapping is
+	   a pure-white / vivid-oklch surface dropped onto cream the day something
+	   does use them, and the fix costs five lines. The five flat accents in
+	   palette order. */
+	--chart-1: var(--skin-blue);
+	--chart-2: var(--skin-red);
+	--chart-3: var(--skin-yellow);
+	--chart-4: var(--skin-green);
+	--chart-5: var(--skin-purple);
+
+	/* --- Sidebar ---------------------------------------------------------- */
+	/* Also zero consumers — apps/main has no sidebar, and none of the eight
+	   fancy-ui components it renders touch these. Same insurance argument as the
+	   charts: an unmapped --sidebar is oklch(0.985 0 0), i.e. a white slab.
+	   Mirrors the card/ink/accent relationships above. */
+	--sidebar: var(--skin-card);
+	--sidebar-foreground: var(--skin-ink);
+	--sidebar-primary: var(--skin-ink);
+	--sidebar-primary-foreground: var(--skin-paper);
+	--sidebar-accent: var(--skin-yellow);
+	--sidebar-accent-foreground: var(--skin-ink);
+	--sidebar-border: var(--skin-line);
+	--sidebar-ring: var(--skin-blue);
+
+	/* NOT MAPPED, deliberately:
+	   --radius-sm/md/lg/xl  derived from --radius by @theme inline; overriding
+	                         them here is a no-op (inline bakes the calc() at the
+	                         use site), so --radius per skin is the only handle.
+	   --animation-*, --ease-*  motion identity, not a skin concern; both skins
+	                         are colour/typography only.
+	   --gradient-start/end/primary/rainbow  already defined as
+	                         `var(--primary)` / `var(--accent)` / `var(--rainbow-*)`
+	                         in layout.css's :root. Custom properties resolve
+	                         against the winning declaration on the same element,
+	                         and :root IS html — so these follow the mappings
+	                         above automatically. Re-declaring them would just
+	                         create a second place to keep in sync. */
+}
+
+/* RainbowButton escape hatch. Specificity: `html` (0,0,1) + `[data-skin]`
+   (0,1,0) + `.rainbow-button` (0,1,0) = (0,2,1), against the Svelte-scoped
+   `.rainbow-button.svelte-jnph8o` at (0,2,0). Wins on weight, so it does not
+   matter that the component's own <style> is emitted later.
+   --app-rainbow-* is inherited from <html>, so there is no cycle.
+   Bare `[data-skin]` is intentional here: any skin that defines the source
+   values should get them, and the attribute never appears for "standard". */
+html[data-skin] .rainbow-button {
+	--rainbow-1: var(--app-rainbow-1);
+	--rainbow-2: var(--app-rainbow-2);
+	--rainbow-3: var(--app-rainbow-3);
+	--rainbow-4: var(--app-rainbow-4);
+	--rainbow-5: var(--app-rainbow-5);
+}
+
+/* ---------------------------------------------------------------------------
+   retro-os.css defect overrides
+
+   The engine's retro-os.css was written for a bounded element (a FancyProvider
+   div, or the docs' window chassis). Hosted on <html> — which is where the
+   anti-FOUC script has to put data-skin — two of its declarations misbehave.
+   Both fixes are pure specificity wins, so import order is irrelevant:
+
+     engine  [data-skin="retro-os"]                            (0,1,0)
+     ours    html[data-skin="retro-os"]                        (0,1,1)  <-
+
+     engine  [data-skin="retro-os"]:not(.docs-skin)::after     (0,2,1)
+     ours    html[data-skin="retro-os"]:not(.docs-skin)::after (0,2,2)  <-
+
+   The `:not(.docs-skin)` is carried over verbatim and is load-bearing for the
+   count, not decorative: `.docs-skin` never appears in this app, so the pseudo-
+   class always matches, but dropping it would land us at (0,1,2), which LOSES
+   to the engine's (0,2,1) on class count.
+
+   The cursor is intentionally left alone — it is a base64-inlined pixel arrow
+   that needs no static asset and is the most recognisable part of the skin.
+
+   STATUS: the two rules below are LOAD-BEARING. `+layout.svelte` imports
+   `fancy-ui-svelte/cameleon/skins/retro-os/retro-os.css` (that import is the
+   whole point of the `"./cameleon/*"` entry added to fancy-ui's exports map),
+   so the engine's own `position: relative` and its `inset: 0` ::after are live
+   on <html>. Deleting either rule below regresses two things at once: the
+   containing block for every absolutely-positioned element without a positioned
+   ancestor, and a document-height scanline gradient that re-rasterises on every
+   scroll instead of sitting fixed to the viewport.
+   brutal.css is imported too and changes nothing here: its 35 lines style only
+   `.cam-range`, a class apps/main never renders.
+   --------------------------------------------------------------------------- */
+
+/* `position: relative` on <html> silently changes the containing block for
+   every absolutely-positioned element in the app that has no other positioned
+   ancestor: those resolve against the initial containing block (viewport-sized)
+   normally, but against html's padding box (full document height) once html is
+   positioned. That is a layout change disguised as a skin. Reverting to
+   `static` restores the unskinned geometry; the overlay below no longer needs a
+   positioned root anyway, since fixed positions against the viewport. */
+html[data-skin="retro-os"] {
+	position: static;
+}
+
+/* The CRT scanline overlay, re-anchored to the viewport.
+   As authored it is `position: absolute; inset: 0` on the skin root — on <html>
+   that resolves against the DOCUMENT box, producing a repeating-linear-gradient
+   layer as tall as the whole portfolio page that has to re-rasterise on every
+   scroll. `fixed` covers exactly the viewport and stays put, which is both the
+   correct visual (a CRT overlay belongs to the screen, not the document) and
+   the cheap one. Everything else the engine sets on this pseudo-element —
+   content, pointer-events: none, z-index: 40, the gradient itself — still
+   applies from its own rule; only these two declarations are replaced. */
+html[data-skin="retro-os"]:not(.docs-skin)::after {
+	position: fixed;
+	inset: 0;
+}

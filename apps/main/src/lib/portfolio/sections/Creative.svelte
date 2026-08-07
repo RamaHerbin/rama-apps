@@ -53,10 +53,10 @@
 {#if !isMobile}
 	<div bind:this={creativeSection} class="flex min-h-96 w-full flex-col gap-2">
 		<div
-			class="relative mx-auto mt-4 flex h-96 w-full max-w-4xl items-center justify-center rounded-lg border border-white/10 p-4"
+			class="border-border relative mx-auto mt-4 flex h-96 w-full max-w-4xl items-center justify-center rounded-lg border p-4"
 		>
 			<span
-				class="absolute inset-0 flex items-center justify-center text-4xl text-white/40 select-none"
+				class="text-muted-foreground absolute inset-0 flex items-center justify-center text-4xl select-none"
 				data-edit="home.creative.hover-label"
 			>
 				{c("home.creative.hover-label")}

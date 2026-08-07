@@ -67,8 +67,11 @@
 		onHoverChange?.(null);
 	}
 
+	// The ring is what cuts the gap between two overlapping photos, so it is the page
+	// colour by definition — `border-white` was an artifact of the upstream demo
+	// living on a white page.
 	const avatarClass =
-		"relative !m-0 block size-14 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105";
+		"border-background relative !m-0 block size-14 rounded-full border-2 object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105";
 </script>
 
 <div class={cn("flex flex-row items-center", className)}>
@@ -84,6 +87,15 @@
 			tabindex="0"
 		>
 			{#if activeId === item.id}
+				<!--
+					Deliberately literal, NOT bg-foreground. A floating tooltip is chrome, not a
+					page surface: it has to stay ink in every palette. Routing it through
+					--foreground inverted it in standard DARK (--foreground is oklch(0.985) there,
+					so a black card became a near-white one) — a redesign of the unskinned theme,
+					not a bridge. It would also have stranded the two hairlines below, which are
+					kept as emerald/sky literals on the grounds that they read on ink everywhere;
+					that reasoning only holds if the surface actually stays ink.
+				-->
 				<div
 					class="pointer-events-none absolute -top-16 left-1/2 z-50 flex flex-col items-center justify-center rounded-md bg-black px-4 py-2 text-xs whitespace-nowrap shadow-xl"
 					style="transform: translateX(calc(-50% + {translation}px)) rotate({rotation}deg);"
