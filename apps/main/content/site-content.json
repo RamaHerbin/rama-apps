@@ -262,6 +262,19 @@
     "Animation"
   ],
   "personal.card-fancyui.title": "FancyUI",
+  "personal.card-hdr.description": "A five-second answer to one question: can your display actually paint brighter than white? WebGPU fireworks burn the question into the sky, then a verdict separates what the screen can do from what the browser will allow.",
+  "personal.card-hdr.github.href": "https://github.com/RamaHerbin/rama-apps",
+  "personal.card-hdr.github.label": "GitHub",
+  "personal.card-hdr.tags": [
+    "WebGPU",
+    "WebGL2",
+    "HDR",
+    "Shaders",
+    "Svelte 5"
+  ],
+  "personal.card-hdr.title": "Is My Screen HDR?",
+  "personal.card-hdr.visit.href": "https://is-my-screen-hdr.rama.app",
+  "personal.card-hdr.visit.label": "Try it live",
   "personal.card-portfolio-2025.description": "Current portfolio built with Nuxt 3, featuring modern UI components, interactive cursors, and performance optimizations. Showcases technical skills and creative development approach.",
   "personal.card-portfolio-2025.github.href": "https://github.com/RamaHerbin/portfolio-2k25",
   "personal.card-portfolio-2025.github.label": "GitHub",
