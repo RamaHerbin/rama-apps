@@ -30,7 +30,13 @@
  */
 
 import { browser } from "$app/environment";
-import { SKINS, SKIN_NAMES, SKIN_STORAGE_KEY, isSkinName } from "$lib/skins/registry.js";
+import {
+	SKINS,
+	SKIN_NAMES,
+	SKIN_STORAGE_KEY,
+	isSkinName,
+	skinAppliesTo,
+} from "$lib/skins/registry.js";
 import type { SkinDef, SkinName } from "$lib/skins/registry.js";
 import { syncThemeColor } from "$lib/stores/theme.svelte.js";
 
@@ -203,7 +209,14 @@ function applySkin() {
 	// The `dark:`-neutralising custom variant keys off presence alone, so
 	// writing data-skin="standard" would silently disable dark mode on an
 	// unskinned page.
-	if (skin === "standard") {
+	//
+	// The pathname check mirrors app.html's IIFE. It is needed here as well and
+	// not only there: the IIFE runs once per full document load, so a
+	// client-side navigation from `/` to `/photo` would otherwise carry the
+	// attribute onto an excluded route. `applySkin()` is re-run on navigation
+	// from the root layout for exactly this reason. The stored preference is
+	// untouched — leaving an excluded route restores the skin.
+	if (skin === "standard" || !skinAppliesTo(window.location.pathname)) {
 		root.removeAttribute("data-skin");
 	} else {
 		root.dataset.skin = skin;
@@ -302,6 +315,19 @@ export function getSkinDef(): SkinDef {
 }
 
 /** Whether any skin is active, i.e. whether `<html>` carries `data-skin`. */
+/**
+ * Re-evaluate whether the stored skin may paint the current route.
+ *
+ * app.html's IIFE decides this once per full document load, which is not enough:
+ * a client-side navigation from `/` to `/photo` never re-runs it, so the
+ * attribute would ride onto an excluded route. The root layout calls this on
+ * every navigation. Idempotent, and it never touches the stored preference —
+ * navigating away from an excluded route restores the skin.
+ */
+export function refreshSkinForRoute() {
+	applySkin();
+}
+
 export function isSkinned(): boolean {
 	return skin !== "standard";
 }

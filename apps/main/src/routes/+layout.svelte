@@ -24,13 +24,26 @@
 
 	import { onMount, type Component } from "svelte";
 	import { dev } from "$app/environment";
+	import { page } from "$app/state";
 	import { injectAnalytics } from "@vercel/analytics/sveltekit";
 	import { Seo } from "$lib/seo/index.js";
+	import { refreshSkinForRoute } from "$lib/stores/skin.svelte.js";
   import { ScrollBlurOverlay } from '$lib/portfolio';
 
 	let { children } = $props();
 
 	injectAnalytics({ mode: dev ? "development" : "production" });
+
+	// Skins are suppressed on /photo and /carbon (see SKIN_EXCLUDED_PATHS).
+	// app.html's IIFE enforces that before first paint, but it only runs on a full
+	// document load — a client-side navigation from / to /photo would otherwise
+	// carry `data-skin` onto a page that commits to `bg-black` and renders no
+	// switcher. Re-evaluating per navigation closes that hole; the stored
+	// preference is never touched, so navigating back restores the skin.
+	$effect(() => {
+		page.url.pathname;
+		refreshSkinForRoute();
+	});
 
 	// Edit mode is opt-in via ?edit=1&studioOrigin=…, resolved client-side only.
 	// The overlay + runtime are dynamically imported (including the param parser)

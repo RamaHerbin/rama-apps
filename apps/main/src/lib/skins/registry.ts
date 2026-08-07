@@ -190,3 +190,38 @@ export const SKINS: Record<SkinName, SkinDef> = {
  * string (it cannot import); the guard is what keeps that copy honest.
  */
 export const SKIN_STORAGE_KEY = "rama-skin";
+
+/**
+ * Routes a skin must never be applied to.
+ *
+ * `/photo` and `/carbon` are standalone always-dark designs — their page roots
+ * commit to `bg-black text-white` outright rather than reading `--background`,
+ * and neither renders `NavAnchor`. Skinning them is wrong three times over:
+ *
+ *   1. There is nothing to repaint. The pages ignore the token layer by
+ *      construction, so a skin buys no visual change on the content itself.
+ *   2. It actively damages them. `ScrollBlurOverlay` is a sibling of the page in
+ *      the root layout and paints `bg-background/90`, so a light `--background`
+ *      lays a cream band across the bottom of a black page — on `/photo` it
+ *      swallows the "move your cursor" hint.
+ *   3. There is no way out. With no `NavAnchor` there is no switcher, so a
+ *      visitor arriving from search with a stored skin is simply stuck.
+ *
+ * Note this is about the SKIN only. These routes' relationship with the ordinary
+ * light theme is a separate, pre-existing question — the cream band reproduces
+ * in standard light with no skin active — and answering it means deciding what
+ * an always-dark page should be under a light theme, which is a design call.
+ *
+ * Duplicated as literals in src/app.html (which cannot import); the build guard
+ * in vite.config.ts is what keeps the two copies in step.
+ */
+export const SKIN_EXCLUDED_PATHS = ["/photo", "/carbon"] as const;
+
+/**
+ * Whether a skin may paint this pathname. Trailing slashes are tolerated because
+ * the attribute is written from `location.pathname`, which can carry one.
+ */
+export function skinAppliesTo(pathname: string): boolean {
+	const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+	return !(SKIN_EXCLUDED_PATHS as readonly string[]).includes(path);
+}

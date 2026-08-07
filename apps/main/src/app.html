@@ -149,6 +149,17 @@
 				// with === rather than looked up on SKINS, so a stored "constructor" or
 				// "__proto__" can never reach the prototype chain and pass as a skin.
 				var skinName = storedSkin === 'brutal' || storedSkin === 'retro-os' ? storedSkin : null;
+
+				// /photo and /carbon are standalone always-dark pages: their roots commit to
+				// `bg-black text-white` instead of reading --background, and neither renders
+				// NavAnchor. A skin there repaints nothing, drops ScrollBlurOverlay's
+				// `bg-background/90` cream band across a black page, and leaves the visitor
+				// with no switcher to undo it. Mirrors SKIN_EXCLUDED_PATHS in
+				// $lib/skins/registry.ts, which the build guard keeps in step with this copy.
+				var path = window.location.pathname;
+				if (path.length > 1 && path.charAt(path.length - 1) === '/') path = path.slice(0, -1);
+				if (path === '/photo' || path === '/carbon') skinName = null;
+
 				var skin = skinName ? SKINS[skinName] : null;
 				if (skinName) root.setAttribute('data-skin', skinName);
 				else root.removeAttribute('data-skin');
