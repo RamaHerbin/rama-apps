@@ -1,10 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+/* NOTE: there is deliberately no @import url('https://fonts.googleapis.com/…') here.
+   Vite does not inline remote @imports — it ships them verbatim into the bundled CSS —
+   so this file used to request the exact same Bricolage Grotesque stylesheet that
+   src/app.html already preloads. Two costs, both paid on every cold load:
+     1. the font stylesheet was fetched twice;
+     2. an @import inside a render-blocking stylesheet serialises the critical path:
+        HTML → app CSS → googleapis CSS → gstatic woff2, three round trips across two
+        third-party origins, none of which can start before the previous one lands.
+   The app.html <link rel="preload" as="style" onload="…rel='stylesheet'"> is the single
+   source of the webfont. If you need to change the font, change it there. */
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @source "../../node_modules/fancy-ui-svelte";
 
 @custom-variant dark (&:is(.dark *));
+
+/* Tell the UA which palette to render its own widgets in: form controls, scrollbars,
+   the canvas behind the page during overscroll, and the default text-selection colors.
+
+   These two rules are ordered by SPECIFICITY, not by source order, so they keep working
+   no matter where they end up in the cascade: `:root.dark` is (0,2,0) and beats the bare
+   `:root` at (0,1,0). The dark rule could sit above the light one and still win.
+
+   Preferred over <meta name="color-scheme" content="light dark"> in app.html because that
+   meta is static and OS-driven, whereas this theme is class-based — it follows the toggle
+   in $lib/stores/theme.svelte.ts, which adds/removes `.dark` on <html>. A meta tag cannot
+   track a class. The anti-FOUC script in app.html sets that class before first paint, so
+   the correct color-scheme is already in effect on the very first frame. */
+:root {
+	color-scheme: light;
+}
+:root.dark {
+	color-scheme: dark;
+}
 
 :root {
 	/* Layout */

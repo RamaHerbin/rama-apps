@@ -11,11 +11,87 @@
 			as="style"
 			onload="this.onload=null;this.rel='stylesheet'"
 		/>
+		<!--
+			The preload above applies the stylesheet from an inline onload handler, which
+			never fires with scripting disabled. layout.css used to carry a remote @import
+			as a second, script-free path, but that @import shipped verbatim through Vite
+			and made the font a render-blocking third-party chain, so it was removed.
+			This noscript restores the no-JS path without putting the chain back.
+		-->
+		<noscript>
+			<link
+				rel="stylesheet"
+				href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap"
+			/>
+		</noscript>
+
+		<!--
+			Icons. Deliberately after the font preconnect/preload: those are on the critical
+			rendering path, icons are fetched at low priority regardless of document order.
+
+			Order within this block is load-bearing:
+			  1. favicon.ico first, with its real contents declared, so a browser that only
+			     speaks ICO can rank the candidate without a speculative round-trip. The
+			     file genuinely holds three PNG payloads at 16/32/48 — 48 is there because
+			     Google Search's favicon crawler prefers multiples of 48, so declaring only
+			     32x32 would hide from sizes-aware selection the exact entry it was added for.
+			  2. favicon.svg second, because every engine that understands
+			     type="image/svg+xml" prefers it over an untyped .ico no matter the order —
+			     so putting it second costs nothing and keeps (1) unambiguous.
+
+			NOTE: no og:* and no twitter:* tags live here, ever. app.html is not route-aware;
+			$lib/seo/Seo.svelte owns every route-varying tag. Declaring og:image in both
+			places emits it twice, and Facebook/LinkedIn read the first while Twitter reads
+			the last — silent cross-platform divergence.
+		-->
+		<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<!--
+			Exactly ONE theme-color tag, no media="(prefers-color-scheme:…)" pair.
+			$lib/stores/theme.svelte.ts rewrites this element's content unconditionally via a
+			first-match querySelector, so a second, media-scoped tag would get clobbered with
+			the wrong value. #0a0a0a === oklch(0.145 0 0) === --background in .dark.
+		-->
+		<meta name="theme-color" content="#0a0a0a" />
+
 		<script type="text/javascript">
-			// Prevent flash of light theme - set dark mode by default
+			/*
+				Anti-FOUC: resolve the theme before first paint.
+
+				This MUST mirror $lib/stores/theme.svelte.ts exactly — same storage key
+				(STORAGE_KEY = "fancy-ui-theme"), same allow-list, same "system" resolution.
+				Any divergence and the store recomputes a different class on hydration, which
+				is the flash we are trying to avoid.
+
+				(Previously this read the key "theme", which the store never writes, so the
+				lookup always missed and fell through to a hardcoded 'dark' — meaning a user
+				who had chosen light flashed dark on every single load.)
+			*/
 			(function () {
-				const theme = localStorage.getItem('theme') || 'dark';
-				document.documentElement.classList.toggle('dark', theme === 'dark');
+				var stored = null;
+				try {
+					stored = localStorage.getItem('fancy-ui-theme');
+				} catch (e) {
+					// Safari private mode / storage blocked by policy: fall through to the OS preference.
+				}
+				// The store validates against ["light","dark","system"] and keeps its "system"
+				// default for anything else, including absent and malformed values.
+				var theme = stored === 'light' || stored === 'dark' ? stored : 'system';
+				var dark =
+					theme === 'dark' ||
+					(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.classList.toggle('dark', dark);
+
+				// The meta above is declared statically as #0a0a0a, but the class we just
+				// resolved may be light — so correct it here, before first paint, rather than
+				// leaving it to applyTheme() on hydration. Without this a light-mode visitor
+				// on iOS Safari / Chrome Android gets a white page under a dark chrome bar
+				// until the JS chunk evaluates, then watches the bar snap. The tag is declared
+				// above this script, so querySelector always finds it.
+				var meta = document.querySelector('meta[name="theme-color"]');
+				if (meta) meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
 			})();
 		</script>
 		%sveltekit.head%

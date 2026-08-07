@@ -3,6 +3,7 @@
 	import { onMount, type Component } from "svelte";
 	import { dev } from "$app/environment";
 	import { injectAnalytics } from "@vercel/analytics/sveltekit";
+	import { Seo } from "$lib/seo/index.js";
   import { ScrollBlurOverlay } from '$lib/portfolio';
 
 	let { children } = $props();
@@ -60,6 +61,16 @@
 		EditOverlay = module.default;
 	});
 </script>
+
+<!--
+	The entire route-varying <head>, mounted exactly once for the whole app.
+	It is prop-less and table-driven: it resolves `page.url.pathname` against
+	`src/lib/seo/routes.ts`, so a new route needs one entry there and nothing
+	here. No page component may declare its own <title>, description, canonical,
+	og:* or twitter:* — SvelteKit dedupes <title> only, so a second <svelte:head>
+	would ship every other tag twice.
+-->
+<Seo />
 
 {@render children()}
 

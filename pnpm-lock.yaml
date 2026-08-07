@@ -96,6 +96,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      sharp:
+        specifier: ^0.33.5
+        version: 0.33.5
       svelte:
         specifier: ^5.51.0
         version: 5.53.10
@@ -108,6 +111,9 @@ importers:
       tailwindcss:
         specifier: ^4.1.0
         version: 4.2.1
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0

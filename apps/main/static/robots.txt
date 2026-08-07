@@ -1,0 +1,5 @@
+# https://rama.app
+User-agent: *
+Allow: /
+
+Sitemap: https://rama.app/sitemap.xml

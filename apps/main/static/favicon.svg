@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+	<title>Rama Herbin — Front-End &amp; UI Engineer</title>
+	<defs>
+		<linearGradient id="ink" gradientUnits="userSpaceOnUse" x1="10" y1="6" x2="54" y2="58">
+			<stop offset="0" stop-color="#ffffff" />
+			<stop offset="0.55" stop-color="#f2ebdd" />
+			<stop offset="1" stop-color="#e3d9bf" />
+		</linearGradient>
+	</defs>
+
+	<rect width="64" height="64" rx="15" fill="#0a0a0a" />
+	<rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="#ffffff" stroke-opacity="0.12" />
+
+	<!-- Registered-trademark ring. Outer r 27.5, inner r 22 — a 5.5-unit wall,
+	     1.37px at 16px, comfortably above the antialiasing floor. -->
+	<path fill="url(#ink)" fill-rule="evenodd" d="M4.5 32a27.5 27.5 0 1 0 55 0a27.5 27.5 0 1 0-55 0ZM10 32a22 22 0 1 1 44 0a22 22 0 1 1-44 0Z" />
+
+	<!-- The R, redrawn as geometry rather than type: 6-unit stem, 5-unit bars, and a
+	     10.5 x 8 rectangular slot counter (2.6 x 2.0px at 16px) instead of the fine
+	     round counter of the system glyph, which fills in solid below 20px. The leg
+	     is a flat-footed wedge held clear of the stem so the two never merge. -->
+	<path fill="url(#ink)" fill-rule="evenodd" d="M21 19H37A6 6 0 0 1 43 25V31A6 6 0 0 1 37 37L43 45H36.5L30.5 37H27V45H21ZM27 24H37.5V32H27Z" />
+</svg>
