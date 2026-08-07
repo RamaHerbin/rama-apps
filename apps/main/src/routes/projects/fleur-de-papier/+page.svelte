@@ -91,14 +91,6 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Fleur de Papier · Case Study · Rama Herbin</title>
-	<meta
-		name="description"
-		content="Case study: interactive, educational web experiences built at Fleur de Papier for cultural institutions: BnF Richelieu, La Contemporaine, Terre Adélice and more. 2020-2023."
-	/>
-</svelte:head>
-
 {#snippet tagList(slug: string, size: "sm" | "xs" = "sm")}
 	{@const key = `productions.${slug}.tags`}
 	<div class="flex flex-wrap gap-2" data-edit-list={key}>

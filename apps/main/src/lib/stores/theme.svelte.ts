@@ -43,12 +43,34 @@ const resolvedTheme = $derived<ResolvedTheme>(
 // Initialization
 // =============================================================================
 
+/**
+ * Read the stored preference, tolerating a storage layer that throws.
+ *
+ * `localStorage` is not merely empty under "block all cookies", Firefox with
+ * cookies disabled, or some enterprise/partitioned contexts — the *getter*
+ * itself throws. Unguarded, that exception escapes `initialize()`, which runs
+ * bare at module scope (see the bottom of this file), so the whole chunk fails
+ * to evaluate, the layout node's dynamic import rejects, and `kit.start()`
+ * never completes: the entire site silently loses hydration on every route.
+ *
+ * The anti-FOUC script in src/app.html is guarded the same way and must stay
+ * in lockstep with the allow-list below.
+ */
+function readStoredTheme(): Theme | null {
+	try {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		return saved && ["light", "dark", "system"].includes(saved) ? (saved as Theme) : null;
+	} catch {
+		return null;
+	}
+}
+
 function initialize() {
 	if (!browser) return;
 
 	// Load saved theme preference
-	const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
-	if (saved && ["light", "dark", "system"].includes(saved)) {
+	const saved = readStoredTheme();
+	if (saved) {
 		theme = saved;
 	}
 
@@ -91,7 +113,26 @@ function applyTheme() {
 		root.classList.remove("dark");
 	}
 
-	// Update meta theme-color for mobile browsers
+	// Update meta theme-color for mobile browsers.
+	//
+	// Three-way contract — all three must agree or the browser chrome desyncs from the page:
+	//   1. src/app.html ships exactly ONE <meta name="theme-color" content="#0a0a0a">,
+	//      matching the dark default the anti-FOUC script resolves to.
+	//   2. src/routes/layout.css  :root { --background: oklch(1 0 0) }     → #ffffff (light)
+	//      src/routes/layout.css  .dark { --background: oklch(0.145 0 0) } → #0a0a0a (dark)
+	//   3. this block, which swaps between the two at runtime.
+	// oklch(0.145 0 0) is #0a0a0a exactly; do not "fix" it to #252525, which is
+	// oklch(0.269 0 0) — that is --border, not --background.
+	//
+	// The values are hardcoded on purpose rather than read from
+	// getComputedStyle(document.documentElement).getPropertyValue("--background"):
+	// that returns the literal "oklch(0.145 0 0)" string, and theme-color parsing of
+	// oklch() is not universally supported (older iOS Safari drops the tag entirely,
+	// leaving the status bar on the previous theme's color).
+	//
+	// Note: until the icons/SEO work added the meta tag to app.html, this querySelector
+	// found nothing and the whole block was a permanent no-op. It only does something now
+	// because that tag exists — if you ever remove it from app.html, remove this too.
 	const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 	if (metaThemeColor) {
 		metaThemeColor.setAttribute("content", resolved === "dark" ? "#0a0a0a" : "#ffffff");
@@ -108,7 +149,13 @@ function applyTheme() {
 export function setTheme(newTheme: Theme) {
 	theme = newTheme;
 	if (browser) {
-		localStorage.setItem(STORAGE_KEY, newTheme);
+		try {
+			localStorage.setItem(STORAGE_KEY, newTheme);
+		} catch {
+			// Storage blocked or over quota: the toggle still works for this
+			// session, it just will not survive a reload. Never let it throw —
+			// this runs from a click handler in NavAnchor.
+		}
 		applyTheme();
 	}
 }
@@ -187,7 +234,7 @@ export function isLight(): boolean {
  */
 export function createThemeState() {
 	// Initialize on first use (client-side only)
-	if (browser && theme === "system" && !localStorage.getItem(STORAGE_KEY)) {
+	if (browser && theme === "system" && !readStoredTheme()) {
 		initialize();
 	}
 

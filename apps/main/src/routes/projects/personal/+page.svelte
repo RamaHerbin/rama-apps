@@ -3,14 +3,6 @@
 	import { c, cList } from "$lib/content/index.js";
 </script>
 
-<svelte:head>
-	<title>Personal Projects - Rama Herbin</title>
-	<meta
-		name="description"
-		content="Personal projects and creative experiments by Rama Herbin. FancyUI Svelte component library, portfolio iterations, blog platform, and technical explorations."
-	/>
-</svelte:head>
-
 <div class="min-h-screen">
 	<!-- Navigation -->
 	<NavAnchor />

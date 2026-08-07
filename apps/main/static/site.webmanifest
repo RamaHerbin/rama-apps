@@ -1,0 +1,41 @@
+{
+	"id": "/",
+	"name": "Rama Herbin — Front-End & UI Engineer",
+	"short_name": "Rama Herbin",
+	"description": "Portfolio of Rama Herbin, front-end and UI engineer in Lyon: case studies, cultural web experiences, photography and open-source Svelte.",
+	"lang": "en",
+	"dir": "ltr",
+	"start_url": "/",
+	"scope": "/",
+	"display": "minimal-ui",
+	"orientation": "any",
+	"background_color": "#0a0a0a",
+	"theme_color": "#0a0a0a",
+	"categories": ["portfolio", "personal", "design", "developer"],
+	"icons": [
+		{
+			"src": "/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/icon-maskable-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
+}

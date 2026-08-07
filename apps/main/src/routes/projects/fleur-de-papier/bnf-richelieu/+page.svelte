@@ -37,14 +37,6 @@
 	</div>
 {/snippet}
 
-<svelte:head>
-	<title>BnF Richelieu · Fleur de Papier · Rama Herbin</title>
-	<meta
-		name="description"
-		content="An interactive digital experience for the Richelieu site of the Bibliothèque nationale de France: collection highlights explorable by touch."
-	/>
-</svelte:head>
-
 <div class="relative min-h-screen overflow-x-clip">
 	<FilmGrain />
 	<NavAnchor />

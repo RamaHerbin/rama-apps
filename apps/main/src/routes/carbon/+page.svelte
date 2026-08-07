@@ -3,14 +3,6 @@
 	import { c } from "$lib/content/index.js";
 </script>
 
-<svelte:head>
-	<title>Carbon Footprint - Rama Herbin</title>
-	<meta
-		name="description"
-		content="Learn about the environmental optimization strategies used in this portfolio website."
-	/>
-</svelte:head>
-
 <div class="min-h-screen bg-black text-white">
 	<!-- Navigation back to home -->
 	<nav class="border-b border-white/10 px-6 py-4">
