@@ -6,5 +6,6 @@
 -->
 <div
 	aria-hidden="true"
+	data-retro-hide
 	class="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-24 isolate transform-gpu will-change-transform bg-background/90 backdrop-blur-[4px] transition-colors duration-300 [mask-image:linear-gradient(to_bottom,transparent_0%,black_100%)]"
 ></div>

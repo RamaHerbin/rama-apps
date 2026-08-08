@@ -164,14 +164,17 @@ html[data-skin="brutal"] {
 /* ---------------------------------------------------------------------------
    retro-os — engine tokens (fancy-ui/dist/cameleon/skins/retro-os/tokens.js)
    "Hard-shadow desktop chrome": desk/panel/card paper stack, ink borders.
-   17 tokens; two are deliberately omitted here:
-     --skin-desk (#E5DCC2) is the surface OUTSIDE the window chassis, and the
-       chassis is explicitly not being ported. Declaring it would invite someone
+   17 tokens; one is deliberately omitted here:
+     --skin-desk (#E5DCC2) is the surface OUTSIDE the window chassis, and no
+       chassis is ported — the retro tree's windows sit straight on the page, so
+       the canvas is --skin-page-bg. Declaring --skin-desk would invite someone
        to reach for it as a page background, which is wrong.
-     --skin-font-pixel ('Silkscreen', 'IBM Plex Mono', monospace) exists only for
-       titlebars and the taskbar — again, chassis. app.html does not request
-       Silkscreen, so the token would silently resolve to its IBM Plex Mono
-       fallback: a variable whose name lies about what it renders.
+   --skin-font-pixel WAS omitted for the same "no chassis" reason, and is now
+   declared: src/routes/retro.css aliases it as --r-font-pixel, and the retro
+   tree renders every window titlebar, button and chip in it. It is only
+   truthful because app.html requests Silkscreen again in the retro-os font URL
+   (see $lib/skins/registry.ts) — without that the token resolves to its IBM
+   Plex Mono fallback and its name lies about what it renders.
    --------------------------------------------------------------------------- */
 html[data-skin="retro-os"] {
 	--skin-page-bg: #f1e9d4;
@@ -189,6 +192,10 @@ html[data-skin="retro-os"] {
 	--skin-purple: #7d6414; /* not purple: a dark-gold stand-in so the five-accent contract still yields 5 */
 	--skin-font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
 	--skin-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+	/* Consumed by the retro tree only, through --r-font-pixel in retro.css. The
+	   semantic bridge below never maps it: no Tailwind utility in the standard
+	   tree should ever render in a pixel face. */
+	--skin-font-pixel: "Silkscreen", "IBM Plex Mono", monospace;
 
 	/* --radius: flattened to zero, unlike brutal — because here the engine asks
 	   for it. retro-os.css squares its own primitives outright (`.ds-card

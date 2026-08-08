@@ -17,6 +17,15 @@
    and `.dark` at (0,1,0). So this file wins over the base theme below no matter which side of it
    the base theme sits on — exactly the same argument the :root/:root.dark pair relies on. */
 @import "./skins.css";
+/* Retro-OS's structural half: the `data-tree` seam that swaps the whole standard section
+   tree for src/lib/retro's window chassis, plus the --r-* palette that tree is built from.
+   Separate from skins.css because it is a different KIND of thing — skins.css re-paints the
+   existing markup through the semantic tokens, this one chooses between two different sets of
+   markup — and because everything in it is inert unless `data-skin="retro-os"` is on <html>.
+   Same @import-must-come-first constraint and the same answer as above: placement carries no
+   cascade meaning, specificity decides. Nothing in retro.css collides with skins.css anyway —
+   it declares only `--r-*` names and `[data-tree]` / `[data-retro-hide]` rules. */
+@import "./retro.css";
 
 /* Scan the PUBLISHED subtree, not the package root.
    `fancy-ui-svelte` ships everything it publishes under dist/fancy-ui — the package's own
