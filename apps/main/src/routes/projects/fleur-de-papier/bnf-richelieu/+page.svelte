@@ -1,6 +1,18 @@
 <script lang="ts">
+	/**
+	 * Seam route — both design trees are rendered, src/routes/retro.css picks one.
+	 * See the long-form note in src/routes/+page.svelte.
+	 *
+	 * THE LIGHTBOX IS HOISTED to route level so ONE instance serves both trees
+	 * (the hidden tree is `display: none`, not absent — two dialogs would mean two
+	 * <video> elements and two focus traps). The standard tree still flips
+	 * `lightboxOpen` inline exactly as before; the retro tree gets `openLightbox`
+	 * as a prop, matching the Fleur de Papier route's shape.
+	 */
 	import { NavAnchor, Footer } from "$lib/portfolio/index.js";
 	import { c } from "$lib/content/index.js";
+	import { createSkinState } from "$lib/stores/skin.svelte.js";
+	import RetroBnfPage from "$lib/retro/pages/RetroBnfPage.svelte";
 	import {
 		FilmGrain,
 		ContextBar,
@@ -13,12 +25,22 @@
 		bnfMeta
 	} from "$lib/portfolio/work/index.js";
 
+	const skinState = createSkinState();
+
 	// `productions` is a frozen data contract — bnf-richelieu is always index 0,
 	// but look it up by slug so this page doesn't silently break if the order changes.
 	const production = productions.find((p) => p.slug === "bnf-richelieu")!;
 	const video = production.video!;
 
 	let lightboxOpen = $state(false);
+
+	/** The route's single opener, handed to the retro tree. It takes no argument
+	    because this page has exactly one video — a `() => void` is assignable to
+	    `RetroBnfPage`'s `(p: Production) => void`, so the prop shape stays shared
+	    with the Fleur de Papier route without inventing a production to pass. */
+	function openLightbox(): void {
+		lightboxOpen = true;
+	}
 
 	const FIG_BASE = "/videos/fleur-de-papier";
 </script>
@@ -37,6 +59,8 @@
 	</div>
 {/snippet}
 
+{#if skinState.skin !== "retro-os"}
+<div data-tree="std">
 <div class="relative min-h-screen overflow-x-clip">
 	<FilmGrain />
 	<NavAnchor />
@@ -106,13 +130,6 @@
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
 			</MediaFrame>
-			<VideoLightbox
-				bind:open={lightboxOpen}
-				webm={video.webm}
-				mp4={video.mp4}
-				fileLabel={`${video.fileLabel}.MP4`}
-				title={production.title}
-			/>
 		</div>
 	</header>
 
@@ -282,3 +299,18 @@
 
 	<Footer />
 </div>
+</div>
+{/if}
+
+<div data-tree="retro">
+	<RetroBnfPage {openLightbox} />
+</div>
+
+<!-- Outside both trees: one lightbox for the whole route (see the header note). -->
+<VideoLightbox
+	bind:open={lightboxOpen}
+	webm={video.webm}
+	mp4={video.mp4}
+	fileLabel={`${video.fileLabel}.MP4`}
+	title={production.title}
+/>

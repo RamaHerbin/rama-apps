@@ -137,11 +137,20 @@ export interface SkinDef {
  * (fancy-ui: dist/cameleon/skins/<skin>/tokens.js) and must stay equal to the
  * `--skin-page-bg` written in src/routes/skins.css.
  *
- * `fontHref` is the engine's own font URL (dist/cameleon/skins/<skin>/index.js)
- * MINUS Silkscreen for retro-os: Silkscreen exists there only for window
- * titlebars and the taskbar, and this port deliberately ships tokens + skin CSS
- * with no desktop chassis, so it would be the most conspicuous font swap of the
- * set with zero consumers. Do not "restore" it without a consumer.
+ * `fontHref` is the engine's own font URL (dist/cameleon/skins/<skin>/index.js),
+ * verbatim for both skins.
+ *
+ * retro-os's URL used to be trimmed of `&family=Silkscreen:wght@400;700`. That
+ * was correct while the skin was a re-paint and nothing else: the engine wants
+ * Silkscreen for window titlebars and a taskbar, the first pass of this port
+ * shipped tokens + skin CSS with no chassis at all, and a webfont downloaded for
+ * zero consumers is the most conspicuous kind of waste. The retro-os TREE
+ * (src/lib/retro/, selected by the `data-tree` seam in src/routes/retro.css) is
+ * that consumer: every window titlebar, button, chip and status strip in it
+ * renders in `--r-font-pixel`, which resolves through `--skin-font-pixel` to
+ * Silkscreen. Drop the segment again and none of that errors — it silently falls
+ * back to IBM Plex Mono and the chrome stops reading as pixels. So it stays for
+ * as long as that tree exists, and skins.css must keep declaring the token.
  */
 export const SKINS: Record<SkinName, SkinDef> = {
 	standard: {
@@ -165,10 +174,12 @@ export const SKINS: Record<SkinName, SkinDef> = {
 		// NOT --skin-desk (#E5DCC2): the desk is the surface *outside* the window
 		// chassis, and this port has no chassis, so the page is the paper.
 		themeColor: "#F1E9D4",
-		// Archivo + IBM Plex Mono, from retroOsSkin.fonts[0].href with the
-		// `&family=Silkscreen:wght@400;700` segment removed.
+		// Archivo + IBM Plex Mono + Silkscreen, verbatim from
+		// retroOsSkin.fonts[0].href. Silkscreen is load-bearing: it is the face
+		// behind --skin-font-pixel / --r-font-pixel, i.e. every titlebar, button
+		// and chip in the retro tree. See the note above the object.
 		fontHref:
-			"https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+			"https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap"
 	}
 };
 

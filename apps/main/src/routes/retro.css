@@ -1,0 +1,144 @@
+/* ============================================================================
+   Retro-OS — the dual-tree seam, and the --r-* vocabulary the retro tree is
+   built out of.
+
+   WHY THIS SKIN NEEDS A SECOND TREE AT ALL
+   `standard` and `brutal` are pure re-paints. skins.css re-declares the
+   semantic tokens under `html[data-skin="…"]`, every `bg-background` /
+   `border-border` utility in the app resolves to a different value, and not one
+   line of markup changes. Retro-OS cannot work that way: it is a different
+   LAYOUT — window chassis with titlebars and DOS labels, a notched hero frame,
+   hard offset shadows, a status strip, pixel type — so there is no assignment of
+   token VALUES that turns the standard sections into it.
+
+   So a skinnable page renders both designs and lets CSS choose one:
+
+       <div data-tree="std">   …$lib/portfolio sections… </div>
+       <div data-tree="retro"> …$lib/retro components…   </div>
+
+   and this file is the choice. Exactly one subtree is ever displayed; the other
+   is `display: none`, so it costs no layout and no paint. It does cost HTML
+   bytes and hydration work, and that is the deliberate price of a structural
+   skin on a site with no server to branch on.
+
+   WHY `display`, AND NOT `{#if skin === "retro-os"}`
+   Same argument as src/lib/skins/registry.ts, one layer down. The site is fully
+   prerendered (`prerender = true`), so at build time there is no visitor and no
+   stored preference to read — the emitted HTML is skin-agnostic by construction.
+   The anti-FOUC IIFE in src/app.html resolves the skin from localStorage and
+   writes `data-skin` onto <html> BEFORE first paint; CSS is the only mechanism
+   that can act on that in the same frame. A Svelte `{#if}` reading the skin
+   store only evaluates after hydration, which is one full paint too late: every
+   retro-os visitor would see the standard portfolio flash first, then swap.
+
+   WHY THE BASE RULE IS UNQUALIFIED
+   `[data-tree="retro"]` hides the retro tree by DEFAULT, not `[data-skin]:not(…)`.
+   Failing closed matters here: with scripting disabled nothing ever writes
+   `data-skin`, and the correct outcome is the standard portfolio — not both
+   trees stacked on top of each other. The retro tree only ever appears because
+   something positively asserted the skin.
+
+   WHY THE WRAPPER MUST NOT CARRY THE `hidden` ATTRIBUTE
+   The obvious belt-and-braces move — `<div data-tree="retro" hidden>` — is a
+   trap. Since the hidden=until-found work, Chromium's UA stylesheet hides
+   [hidden] with `display: none !important`, and UA !important outranks every
+   author rule, important or not. The reveal rule below can then never fire and
+   the retro tree is unconditionally invisible (measured on Chrome 140). This
+   stylesheet ships in the render-blocking bundle, so the base rule alone
+   already covers the no-JS case; the only consumers that ever see both trees
+   are no-CSS readers, which linearise the standard tree first.
+
+   `[data-retro-hide]` is the escape hatch for elements that belong to NEITHER
+   tree: root-layout siblings (ScrollBlurOverlay) that have no retro counterpart
+   and would paint standard-theme chrome over the retro page.
+
+   ORDER IS NOT LOAD-BEARING (again). The base rule is (0,1,0); every skinned
+   rule is (0,1,1) and outranks it from anywhere in the cascade — the same
+   specificity-over-source-order argument skins.css documents at length.
+   ============================================================================ */
+
+[data-tree="retro"] { display: none; }
+html[data-skin="retro-os"] [data-tree="retro"] { display: block; }
+html[data-skin="retro-os"] [data-tree="std"] { display: none; }
+html[data-skin="retro-os"] [data-retro-hide] { display: none; }
+
+/* ---------------------------------------------------------------------------
+   The --r-* tokens — the retro tree's ENTIRE colour and pixel-font vocabulary.
+
+   Every component under src/lib/retro/ reads colour, border and shadow values
+   from these names (or from the `.r-*` recipe classes in
+   src/lib/retro/retro.css, which read them in turn) and from nothing else. Not
+   from the semantic bridge utilities (`bg-background`, `text-muted-foreground`,
+   `border-border`): those are shaped for the standard tree's needs, they carry
+   `dark:` history, and half the retro palette has no semantic name at all.
+
+   ALIAS WHERE THE ENGINE HAS THE VALUE, LITERAL WHERE IT DOES NOT.
+   The seven aliases below point at the tokens skins.css transcribes from
+   fancy-ui's dist/cameleon/skins/retro-os/tokens.js, so if that upstream palette
+   is ever retuned the retro tree follows it for free. The literals are values
+   the engine deliberately does NOT ship as tokens — its own note calls #ECD77F
+   "a fill tint, not an accent" — plus the four tint fills, the four avatar
+   fills, and one text ink that sits between --skin-ink and --skin-muted.
+
+   Scoped to `html[data-skin="retro-os"]` rather than `:root` on purpose: these
+   names must not resolve while another skin is active. A retro component that
+   somehow escapes the seam then renders visibly broken (unset colours) instead
+   of quietly painting cream-on-cream inside the standard page.
+   --------------------------------------------------------------------------- */
+
+html[data-skin="retro-os"] {
+	/* --- Paper stack ------------------------------------------------------ */
+	/* The canvas is the PAGE, not the engine's --skin-desk (#E5DCC2): the desk is
+	   the surface outside a window chassis, and this port has no chassis — the
+	   windows sit straight on the page. Same call registry.ts documents for
+	   themeColor. */
+	--r-canvas: var(--skin-page-bg); /* #F1E9D4 */
+	--r-paper: var(--skin-card); /* #FAF5E6 — every window, card and frame fill */
+
+	/* --- Ink and text ----------------------------------------------------- */
+	--r-ink: var(--skin-ink); /* #191308 — borders, shadows, primary text */
+	--r-muted: var(--skin-muted); /* #5C5340 — DOS labels, mono eyebrows, meta */
+	/* --r-prose: body copy inside cards. Deliberately its own value rather than
+	   ink or muted: paragraphs set in full ink read too heavy against 2px ink
+	   borders, and muted is too light to carry a 13.5px/1.6 paragraph. */
+	--r-prose: #3D3629;
+	/* --r-btn: the primary button / highlight fill. The engine keeps this out of
+	   its token set on purpose (tokens.js: "the lighter #ECD77F is a fill tint,
+	   not an accent"), so it is a literal here and has no --skin-* equivalent to
+	   alias. Do not reach for --skin-yellow (#B8912B) instead — that is the gold
+	   ACCENT, four steps darker, and ink on it is a different relationship. */
+	--r-btn: #ECD77F;
+
+	/* --- Accents ---------------------------------------------------------- */
+	/* Four of the engine's five. --skin-purple (#7D6414, itself a dark-gold
+	   stand-in) has no role in this design and is deliberately not aliased. */
+	--r-blue: var(--skin-blue); /* #3F62A7 */
+	--r-rust: var(--skin-red); /* #A0442F */
+	--r-gold: var(--skin-yellow); /* #B8912B */
+	--r-green: var(--skin-green); /* #3A6B42 */
+
+	/* --- Accent tints ----------------------------------------------------- */
+	/* Pale fills paired one-to-one with the accents above (gold/blue/green/rust):
+	   titlebar backgrounds, tag pills, hero chip strips, definition rows. */
+	--r-tint-gold: #F7EFD2;
+	--r-tint-blue: #E8EDF6;
+	--r-tint-green: #EAF2E4;
+	--r-tint-rust: #F8E8DC;
+
+	/* --- Avatar fills ----------------------------------------------------- */
+	/* Index-mapped across the four testimonial cards, brighter than the tints
+	   because they sit behind initials rather than behind text. */
+	--r-avatar-1: #B9CBE8;
+	--r-avatar-2: #F0BFA8;
+	--r-avatar-3: #B5DCB2;
+	--r-avatar-4: #ECD77F;
+
+	/* --- Pixel face ------------------------------------------------------- */
+	/* Titlebars, buttons, chips, the status strip. Aliased to the engine token,
+	   which src/routes/skins.css declares for this skin — and which is only
+	   truthful because app.html now requests Silkscreen in the retro-os font URL.
+	   Without that request the whole stack silently degrades to IBM Plex Mono and
+	   every window title stops reading as pixels. registry.ts holds the long
+	   form; the build guard keeps the two font URLs equal. */
+	--r-font-pixel: var(--skin-font-pixel);
+}

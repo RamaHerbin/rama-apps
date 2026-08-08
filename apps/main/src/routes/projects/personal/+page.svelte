@@ -1,8 +1,20 @@
 <script lang="ts">
+	/**
+	 * Seam route — both design trees are rendered, src/routes/retro.css picks one.
+	 * See the long-form note in src/routes/+page.svelte; the same three lines
+	 * (skin state, `{#if}` around the standard tree, `[data-tree]` wrappers) mean
+	 * the same thing on every skinnable route.
+	 */
 	import { NavAnchor, Footer } from "$lib/portfolio/index.js";
 	import { c, cList } from "$lib/content/index.js";
+	import { createSkinState } from "$lib/stores/skin.svelte.js";
+	import RetroPersonalPage from "$lib/retro/pages/RetroPersonalPage.svelte";
+
+	const skinState = createSkinState();
 </script>
 
+{#if skinState.skin !== "retro-os"}
+<div data-tree="std">
 <div class="min-h-screen">
 	<!-- Navigation -->
 	<NavAnchor />
@@ -501,4 +513,10 @@
 
 	<!-- Footer -->
 	<Footer />
+</div>
+</div>
+{/if}
+
+<div data-tree="retro">
+	<RetroPersonalPage />
 </div>

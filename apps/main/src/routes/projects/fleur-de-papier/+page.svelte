@@ -1,7 +1,22 @@
 <script lang="ts">
+	/**
+	 * Seam route — both design trees are rendered, src/routes/retro.css picks one.
+	 * See the long-form note in src/routes/+page.svelte.
+	 *
+	 * THE LIGHTBOX IS HOISTED. `VideoLightbox`, `lightboxOpen` and
+	 * `activeProduction` used to live inside the page markup; they now sit at
+	 * route level, outside BOTH trees, with `openLightbox` handed to the retro
+	 * page as a prop. One instance serves both designs — which matters because
+	 * only one tree is `display: none`, not absent: a lightbox per tree would mean
+	 * two dialogs, two `<video>` elements competing for playback, and a focus trap
+	 * in a subtree nobody can see. The standard tree's call sites are untouched;
+	 * they close over the same `openLightbox` they always did.
+	 */
 	import { onMount } from "svelte";
 	import { NavAnchor, Footer } from "$lib/portfolio/index.js";
 	import { c, cList } from "$lib/content/index.js";
+	import { createSkinState } from "$lib/stores/skin.svelte.js";
+	import RetroFdpPage from "$lib/retro/pages/RetroFdpPage.svelte";
 	import {
 		FilmGrain,
 		MetaStrip,
@@ -17,6 +32,8 @@
 		type Production,
 		type ProductionCredit
 	} from "$lib/portfolio/work/index.js";
+
+	const skinState = createSkinState();
 
 	// --- Selected-productions rows ------------------------------------------
 	// The 6 productions render data-driven, in their `layout` variant. The two
@@ -211,6 +228,8 @@
 	{/if}
 {/snippet}
 
+{#if skinState.skin !== "retro-os"}
+<div data-tree="std">
 <div class="relative min-h-screen overflow-x-clip">
 	<FilmGrain />
 	<NavAnchor />
@@ -635,12 +654,19 @@
 		centerKey="fdp.context-bar.center"
 		next={{ href: "/projects/personal", labelKey: "fdp.context-bar.next-label" }}
 	/>
-
-	<VideoLightbox
-		bind:open={lightboxOpen}
-		webm={activeProduction?.video?.webm}
-		mp4={activeProduction?.video?.mp4}
-		fileLabel={activeProduction?.video ? `${activeProduction.video.fileLabel}.MP4` : ""}
-		title={activeProduction?.title ?? "Video"}
-	/>
 </div>
+</div>
+{/if}
+
+<div data-tree="retro">
+	<RetroFdpPage {openLightbox} />
+</div>
+
+<!-- Outside both trees: one lightbox for the whole route (see the header note). -->
+<VideoLightbox
+	bind:open={lightboxOpen}
+	webm={activeProduction?.video?.webm}
+	mp4={activeProduction?.video?.mp4}
+	fileLabel={activeProduction?.video ? `${activeProduction.video.fileLabel}.MP4` : ""}
+	title={activeProduction?.title ?? "Video"}
+/>

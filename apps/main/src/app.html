@@ -131,10 +131,13 @@
 					},
 					'retro-os': {
 						themeColor: '#F1E9D4',
-						// Archivo + IBM Plex Mono. Silkscreen dropped: the engine wants it for the
-						// titlebars/taskbar chassis, and no chassis is ported.
+						// Archivo + IBM Plex Mono + Silkscreen, the engine's URL unmodified.
+						// Silkscreen was dropped while this skin was a re-paint with no chassis;
+						// the retro tree (src/lib/retro, selected by src/routes/retro.css) now
+						// renders every titlebar, button and chip in it via --r-font-pixel.
+						// Removing it does not error — it silently degrades to IBM Plex Mono.
 						fontHref:
-							'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'
+							'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap'
 					}
 				};
 
