@@ -2,6 +2,67 @@
 	import { onMount } from "svelte";
 	import { FluidCursor, InteractiveGridPattern, BlurReveal, RainbowButton } from "fancy-ui-svelte";
 	import { c } from "$lib/content/index.js";
+	import { createSkinState } from "$lib/stores/skin.svelte.js";
+	import type { SkinName } from "$lib/skins/registry.js";
+
+	const skinState = createSkinState();
+
+	/**
+	 * Per-skin fluid treatment for the hero.
+	 *
+	 * Both skins swap the smooth HDR fluid for the engine's ordered-dither
+	 * display pass, which snaps the dye to a chunky pixel grid and quantizes each
+	 * channel against a 4x4 Bayer matrix. Cells that quantize to black stay fully
+	 * transparent, so it composites over the cream page without a dark box.
+	 *
+	 * Colours are each skin's own accents rather than the default neon: the
+	 * palettes are light and warm, and the stock cyan/magenta reads as a foreign
+	 * object on them.
+	 *
+	 * Note `dither` forces the WebGL renderer and makes `hdr` a no-op, so the HDR
+	 * props are deliberately NOT passed under a skin instead of being left dead.
+	 */
+	interface DitherConfig {
+		/** Size of one dithered cell in CSS pixels. */
+		ditherPixelSize: number;
+		/** Colour levels per channel; lower quantizes harder. */
+		ditherLevels: number;
+		fluidColors: string[];
+	}
+
+	/**
+	 * Both skins put the fluid on a light page (#f4eee0 / #f1e9d4), which is the
+	 * opposite of what the effect is tuned for — the engine's own example runs it
+	 * on black. Two knobs compensate, and both are needed:
+	 *
+	 * - `colorIntensity` well above the 0.15 default, because the dither drops any
+	 *   cell that quantizes to black; at the default the dye barely crosses the
+	 *   first quantization step and the trail reads as scattered specks.
+	 * - `densityDissipation` below the 3.5 default so the trail survives long
+	 *   enough to be read as a trail. On a dark page the dots carry themselves;
+	 *   on cream they need the persistence.
+	 */
+	const DITHER_INTENSITY = 0.6;
+	const DITHER_DISSIPATION = 3;
+
+	const DITHER: Record<Exclude<SkinName, "standard">, DitherConfig> = {
+		// Bolder, flatter quantization to match the poster-like flat fills.
+		brutal: {
+			ditherPixelSize: 3,
+			ditherLevels: 3,
+			fluidColors: ["#e5372b", "#1b6ef3", "#f5b40c", "#12a147"],
+		},
+		// Chunkier cells: this skin is a pixel OS, so the grid should read as one.
+		"retro-os": {
+			ditherPixelSize: 4,
+			ditherLevels: 4,
+			fluidColors: ["#a0442f", "#3f62a7", "#b8912b", "#3a6b42"],
+		},
+	};
+
+	const dither = $derived<DitherConfig | null>(
+		skinState.skin === "standard" ? null : DITHER[skinState.skin]
+	);
 
 	let heroSectionRef: HTMLDivElement | undefined = $state();
 	let showInteractiveElements = $state(false);
@@ -28,17 +89,42 @@
 >
 	<!--
 		Fluid Cursor - contained to this section only, never full-screen/global.
-		HDR path: WebGPU rgba16float + display-p3 with extended tone mapping, so
-		the splats glow past SDR white on an HDR display in a WebGPU browser;
-		gracefully falls back to the WebGL cursor everywhere else.
+
+		Standard skin, HDR path: WebGPU rgba16float + display-p3 with extended tone
+		mapping, so the splats glow past SDR white on an HDR display in a WebGPU
+		browser; gracefully falls back to the WebGL cursor everywhere else.
+
+		Brutal / Retro OS: the ordered-dither bitmap pass instead (see DITHER above).
+
+		The `{#key}` is load-bearing, not cosmetic. The engine reads its simulation
+		and dither props ONCE, at mount, so a runtime skin switch would otherwise
+		leave the previous treatment on screen until a full reload. Keying on the
+		skin name tears the canvas down and rebuilds it. It keys on the NAME rather
+		than the config object so that a re-render never remounts by identity.
 	-->
-	<FluidCursor
-		contained
-		simResolution={128}
-		hdr
-		hdrBoost={2}
-		class="absolute inset-0 -z-10"
-	/>
+	{#key skinState.skin}
+		{#if dither}
+			<FluidCursor
+				contained
+				simResolution={128}
+				dither
+				ditherPixelSize={dither.ditherPixelSize}
+				ditherLevels={dither.ditherLevels}
+				fluidColors={dither.fluidColors}
+				colorIntensity={DITHER_INTENSITY}
+				densityDissipation={DITHER_DISSIPATION}
+				class="absolute inset-0 -z-10"
+			/>
+		{:else}
+			<FluidCursor
+				contained
+				simResolution={128}
+				hdr
+				hdrBoost={2}
+				class="absolute inset-0 -z-10"
+			/>
+		{/if}
+	{/key}
 
 	<!--
 		Interactive Grid Pattern Background.
