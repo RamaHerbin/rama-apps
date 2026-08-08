@@ -56,7 +56,7 @@
 		{#if indexLabel}
 			<span class="r-mono r-window-index">{indexLabel}</span>
 		{/if}
-		<span class="r-pixel r-window-title" data-edit={titleKey}>{c(titleKey)}</span>
+		<h2 class="r-pixel r-window-title" data-edit={titleKey}>{c(titleKey)}</h2>
 		<span class="r-window-spacer"></span>
 		<span class="r-mono r-window-dos" data-edit={dosKey}>{c(dosKey)}</span>
 	</div>
@@ -97,6 +97,7 @@
 	}
 
 	.r-window-title {
+		margin: 0;
 		font-size: 12px;
 		text-transform: uppercase;
 	}

@@ -191,7 +191,7 @@
 			prev={{
 				kickerKey: "fdp.prev-next.prev.eyebrow",
 				titleKey: "fdp.prev-next.prev.title",
-				href: "/"
+				href: "/#retro-projects"
 			}}
 			next={{
 				kickerKey: "fdp.prev-next.next.eyebrow",

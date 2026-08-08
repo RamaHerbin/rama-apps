@@ -17,11 +17,13 @@
 	 * carry; it is repeated per page rather than hoisted into the routes because
 	 * the routes must stay a pure seam (see src/routes/retro.css).
 	 *
-	 * WHY NO <main>
+	 * WHY THIS TREE OWNS ITS OWN <main>
 	 * The standard tree's `+page.svelte` keeps its own `<main>`, and both trees
-	 * are in the DOM at once — only one is `display: none`. Two `<main>` elements
-	 * in one document is a landmark violation that no CSS can hide, so the retro
-	 * tree stays a plain div stack and lets the standard tree own the landmark.
+	 * are in the DOM at once, but `display: none` (src/routes/retro.css) removes
+	 * a subtree from the accessibility tree along with its landmarks. So exactly
+	 * one `<main>` is ever exposed to assistive tech — never two — and the retro
+	 * tree needs its own so screen-reader users aren't left without any main
+	 * landmark while it is the visible one.
 	 *
 	 * SECTION NUMBERING (01–07) lives in each section, not here: the index is part
 	 * of what a section IS in this design (it is printed in its own titlebar), not
@@ -47,15 +49,17 @@
 	<div class="mx-auto flex w-full max-w-[1120px] flex-col gap-[26px]">
 		<HeaderBar />
 
-		<RetroHero />
+		<main class="contents">
+			<RetroHero />
 
-		<RetroTrusted />
-		<RetroAbout />
-		<RetroWork />
-		<RetroTestimonials />
-		<RetroBeyondCode />
-		<RetroGear />
-		<RetroConnect />
+			<RetroTrusted />
+			<RetroAbout />
+			<RetroWork />
+			<RetroTestimonials />
+			<RetroBeyondCode />
+			<RetroGear />
+			<RetroConnect />
+		</main>
 
 		<RetroFooter variant="home" />
 	</div>
